@@ -26,6 +26,10 @@ public class SignupActivity extends AppCompatActivity {
         common = new Common(this,this);
         userController = new UserController(this,this);
 
+        onClickRegisterButton();
+    }
+
+    private void onClickRegisterButton() {
         binding.registerButton.setOnClickListener(v->{
             String email = binding.emailEditText.getText().toString();
             String name = binding.nameEditText.getText().toString();
@@ -48,7 +52,7 @@ public class SignupActivity extends AppCompatActivity {
                 return;
             }
 
-            User user = new User(email, name, password);
+            User user = new User(name, email, password);
             userController.createUser(user);
         });
     }
