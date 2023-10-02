@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.meeting_android.common.TokenManager;
+import com.example.meeting_android.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
 
