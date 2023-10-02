@@ -2,11 +2,7 @@ package com.example.meeting_android.api.user;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.CountDownTimer;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meeting_android.common.Common;
 
@@ -36,12 +32,15 @@ public class UserController {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     common.alertDialog(mContext,"성공","회원가입이 완료되었습니다.");
-                }
+                }else {
 
+                }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                String errorMessage = t.getMessage(); // 예외 메시지 가져오기
+                Toast.makeText(mContext, "실패했습니다. 오류: " + errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }

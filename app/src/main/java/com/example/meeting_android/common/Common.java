@@ -22,6 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Common {
     private String[] items = {"앨범에서 선택", "사진 찍기", "프로필 사진 삭제"};
@@ -33,8 +35,6 @@ public class Common {
 
     public int REQUEST_CODE_CAMERA = 2;
     public static int PICK_IMAGES_MULTIPLE = 3;
-
-
 
     public Common(Context context, Activity activity) {
         this.permission = new Permission(context);
@@ -192,5 +192,16 @@ public class Common {
             }
         });
         builder.create().show();
+    }
+
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+    private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+
+    public static boolean isValidEmail(String email) {
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }
