@@ -27,45 +27,15 @@
             android:text="Meeting"
             android:textSize="50dp"
             android:textStyle="bold" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_weight="3"
             android:hint="이메일"
             android:id="@+id/emailEditText"
             android:inputType="textEmailAddress" />
 
-            <Button
-                android:id="@+id/verificationRequest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/gray"
-                android:textColor="@color/black"
-                android:text="인증요청" />
-
-        </LinearLayout>
-        <!-- 인증번호 입력 칸 -->
-        <EditText
-            android:id="@+id/verificationCodeEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            android:hint="인증번호" />
-        <TextView
-            android:id="@+id/timerTextView"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="남은 시간: 03:00"
-            android:textColor="@color/main" />
 
         <EditText
             android:layout_width="match_parent"

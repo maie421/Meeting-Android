@@ -14,20 +14,6 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface UserApi {
-    @Multipart
-    @POST("users")
-    Call<ResponseBody> createUser(@Part("user") User user, @Part MultipartBody.Part image);
-
-    @Multipart
-    @POST("users/update")
-    Call<User> updateUser(@Part("name") String name, @Part MultipartBody.Part image, @Header("Authorization") String token);
-
-    @POST("login")
-    Call<ResponseBody> loginUser(@Body JsonObject body);
-
-    @GET("users/phone/{phone}")
-    Call<ResponseBody> findUserByPhone(@Path("phone") String phone);
-
-    @GET("usersAuth")
-    Call<User> getUser(@Header("Authorization") String token);
+    @POST("users/register")
+    Call<User> createUser(@Body User user);
 }

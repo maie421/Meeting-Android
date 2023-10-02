@@ -35,6 +35,7 @@ public class NotificationController {
         this.mActivity = mActivity;
     }
 
+    /*
     public void sendMain(String email) {
         notificationService.sendMail(email, new Callback<ResponseBody>() {
 
@@ -80,4 +81,5 @@ public class NotificationController {
             }
         });
     }
+    */
 }
