@@ -4,15 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-
-import com.example.meeting_android.R;
 import com.example.meeting_android.common.TokenManager;
-import com.example.meeting_android.databinding.ActivitySplashBinding;
 
 public class SplashActivity extends AppCompatActivity {
-
-    private ActivitySplashBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
