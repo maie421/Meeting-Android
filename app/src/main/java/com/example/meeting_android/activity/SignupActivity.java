@@ -6,15 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.meeting_android.R;
-import com.example.meeting_android.api.notification.NotificationController;
 import com.example.meeting_android.api.user.User;
 import com.example.meeting_android.api.user.UserController;
 import com.example.meeting_android.common.Common;
-import com.example.meeting_android.databinding.ActivityLoginBinding;
 import com.example.meeting_android.databinding.ActivitySignupBinding;
 
 public class SignupActivity extends AppCompatActivity {
