@@ -27,4 +27,12 @@ public class UserService extends ApiService {
         Call<User> call = userApi.createUser(user);
         call.enqueue(callback);
     }
+    public void loginUser(String email,String password, Callback<Authorization> callback){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("email", email);
+        jsonObject.addProperty("password", password);
+
+        Call<Authorization> call = userApi.loginUser(jsonObject);
+        call.enqueue(callback);
+    }
 }
