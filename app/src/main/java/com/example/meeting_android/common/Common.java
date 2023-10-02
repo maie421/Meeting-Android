@@ -26,7 +26,8 @@ import java.time.format.DateTimeFormatter;
 public class Common {
     private String[] items = {"앨범에서 선택", "사진 찍기", "프로필 사진 삭제"};
     private AlertDialog.Builder builder;
-    public static Context context;
+    public Context context;
+    public Activity activity;
     public Uri selectedImage;
     public Permission permission;
 
@@ -35,9 +36,10 @@ public class Common {
 
 
 
-    public Common(Context context) {
+    public Common(Context context, Activity activity) {
         this.permission = new Permission(context);
         this.context = context;
+        this.activity = activity;
     }
 
     public void setSelectedImage(Uri imageUrl, ImageView imageView) {
@@ -66,9 +68,9 @@ public class Common {
         ((Activity) view.getContext()).startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGES_MULTIPLE);
     }
 
-    public static String getRealPathFromUri(Uri uri) {
+    public String getRealPathFromUri(Uri uri) {
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
-        Cursor cursor = context.getContentResolver().query(uri, filePathColumn, null, null, null);
+        Cursor cursor = this.context.getContentResolver().query(uri, filePathColumn, null, null, null);
         cursor.moveToFirst();
         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 
@@ -177,5 +179,18 @@ public class Common {
         int minute = dateTime.getMinute();
 
         return  hour + ":" + minute;
+    }
+
+    public void alertDialog(Context mContext, String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 }
