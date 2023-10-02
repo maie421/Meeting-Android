@@ -38,10 +38,11 @@
             android:layout_marginTop="16dp"
             android:layout_weight="3"
             android:hint="이메일"
+            android:id="@+id/emailEditText"
             android:inputType="textEmailAddress" />
 
             <Button
-                android:id="@+id/tv_verification_request"
+                android:id="@+id/verificationRequest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/gray"
@@ -55,9 +56,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:hint="인증번호" />
         <TextView
             android:id="@+id/tv_timer"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -68,9 +71,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:id="@+id/nameEditText"
             android:hint="닉네임" />
 
         <EditText
+            android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -80,18 +85,19 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/checkPasswordEditText"
             android:layout_marginTop="8dp"
             android:hint="비밀번호 확인"
             android:inputType="textPassword" />
 
         <Button
+            android:id="@+id/registerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/main"
             android:textColor="@color/white"
-            android:text="회원가입"
-            android:onClick="onSignupClick" />
+            android:text="회원가입" />
 
     </LinearLayout>
 </layout>
