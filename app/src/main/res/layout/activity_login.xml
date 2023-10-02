@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.LoginActivity">
+
+    <data>
+
+        <!-- 데이터 바인딩을 위한 변수 정의 -->
+        <variable
+            name="viewModel"
+            type="com.example.meeting_android.activity.LoginActivity" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        tools:context=".activity.LoginActivity">
+
+        <TextView
+            android:id="@+id/logoImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
+            android:text="Meeting"
+            android:textSize="50dp"
+            android:textStyle="bold"
+            android:layout_marginTop="80dp"
+            android:contentDescription="@string/app_name" />
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logoImageView"
+            android:layout_marginTop="16dp"
+            android:hint="이메일" />
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/emailEditText"
+            android:layout_marginTop="8dp"
+            android:hint="비밀번호"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/passwordEditText"
+            android:backgroundTint="@color/main"
+            android:textColor="@color/white"
+            android:layout_marginTop="24dp"
+            android:text="로그인" />
+
+        <TextView
+            android:id="@+id/registerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/loginButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="계정이 없으신가요? 회원가입"
+            android:onClick="onRegisterClick"
+            android:textColor="@color/main" />
+
+    </RelativeLayout>
+</layout>
