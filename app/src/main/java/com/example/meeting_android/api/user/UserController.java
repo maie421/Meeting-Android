@@ -80,7 +80,7 @@ public class UserController {
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     mActivity.startActivity(intent);
                 }else {
-                    Toast.makeText(mContext, "실패했습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "아이디 또는 비밀번호를 잘못 입력했습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
 
