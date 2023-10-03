@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         binding.registerButton.setOnClickListener(v->{
-            Intent intent = new Intent(this, SignupActivity.class);
+            Intent intent = new Intent(this, TermsActivity.class);
             startActivity(intent);
         });
 

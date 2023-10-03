@@ -19,9 +19,12 @@ public class SplashActivity extends AppCompatActivity {
             TokenManager tokenManager = new TokenManager(this);
             String token = tokenManager.getToken();
             if (token != null) {
-                Intent intent = new Intent(this, MeetingMainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                Intent intent = new Intent(this, MeetingMainActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
+                finish();
             }else {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
