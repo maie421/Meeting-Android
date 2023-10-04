@@ -46,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         binding.registerTextView.setOnClickListener(v->{
             Intent intent = new Intent(this, TermsActivity.class);
             startActivity(intent);
+            finish();
         });
 
     }
