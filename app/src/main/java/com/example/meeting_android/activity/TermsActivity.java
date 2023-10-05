@@ -42,6 +42,7 @@ public class TermsActivity extends AppCompatActivity {
             if (binding.termsConditionsCheckBox.isChecked() && binding.privacyCheckBox.isChecked()){
                 Intent intent = new Intent(this, SignupActivity.class);
                 startActivity(intent);
+                finish();
             }else{
                 Toast.makeText(this, "약관에 동의해주세요.", Toast.LENGTH_SHORT).show();
             }
