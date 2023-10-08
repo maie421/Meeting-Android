@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/createRoomButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="25dp"
@@ -24,14 +24,14 @@
             android:adjustViewBounds="true"
             android:background="@color/white"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/imageButton4"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton4"
+            app:layout_constraintBottom_toBottomOf="@+id/addRoomButton"
+            app:layout_constraintEnd_toStartOf="@+id/addRoomButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/imageButton4"
+            app:layout_constraintTop_toTopOf="@+id/addRoomButton"
             app:srcCompat="@drawable/video_icon_128703" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/addRoomButton"
             android:layout_width="0dp"
             android:layout_height="150dp"
             android:layout_marginEnd="31dp"
@@ -41,7 +41,7 @@
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toTopOf="@+id/textView5"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageButton3"
+            app:layout_constraintStart_toEndOf="@+id/createRoomButton"
             app:srcCompat="@drawable/pngwing" />
 
         <TextView
@@ -53,7 +53,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/imageButton3"
+            app:layout_constraintStart_toStartOf="@+id/createRoomButton"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.571" />
 
@@ -65,8 +65,8 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/imageButton4"
-            app:layout_constraintStart_toStartOf="@+id/imageButton4"
+            app:layout_constraintEnd_toEndOf="@+id/addRoomButton"
+            app:layout_constraintStart_toStartOf="@+id/addRoomButton"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.57" />
     </androidx.constraintlayout.widget.ConstraintLayout>
