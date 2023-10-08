@@ -9,8 +9,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.meeting_android.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraVideoCapturer;
@@ -39,6 +41,7 @@ public class MeetingActivity extends AppCompatActivity {
     EglBase.Context eglBaseContext;
     public PeerConnectionFactory peerConnectionFactory;
     SurfaceViewRenderer renderer;
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,21 @@ public class MeetingActivity extends AppCompatActivity {
         requestPermissions();
 
         renderer = findViewById(R.id.View);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.tab_mic) {
+                return true;
+            }
+            if (itemId == R.id.tab_video) {
+                return true;
+            }
+            if (itemId == R.id.tab_chat) {
+                return true;
+            }
+            return false;
+        });
 
     }
 
