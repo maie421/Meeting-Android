@@ -8,12 +8,18 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 
 import com.example.meeting_android.R;
+import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
+import org.java_websocket.drafts.Draft_6455;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
@@ -30,10 +36,22 @@ import org.webrtc.VideoEncoderFactory;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MeetingActivity extends AppCompatActivity {
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+public class MeetingActivity extends AppCompatActivity{
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
     private static final int PERMISSION_REQUEST = 2;
     public VideoCapturer videoCapturer;
@@ -43,6 +61,7 @@ public class MeetingActivity extends AppCompatActivity {
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceViewRenderer renderer;
     public BottomNavigationView bottomNavigationView;
+    public WebSocketClientManager webSocketClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +71,7 @@ public class MeetingActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         onClickButtonNavigation();
+        initWebSocketClient();
         initPeer();
         requestPermissions();
     }
@@ -240,5 +260,48 @@ public class MeetingActivity extends AppCompatActivity {
 
         return missingPermissions.toArray(new String[missingPermissions.size()]);
 
+    }
+
+    private void initWebSocketClient() {
+        try {
+            Log.d("웹소켓", "시작1");
+            // WebSocket 클라이언트 초기화
+            URI serverUri = new URI("ws://192.168.45.1:3000/groupcall");
+
+            // Create an SSLContext that trusts all certificates
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
+            }}, new java.security.SecureRandom());
+
+            // Create custom HTTP headers if needed (for authentication or other purposes)
+            Map<String, String> httpHeaders = new HashMap<>();
+            // Add headers here if necessary
+
+            // Create a WebSocket client with custom SSL context and headers
+            WebSocketClientManager webSocketClient = new WebSocketClientManager(serverUri, httpHeaders);
+
+            // Set the custom SSL context
+            webSocketClient.setSocket(sslContext.getSocketFactory().createSocket());
+            webSocketClient.connect();
+
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (KeyManagementException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
