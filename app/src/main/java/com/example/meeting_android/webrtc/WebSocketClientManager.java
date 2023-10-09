@@ -24,8 +24,8 @@ public class WebSocketClientManager extends WebSocketClient{
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-
         Log.i(TAG, "WebSocket connection opened");
+
         Log.d("웹소켓", "시작");
         JsonObject message = new JsonObject();
         message.addProperty("id", "joinRoom");
