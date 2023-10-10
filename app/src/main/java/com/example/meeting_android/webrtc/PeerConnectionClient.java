@@ -96,12 +96,13 @@ public class PeerConnectionClient {
     private class PCObserver implements PeerConnection.Observer {
         @Override
         public void onIceCandidate(final IceCandidate candidate) {
-            Log.i("웹소켓", String.valueOf(candidate));
+            Log.d(TAG, "그냥 안 나오는 거냐"+String.valueOf(candidate));
             executor.execute(() -> events.onIceCandidate(candidate));
         }
 
         @Override
         public void onIceCandidatesRemoved(final IceCandidate[] candidates) {
+            Log.d(TAG, "여기냐"+String.valueOf(candidates));
             executor.execute(() -> events.onIceCandidatesRemoved(candidates));
         }
 
@@ -204,7 +205,7 @@ public class PeerConnectionClient {
     }
     public interface PeerConnectionEvents {
         /**
-         * Callback fired once local SDP is created and set.
+         * Callback fired once local SDP is created  and set.
          */
         void onLocalDescription(final SessionDescription sdp);
 

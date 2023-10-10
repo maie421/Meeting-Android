@@ -7,10 +7,12 @@ import android.util.Log;
 import com.example.meeting_android.activity.MeetingActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
@@ -46,15 +48,12 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         Log.i(TAG, "WebSocket connection opened");
-        Log.d("웹소켓", "시작");
 
-        // 숫자를 문자열로 변환
         JsonObject message = new JsonObject();
         message.addProperty("id", "joinRoom");
         message.addProperty("name", randomNumberAsString);
-        message.addProperty("roomName", "123");
+        message.addProperty("roomName", "1234");
         sendMessage(message.toString());
-
     }
 
     //서버로 부터 텍스트 메시지를 수신 했을 때 처리
@@ -89,18 +88,37 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
         Log.d(TAG, "iceCandidate");
     }
 
+    //상대방 sdp 가져오기
     private void onReceiveVideoAnswer(JsonObject jsonObject) {
         Log.d(TAG, "onReceiveVideoAnswer");
-        JsonObject message = new Gson().fromJson(jsonObject, JsonObject.class);
-        String sdpAnswer = jsonObject.get("sdpAnswer").getAsString();
+        try {
+            String sdpAnswer = jsonObject.get("sdpAnswer").getAsString();
 
+            // SDP 생성
+            SessionDescription sdp = new SessionDescription(
+                    SessionDescription.Type.ANSWER, sdpAnswer);
+
+            // 로컬 PeerConnection에 SDP 설정
+            SimpleSdpObserver sdpObserver = new SimpleSdpObserver();
+            peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+                @Override
+                public void onSetFailure(String error) {
+                    // setRemoteDescription 실패 시 호출됩니다.
+                    Log.e(TAG, "setRemoteDescription failed: " + error);
+                    // 실패 처리를 수행합니다.
+                }
+            }, sdp);
+
+        } catch (JsonSyntaxException e) {
+            Log.e(TAG, "Error parsing JSON: " + e.getMessage());
+        }
     }
 
     private void onParticipantLeft(JsonObject jsonObject) {
         Log.d(TAG, "onParticipantLeft");
-        
-    }
 
+    }
+    //다른 참가자가 새로 연결 되었을 때 호출
     private void onNewParticipantArrived(JsonObject jsonObject) {
         Log.d(TAG, "onNewParticipantArrived");
 
@@ -112,8 +130,32 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
 //        sendMessage(json.toString());
     }
 
+    //이미 존재하는 참가자 목록
     private void onExistingParticipants(JsonObject jsonObject) {
         Log.d(TAG, "onExistingParticipants");
+        JsonObject json = new JsonObject();
+        MediaConstraints sdpMediaConstraints = new MediaConstraints();
+
+        //본인 sdp 전송
+        peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
+            @Override
+            public void onCreateSuccess(SessionDescription sessionDescription) {
+                Log.d(TAG, "onCreateSuccess");
+                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                    @Override
+                    public void onSetFailure(String error) {
+                        // 실패 시 호출됩니다.
+                        Log.e(TAG, "setLocalDescription failed: " + error);
+                    }
+                }, sessionDescription);
+
+                json.addProperty("sdpOffer",sessionDescription.description);
+                json.addProperty("id", "receiveVideoFrom");
+                json.addProperty("sender", randomNumberAsString);
+
+                sendMessage(json.toString());
+            }
+        }, sdpMediaConstraints);
     }
 
     // WebSocket 연결이 닫혔을 때
@@ -146,9 +188,14 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
 
     @Override
     public void onIceCandidate(IceCandidate candidate) {
+        Log.d(TAG, "그냥 안나오는 거냐"+String.valueOf(candidate));
+        JsonObject message = new JsonObject();
+        message.addProperty("candidate", String.valueOf(candidate));
+        message.addProperty("id", "onIceCandidate");
+        message.addProperty("sender", randomNumberAsString);
 
+        sendMessage(message.toString());
     }
-
     @Override
     public void onIceCandidatesRemoved(IceCandidate[] candidates) {
 
@@ -186,6 +233,25 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
 
     @Override
     public void onPeerConnectionError(String description) {
+
+    }
+    class SimpleSdpObserver implements SdpObserver {
+
+        @Override
+        public void onCreateSuccess(SessionDescription sessionDescription) {
+        }
+
+        @Override
+        public void onSetSuccess() {
+        }
+
+        @Override
+        public void onCreateFailure(String s) {
+        }
+
+        @Override
+        public void onSetFailure(String s) {
+        }
 
     }
 }
