@@ -3,29 +3,37 @@ package com.example.meeting_android.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
 
 import com.example.meeting_android.R;
-import com.example.meeting_android.webrtc.AppRTCClient;
 import com.example.meeting_android.webrtc.PeerConnectionClient;
 import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
+import org.java_websocket.drafts.Draft_6455;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
-import org.webrtc.IceCandidate;
+import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
-import org.webrtc.SessionDescription;
-import org.webrtc.StatsReport;
+import org.webrtc.SoftwareVideoDecoderFactory;
+import org.webrtc.SoftwareVideoEncoderFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoCapturer;
+import org.webrtc.VideoDecoderFactory;
+import org.webrtc.VideoEncoderFactory;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
@@ -37,14 +45,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class MeetingActivity extends AppCompatActivity implements AppRTCClient.SignalingEvents,
-        PeerConnectionClient.PeerConnectionEvents {
+public class MeetingActivity extends AppCompatActivity{
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
     private static final int PERMISSION_REQUEST = 2;
     public VideoCapturer videoCapturer;
@@ -53,7 +61,6 @@ public class MeetingActivity extends AppCompatActivity implements AppRTCClient.S
     public EglBase.Context eglBaseContext;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceViewRenderer renderer;
-    public SurfaceViewRenderer pipRenderer;
     public BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +68,11 @@ public class MeetingActivity extends AppCompatActivity implements AppRTCClient.S
         setContentView(R.layout.activity_meeting);
 
         renderer = findViewById(R.id.View);
-        pipRenderer = findViewById(R.id.pip_video_view);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         onClickButtonNavigation();
         initWebSocketClient();
+        initPeer();
         requestPermissions();
     }
 
@@ -99,18 +106,40 @@ public class MeetingActivity extends AppCompatActivity implements AppRTCClient.S
             public void onFrameResolutionChanged(int i, int i1, int i2) {
                 Log.i("RendererEvents","onFrameResolutionChanged");
             }
-        });
-        pipRenderer.init(eglBaseContext,null);
 
+        });
         rootEglBase = EglBase.create();
         eglBaseContext = rootEglBase.getEglBaseContext();
         surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
         (getLocalVideo(true)).addSink(renderer);
-        (getLocalVideo(true)).addSink(pipRenderer);
     }
 
+    private void initPeer() {
+        PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
+                .builder(getApplicationContext())
+                .setEnableInternalTracer(true)
+                .createInitializationOptions());
 
+        PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
+        Log.i("options : ", options.toString());
+
+        VideoEncoderFactory encoderFactory = new SoftwareVideoEncoderFactory();
+        VideoDecoderFactory decoderFactory = new SoftwareVideoDecoderFactory();
+
+        // STUN 서버 설정
+        List<PeerConnection.IceServer> iceServers = new ArrayList<>();
+        PeerConnection.IceServer stunServer = PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer();
+        iceServers.add(stunServer);
+
+        // PeerConnectionFactory 생성 및 IceServer 추가
+        peerConnectionFactory = PeerConnectionFactory.builder()
+                .setOptions(options)
+                .setVideoEncoderFactory(encoderFactory)
+                .setVideoDecoderFactory(decoderFactory)
+                .createPeerConnectionFactory();
+    }
     public VideoTrack getLocalVideo(boolean isFront){
+
         VideoTrack localVideo;
         // 앞 카메라 요청
         videoCapturer = createVideoCapturer(isFront);
@@ -236,6 +265,8 @@ public class MeetingActivity extends AppCompatActivity implements AppRTCClient.S
             Log.d("웹소켓", "시작1");
             // WebSocket 클라이언트 초기화
             URI serverUri = new URI("ws://192.168.0.141:3000/groupcall");
+
+            // Create an SSLContext that trusts all certificates
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{new X509TrustManager() {
                 public X509Certificate[] getAcceptedIssuers() {
@@ -249,12 +280,17 @@ public class MeetingActivity extends AppCompatActivity implements AppRTCClient.S
                 }
             }}, new java.security.SecureRandom());
 
+            // Create custom HTTP headers if needed (for authentication or other purposes)
             Map<String, String> httpHeaders = new HashMap<>();
+            // Add headers here if necessary
 
+            // Create a WebSocket client with custom SSL context and headers
             WebSocketClientManager webSocketClient = new WebSocketClientManager(serverUri, httpHeaders);
 
+            // Set the custom SSL context
             webSocketClient.setSocket(sslContext.getSocketFactory().createSocket());
             webSocketClient.connect();
+
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -265,85 +301,5 @@ public class MeetingActivity extends AppCompatActivity implements AppRTCClient.S
         } catch (KeyManagementException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void onConnectedToRoom(AppRTCClient.SignalingParameters params) {
-
-    }
-
-    @Override
-    public void onRemoteDescription(SessionDescription sdp) {
-
-    }
-
-    @Override
-    public void onRemoteIceCandidate(IceCandidate candidate) {
-
-    }
-
-    @Override
-    public void onRemoteIceCandidatesRemoved(IceCandidate[] candidates) {
-
-    }
-
-    @Override
-    public void onChannelClose() {
-
-    }
-
-    @Override
-    public void onChannelError(String description) {
-
-    }
-
-    @Override
-    public void onLocalDescription(SessionDescription sdp) {
-
-    }
-
-    @Override
-    public void onIceCandidate(IceCandidate candidate) {
-
-    }
-
-    @Override
-    public void onIceCandidatesRemoved(IceCandidate[] candidates) {
-
-    }
-
-    @Override
-    public void onIceConnected() {
-
-    }
-
-    @Override
-    public void onIceDisconnected() {
-
-    }
-
-    @Override
-    public void onConnected() {
-
-    }
-
-    @Override
-    public void onDisconnected() {
-
-    }
-
-    @Override
-    public void onPeerConnectionClosed() {
-
-    }
-
-    @Override
-    public void onPeerConnectionStatsReady(StatsReport[] reports) {
-
-    }
-
-    @Override
-    public void onPeerConnectionError(String description) {
-
     }
 }
