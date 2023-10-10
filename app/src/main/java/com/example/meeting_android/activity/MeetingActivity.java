@@ -97,122 +97,6 @@ public class MeetingActivity extends AppCompatActivity implements PeerConnection
         });
     }
 
-    public void getVideoTrack(){
-        renderer.setMirror(false);
-        renderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-            //첫 번째 프레임이 렌더링되면 콜백이 실행됩니다.
-            @Override
-            public void onFirstFrameRendered() {
-                Log.i("RendererEvents","onFirstFrameRendered");
-
-            }
-            //렌더링된 프레임 해상도 또는 회전이 변경되면 콜백이 실행됩니다.
-            @Override
-            public void onFrameResolutionChanged(int i, int i1, int i2) {
-                Log.i("RendererEvents","onFrameResolutionChanged");
-            }
-
-        });
-        rootEglBase = EglBase.create();
-        eglBaseContext = rootEglBase.getEglBaseContext();
-        surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
-        (getLocalVideo(true)).addSink(renderer);
-    }
-
-    private void initPeer() {
-        PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
-                .builder(getApplicationContext())
-                .setEnableInternalTracer(true)
-                .createInitializationOptions());
-
-        PeerConnectionFactory.Options options = new PeerConnectionFactory.Options();
-        Log.i("options : ", options.toString());
-
-        VideoEncoderFactory encoderFactory = new SoftwareVideoEncoderFactory();
-        VideoDecoderFactory decoderFactory = new SoftwareVideoDecoderFactory();
-
-        // STUN 서버 설정
-        List<PeerConnection.IceServer> iceServers = new ArrayList<>();
-        PeerConnection.IceServer stunServer = PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer();
-        iceServers.add(stunServer);
-
-        // PeerConnectionFactory 생성 및 IceServer 추가
-        peerConnectionFactory = PeerConnectionFactory.builder()
-                .setOptions(options)
-                .setVideoEncoderFactory(encoderFactory)
-                .setVideoDecoderFactory(decoderFactory)
-                .createPeerConnectionFactory();
-    }
-    public VideoTrack getLocalVideo(boolean isFront){
-
-        VideoTrack localVideo;
-        // 앞 카메라 요청
-        videoCapturer = createVideoCapturer(isFront);
-        Log.w("createVideoCapturer",videoCapturer.toString());
-        VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
-        videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
-
-        // 비디오 캡쳐 : getUserMedia 로 스트림 받아오기 시작?
-        videoCapturer.startCapture(240, 320, 30);
-        localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
-
-        return localVideo;
-
-    }
-
-    private VideoCapturer createVideoCapturer(boolean isFront) {
-
-        Camera1Enumerator enumerator = new Camera1Enumerator(false);
-        final String[] deviceNames = enumerator.getDeviceNames();
-
-        for (String deviceName : deviceNames) {
-            if (isFront ? enumerator.isFrontFacing(deviceName) : enumerator.isBackFacing(deviceName)) {
-                VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, new CameraVideoCapturer.CameraEventsHandler() {
-                    @Override
-                    public void onCameraError(String s) {
-                        Log.w("onCameraError",s);
-                    }
-
-                    @Override
-                    public void onCameraDisconnected() {
-                        Log.w("onCameraDisconnected","");
-
-                    }
-
-                    @Override
-                    public void onCameraFreezed(String s) {
-                        Log.w("onCameraFreezed",s);
-
-                    }
-
-                    @Override
-                    public void onCameraOpening(String s) {
-                        Log.w("onCameraOpening",s);
-
-                    }
-
-                    @Override
-                    public void onFirstFrameAvailable() {
-                        Log.w("onFirstFrameAvailable","");
-
-                    }
-
-                    @Override
-                    public void onCameraClosed() {
-                        Log.w("onCameraClosed","");
-                    }
-                });
-
-                if (videoCapturer != null) {
-                    return videoCapturer;
-                }
-            }
-        }
-
-        return null;
-
-    }
-
     @TargetApi(Build.VERSION_CODES.M)
     private void requestPermissions() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -229,7 +113,6 @@ public class MeetingActivity extends AppCompatActivity implements PeerConnection
             int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST) {
-//            getVideoTrack();
         }
 
     }
@@ -285,18 +168,11 @@ public class MeetingActivity extends AppCompatActivity implements PeerConnection
                 }
             }}, new java.security.SecureRandom());
 
-            // Create custom HTTP headers if needed (for authentication or other purposes)
             Map<String, String> httpHeaders = new HashMap<>();
-            // Add headers here if necessary
-
-            // Create a WebSocket client with custom SSL context and headers
             WebSocketClientManager webSocketClient = new WebSocketClientManager(serverUri, httpHeaders);
 
-            // Set the custom SSL context
             webSocketClient.setSocket(sslContext.getSocketFactory().createSocket());
             webSocketClient.connect();
-
-
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
