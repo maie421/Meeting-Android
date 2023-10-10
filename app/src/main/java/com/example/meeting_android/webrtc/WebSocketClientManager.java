@@ -13,25 +13,32 @@ import org.webrtc.VideoTrack;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Random;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 public class WebSocketClientManager extends WebSocketClient{
     private static final String TAG = "웹소켓";
+    String randomNumberAsString;
 
     public WebSocketClientManager(URI serverUri, Map<String, String> httpHeaders) {
         super(serverUri);
+        Random random = new Random();
+        int randomNumber = random.nextInt(100); //
+        randomNumberAsString = Integer.toString(randomNumber);
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         Log.i(TAG, "WebSocket connection opened");
-
         Log.d("웹소켓", "시작");
+
+        // 숫자를 문자열로 변환
+
         JsonObject message = new JsonObject();
         message.addProperty("id", "joinRoom");
-        message.addProperty("name", "안녕");
+        message.addProperty("name", randomNumberAsString);
         message.addProperty("roomName", "123");
         sendMessage(message.toString());
     }
@@ -86,7 +93,7 @@ public class WebSocketClientManager extends WebSocketClient{
 //        JsonObject json = new JsonObject();
 //        json.addProperty("id", "onIceCandidate");
 //        json.addProperty("candidate", "candidate");
-//        json.addProperty("name", "안녕");
+//        json.addProperty("name", randomNumberAsString);
 //
 //        sendMessage(json.toString());
     }
@@ -117,4 +124,5 @@ public class WebSocketClientManager extends WebSocketClient{
             Log.d(TAG, "에러 message" + message);
         }
     }
+
 }

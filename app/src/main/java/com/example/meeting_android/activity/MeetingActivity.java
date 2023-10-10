@@ -24,11 +24,15 @@ import org.java_websocket.drafts.Draft_6455;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
+import org.webrtc.IceCandidate;
+import org.webrtc.Logging;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
+import org.webrtc.SessionDescription;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
+import org.webrtc.StatsReport;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoCapturer;
@@ -52,16 +56,18 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class MeetingActivity extends AppCompatActivity{
+public class MeetingActivity extends AppCompatActivity implements PeerConnectionClient.PeerConnectionEvents{
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
     private static final int PERMISSION_REQUEST = 2;
     public VideoCapturer videoCapturer;
     public SurfaceTextureHelper surfaceTextureHelper;
+    private boolean isSwappedFeeds;
     public EglBase rootEglBase;
     public EglBase.Context eglBaseContext;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceViewRenderer renderer;
     public BottomNavigationView bottomNavigationView;
+    public PeerConnectionClient peerConnectionClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,10 +75,9 @@ public class MeetingActivity extends AppCompatActivity{
 
         renderer = findViewById(R.id.View);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
         onClickButtonNavigation();
         initWebSocketClient();
-        initPeer();
+        peerConnectionClient = new PeerConnectionClient(this,this, MeetingActivity.this);
         requestPermissions();
     }
 
@@ -224,7 +229,7 @@ public class MeetingActivity extends AppCompatActivity{
             int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST) {
-            getVideoTrack();
+//            getVideoTrack();
         }
 
     }
@@ -301,5 +306,55 @@ public class MeetingActivity extends AppCompatActivity{
         } catch (KeyManagementException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void onLocalDescription(SessionDescription sdp) {
+
+    }
+
+    @Override
+    public void onIceCandidate(IceCandidate candidate) {
+
+    }
+
+    @Override
+    public void onIceCandidatesRemoved(IceCandidate[] candidates) {
+
+    }
+
+    @Override
+    public void onIceConnected() {
+
+    }
+
+    @Override
+    public void onIceDisconnected() {
+
+    }
+
+    @Override
+    public void onConnected() {
+
+    }
+
+    @Override
+    public void onDisconnected() {
+
+    }
+
+    @Override
+    public void onPeerConnectionClosed() {
+
+    }
+
+    @Override
+    public void onPeerConnectionStatsReady(StatsReport[] reports) {
+
+    }
+
+    @Override
+    public void onPeerConnectionError(String description) {
+
     }
 }
