@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
+import org.webrtc.VideoTrack;
 
 import java.net.URI;
 import java.util.Map;
@@ -30,7 +32,7 @@ public class WebSocketClientManager extends WebSocketClient{
         JsonObject message = new JsonObject();
         message.addProperty("id", "joinRoom");
         message.addProperty("name", "안녕");
-        message.addProperty("roomName", "222222222222222222");
+        message.addProperty("roomName", "123");
         sendMessage(message.toString());
     }
 
@@ -68,6 +70,9 @@ public class WebSocketClientManager extends WebSocketClient{
 
     private void onReceiveVideoAnswer(JsonObject jsonObject) {
         Log.d(TAG, "onReceiveVideoAnswer");
+        JsonObject message = new Gson().fromJson(jsonObject, JsonObject.class);
+        String sdpAnswer = jsonObject.get("sdpAnswer").getAsString();
+
     }
 
     private void onParticipantLeft(JsonObject jsonObject) {
@@ -77,11 +82,17 @@ public class WebSocketClientManager extends WebSocketClient{
 
     private void onNewParticipantArrived(JsonObject jsonObject) {
         Log.d(TAG, "onNewParticipantArrived");
+
+//        JsonObject json = new JsonObject();
+//        json.addProperty("id", "onIceCandidate");
+//        json.addProperty("candidate", "candidate");
+//        json.addProperty("name", "안녕");
+//
+//        sendMessage(json.toString());
     }
 
     private void onExistingParticipants(JsonObject jsonObject) {
-        Log.d(TAG, "onNewParticipantArrived");
-        
+        Log.d(TAG, "onExistingParticipants");
     }
 
     // WebSocket 연결이 닫혔을 때

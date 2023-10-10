@@ -8,11 +8,25 @@
 
     <org.webrtc.SurfaceViewRenderer
         android:id="@+id/View"
-        android:layout_width="wrap_content"
+        android:layout_width="410dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/pip_video_view"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/pip_video_view"
+        android:layout_width="412dp"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="7dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/View" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -22,7 +36,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/View"
+        app:layout_constraintTop_toBottomOf="@+id/pip_video_view"
         app:menu="@menu/btm_navi_menu">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
