@@ -56,7 +56,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class MeetingActivity extends AppCompatActivity implements PeerConnectionClient.PeerConnectionEvents{
+public class MeetingActivity extends AppCompatActivity {
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
     private static final int PERMISSION_REQUEST = 2;
     public VideoCapturer videoCapturer;
@@ -77,7 +77,6 @@ public class MeetingActivity extends AppCompatActivity implements PeerConnection
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         onClickButtonNavigation();
         initWebSocketClient();
-        peerConnectionClient = new PeerConnectionClient(this,this, MeetingActivity.this);
         requestPermissions();
     }
 
@@ -169,7 +168,7 @@ public class MeetingActivity extends AppCompatActivity implements PeerConnection
             }}, new java.security.SecureRandom());
 
             Map<String, String> httpHeaders = new HashMap<>();
-            WebSocketClientManager webSocketClient = new WebSocketClientManager(serverUri, httpHeaders);
+            WebSocketClientManager webSocketClient = new WebSocketClientManager(this,this,serverUri, httpHeaders);
 
             webSocketClient.setSocket(sslContext.getSocketFactory().createSocket());
             webSocketClient.connect();
@@ -182,55 +181,5 @@ public class MeetingActivity extends AppCompatActivity implements PeerConnection
         } catch (KeyManagementException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void onLocalDescription(SessionDescription sdp) {
-
-    }
-
-    @Override
-    public void onIceCandidate(IceCandidate candidate) {
-
-    }
-
-    @Override
-    public void onIceCandidatesRemoved(IceCandidate[] candidates) {
-
-    }
-
-    @Override
-    public void onIceConnected() {
-
-    }
-
-    @Override
-    public void onIceDisconnected() {
-
-    }
-
-    @Override
-    public void onConnected() {
-
-    }
-
-    @Override
-    public void onDisconnected() {
-
-    }
-
-    @Override
-    public void onPeerConnectionClosed() {
-
-    }
-
-    @Override
-    public void onPeerConnectionStatsReady(StatsReport[] reports) {
-
-    }
-
-    @Override
-    public void onPeerConnectionError(String description) {
-
     }
 }

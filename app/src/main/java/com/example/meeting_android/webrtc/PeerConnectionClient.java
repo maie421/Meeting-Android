@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import com.example.meeting_android.R;
 
 import org.webrtc.Camera1Enumerator;
@@ -19,6 +21,7 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
 import org.webrtc.RtpReceiver;
+import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
@@ -93,6 +96,7 @@ public class PeerConnectionClient {
     private class PCObserver implements PeerConnection.Observer {
         @Override
         public void onIceCandidate(final IceCandidate candidate) {
+            Log.i("웹소켓", String.valueOf(candidate));
             executor.execute(() -> events.onIceCandidate(candidate));
         }
 
@@ -352,9 +356,7 @@ public class PeerConnectionClient {
                 }
             }
         }
-
         return null;
-
     }
 
 }
