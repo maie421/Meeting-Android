@@ -19,8 +19,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
-import org.java_websocket.drafts.Draft_6455;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
@@ -67,7 +65,7 @@ public class MeetingActivity extends AppCompatActivity {
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceViewRenderer renderer;
     public BottomNavigationView bottomNavigationView;
-    public PeerConnectionClient peerConnectionClient;
+    public WebSocketClientManager webSocketClientManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,38 +146,6 @@ public class MeetingActivity extends AppCompatActivity {
     }
 
     private void initWebSocketClient() {
-        try {
-            Log.d("웹소켓", "시작1");
-            // WebSocket 클라이언트 초기화
-            URI serverUri = new URI("ws://192.168.0.141:3000/groupcall");
-
-            // Create an SSLContext that trusts all certificates
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }}, new java.security.SecureRandom());
-
-            Map<String, String> httpHeaders = new HashMap<>();
-            WebSocketClientManager webSocketClient = new WebSocketClientManager(this,this,serverUri, httpHeaders);
-
-            webSocketClient.setSocket(sslContext.getSocketFactory().createSocket());
-            webSocketClient.connect();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (KeyManagementException e) {
-            throw new RuntimeException(e);
-        }
+        webSocketClientManager = new WebSocketClientManager(this, this);
     }
 }

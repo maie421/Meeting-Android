@@ -62,7 +62,7 @@ public class PeerConnectionClient {
         this.mActivity = mActivity;
         initPeer();
         getVideoTrack();
-        createPeerConnection();
+
     }
 
     private void initPeer() {
@@ -90,8 +90,8 @@ public class PeerConnectionClient {
         iceServers.add(stunServer);
 
         configuration = new PeerConnection.RTCConfiguration(iceServers);
-
         pcObserver();
+        createPeerConnection();
     }
 
     private void createPeerConnection() {

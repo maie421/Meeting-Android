@@ -1,17 +1,18 @@
 package com.example.meeting_android.webrtc;
 
+import static org.webrtc.ContextUtils.getApplicationContext;
+
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.meeting_android.activity.MeetingActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft_6455;
-import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.EglBase;
@@ -30,117 +31,49 @@ import java.util.Random;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-public class WebSocketClientManager extends WebSocketClient {
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
+public class WebSocketClientManager {
     private static final String TAG = "웹소켓";
     String randomNumberAsString;
     public Context mContext;
     public Activity mActivity;
+    private Socket mSocket;
+    private String roomName;
     public PeerConnectionClient peerConnectionClient;
-    public WebSocketClientManager(Context mContext, Activity mActivity, URI serverUri, Map<String, String> httpHeaders) {
-        super(serverUri);
+    public WebSocketClientManager(Context mContext, Activity mActivity) {
         Random random = new Random();
         int randomNumber = random.nextInt(100); //
+        roomName = "12345";
         randomNumberAsString = Integer.toString(randomNumber);
-
         peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
+        connect();
     }
 
-    @Override
-    public void onOpen(ServerHandshake handshakedata) {
-        Log.i(TAG, "WebSocket connection opened");
-
-        JsonObject message = new JsonObject();
-        message.addProperty("id", "joinRoom");
-        message.addProperty("name", randomNumberAsString);
-        message.addProperty("roomName", "1234");
-        sendMessage(message.toString());
-    }
-
-    //서버로 부터 텍스트 메시지를 수신 했을 때 처리
-    @Override
-    public void onMessage(String message) {
-        Log.e(TAG, "######## onMessage ########\n" + message);
-        JsonObject jsonObject = new Gson().fromJson(message, JsonObject.class);
-        String id = jsonObject.get("id").getAsString();
-
-        switch (id) {
-            case "existingParticipants":
-                onExistingParticipants(jsonObject);
-                break;
-            case "newParticipantArrived":
-                onNewParticipantArrived(jsonObject);
-                break;
-            case "participantLeft":
-                onParticipantLeft(jsonObject);
-                break;
-            case "receiveVideoAnswer":
-                onReceiveVideoAnswer(jsonObject);
-                break;
-            case "iceCandidate":
-                ceCandidate(jsonObject);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void ceCandidate(JsonObject jsonObject) {
-        Log.d(TAG, "iceCandidate");
-    }
-
-    //상대방 sdp 가져오기
-    private void onReceiveVideoAnswer(JsonObject jsonObject) {
-        Log.d(TAG, "onReceiveVideoAnswer");
+    private void connect(){
         try {
-            String sdpAnswer = jsonObject.get("sdpAnswer").getAsString();
+            mSocket = IO.socket("https://16dc-27-35-20-189.ngrok-free.app");
+            mSocket.on(Socket.EVENT_CONNECT, onConnect);
+            mSocket.on("welcome", onWelcome);
+            mSocket.on("offer", onOffer);
+            mSocket.on("answer", onAnswer);
+            mSocket.connect();
 
-            // SDP 생성
-            SessionDescription sdp = new SessionDescription(
-                    SessionDescription.Type.ANSWER, sdpAnswer);
-
-            // 로컬 PeerConnection에 SDP 설정
-            SimpleSdpObserver sdpObserver = new SimpleSdpObserver();
-            peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
-                @Override
-                public void onSetFailure(String error) {
-                    // setRemoteDescription 실패 시 호출됩니다.
-                    Log.e(TAG, "setRemoteDescription failed: " + error);
-                    // 실패 처리를 수행합니다.
-                }
-            }, sdp);
-
-        } catch (JsonSyntaxException e) {
-            Log.e(TAG, "Error parsing JSON: " + e.getMessage());
+            mSocket.emit("join_room",roomName);
+        } catch (Exception e) {
+            Log.d(TAG,"연결 실패" + e.getMessage());
+            e.printStackTrace();
         }
     }
+    private Emitter.Listener onConnect = args -> Log.d(TAG,"연결 성공");
 
-    private void onParticipantLeft(JsonObject jsonObject) {
-        Log.d(TAG, "onParticipantLeft");
-
-    }
-    //다른 참가자가 새로 연결 되었을 때 호출
-    private void onNewParticipantArrived(JsonObject jsonObject) {
-        Log.d(TAG, "onNewParticipantArrived");
-
-//        JsonObject json = new JsonObject();
-//        json.addProperty("id", "onIceCandidate");
-//        json.addProperty("candidate", "candidate");
-//        json.addProperty("name", randomNumberAsString);
-//
-//        sendMessage(json.toString());
-    }
-
-    //이미 존재하는 참가자 목록
-    private void onExistingParticipants(JsonObject jsonObject) {
-        Log.d(TAG, "onExistingParticipants");
-        JsonObject json = new JsonObject();
+    private Emitter.Listener onWelcome = args -> {
         MediaConstraints sdpMediaConstraints = new MediaConstraints();
-
-        //본인 sdp 전송
         peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
-                Log.d(TAG, "onCreateSuccess");
                 peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
@@ -148,38 +81,59 @@ public class WebSocketClientManager extends WebSocketClient {
                         Log.e(TAG, "setLocalDescription failed: " + error);
                     }
                 }, sessionDescription);
-
-                json.addProperty("sdpOffer",sessionDescription.description);
-                json.addProperty("id", "receiveVideoFrom");
-                json.addProperty("sender", randomNumberAsString);
-
-                sendMessage(json.toString());
+                Log.d(TAG,sessionDescription.description);
+                mSocket.emit("offer", sessionDescription.description, roomName);
             }
         }, sdpMediaConstraints);
-    }
+    };
+    private Emitter.Listener onOffer = args -> {
+        String offer = (String) args[0];
+        Log.d(TAG, "Received onOffer message: " + offer);
 
-    // WebSocket 연결이 닫혔을 때
-    @Override
-    public void onClose(int code, String reason, boolean remote) {
-        Log.i(TAG, "onClose code=" + code + " reason=" + reason + " remote=" + remote);
-    }
+        // SDP 생성
+        SessionDescription sdp = new SessionDescription(
+                SessionDescription.Type.OFFER, offer);
 
-    // WebSocket 연결 실패
-    @Override
-    public void onError(Exception ex) {
-        if (ex != null) {
-            ex.printStackTrace();
-        }
-    }
+        // 로컬 PeerConnection에 Offer를 설정
+        peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+            @Override
+            public void onSetFailure(String error) {
+                Log.e(TAG, "setRemoteDescription failed: " + error);
+            }
+        }, sdp);
 
-    public void sendMessage(String message) {
-        if (this.isOpen()) {
-            Log.d(TAG, "message" + message);
-            this.send(message);
-        }else{
-            Log.d(TAG, "에러 message" + message);
-        }
-    }
+        // Answer 생성
+        peerConnectionClient.peerConnection.createAnswer(new SimpleSdpObserver() {
+            @Override
+            public void onCreateSuccess(SessionDescription sessionDescription) {
+                Log.d(TAG, "Created Answer: " + sessionDescription.description);
+
+                // Answer SDP를 로컬에 설정
+                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                    @Override
+                    public void onSetFailure(String error) {
+                        Log.e(TAG, "setRemoteDescription1 failed: " + error);
+                    }
+                }, sessionDescription);
+                 mSocket.emit("answer", sessionDescription.description, roomName);
+            }
+
+        }, new MediaConstraints());
+    };
+
+    private Emitter.Listener onAnswer = args -> {
+        String answer = (String) args[0];
+        Log.d(TAG, "Received onAnswer message: " + answer);;
+
+        SessionDescription sdp = new SessionDescription(
+                SessionDescription.Type.ANSWER, answer);
+        peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+            @Override
+            public void onSetFailure(String error) {
+                Log.e(TAG, "setRemoteDescription failed: " + error);
+            }
+        }, sdp);
+    };
 
     class SimpleSdpObserver implements SdpObserver {
 
