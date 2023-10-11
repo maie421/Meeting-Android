@@ -30,7 +30,7 @@ import java.util.Random;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
-public class WebSocketClientManager extends WebSocketClient implements PeerConnectionClient.PeerConnectionEvents{
+public class WebSocketClientManager extends WebSocketClient {
     private static final String TAG = "웹소켓";
     String randomNumberAsString;
     public Context mContext;
@@ -42,7 +42,7 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
         int randomNumber = random.nextInt(100); //
         randomNumberAsString = Integer.toString(randomNumber);
 
-        peerConnectionClient = new PeerConnectionClient(mContext, mActivity,WebSocketClientManager.this);
+        peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
     }
 
     @Override
@@ -181,60 +181,6 @@ public class WebSocketClientManager extends WebSocketClient implements PeerConne
         }
     }
 
-    @Override
-    public void onLocalDescription(SessionDescription sdp) {
-
-    }
-
-    @Override
-    public void onIceCandidate(IceCandidate candidate) {
-        Log.d(TAG, "그냥 안나오는 거냐"+String.valueOf(candidate));
-        JsonObject message = new JsonObject();
-        message.addProperty("candidate", String.valueOf(candidate));
-        message.addProperty("id", "onIceCandidate");
-        message.addProperty("sender", randomNumberAsString);
-
-        sendMessage(message.toString());
-    }
-    @Override
-    public void onIceCandidatesRemoved(IceCandidate[] candidates) {
-
-    }
-
-    @Override
-    public void onIceConnected() {
-
-    }
-
-    @Override
-    public void onIceDisconnected() {
-
-    }
-
-    @Override
-    public void onConnected() {
-
-    }
-
-    @Override
-    public void onDisconnected() {
-
-    }
-
-    @Override
-    public void onPeerConnectionClosed() {
-
-    }
-
-    @Override
-    public void onPeerConnectionStatsReady(StatsReport[] reports) {
-
-    }
-
-    @Override
-    public void onPeerConnectionError(String description) {
-
-    }
     class SimpleSdpObserver implements SdpObserver {
 
         @Override
