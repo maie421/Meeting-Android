@@ -1,5 +1,6 @@
 package com.example.meeting_android.webrtc;
 
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
 import android.app.Activity;
@@ -19,6 +20,7 @@ import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
+import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
@@ -215,13 +217,7 @@ public class PeerConnectionClient {
 
             @Override
             public void onIceCandidate(IceCandidate iceCandidate) {
-                Log.d(TAG, "그냥 안나오는 거냐"+String.valueOf(iceCandidate));
-//                JsonObject message = new JsonObject();
-//                message.addProperty("candidate", String.valueOf(iceCandidate));
-//                message.addProperty("id", "onIceCandidate");
-//                message.addProperty("sender", randomNumberAsString);
-//
-//                sendMessage(message.toString());
+                sendIce(iceCandidate);
             }
 
             @Override
@@ -231,7 +227,7 @@ public class PeerConnectionClient {
 
             @Override
             public void onAddStream(MediaStream mediaStream) {
-                Log.d(TAG, "onAddStream : "+ mediaStream);
+                Log.d(TAG, "onAddStream : " + mediaStream);
                 getRemoteStream(mediaStream);
             }
 
@@ -259,11 +255,23 @@ public class PeerConnectionClient {
     }
 
     private void getRemoteStream(MediaStream mediaStream) {
-        SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
-        VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
-        mActivity.runOnUiThread(() -> {
-            remoteVideoTrack.addSink(pip_video_view);
-        });
+        try {
+            SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
+            VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
+
+            mActivity.runOnUiThread(() -> {
+                try {
+                    remoteVideoTrack.addSink(pip_video_view);
+                    remoteVideoTrack.setEnabled(true);
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to add video sink", e);
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get video track", e);
+        }
+
+
     }
 }
 

@@ -4,11 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;;
+import java.lang.reflect.Type;
 import java.util.Random;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -19,8 +25,8 @@ public class WebSocketClientManager {
     String randomNumberAsString;
     public Context mContext;
     public Activity mActivity;
-    private Socket mSocket;
-    private String roomName;
+    private static Socket mSocket;
+    private static String roomName;
     public PeerConnectionClient peerConnectionClient;
     public WebSocketClientManager(Context mContext, Activity mActivity) {
         Random random = new Random();
@@ -34,7 +40,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://577e-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://cbe8-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -60,7 +66,7 @@ public class WebSocketClientManager {
         Log.i(TAG, "Welcome");
         MediaConstraints sdpMediaConstraints = new MediaConstraints();
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "true"));
-        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "false"));
+        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
 
         peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
             @Override
@@ -155,11 +161,33 @@ public class WebSocketClientManager {
     };
 
     private Emitter.Listener onIce = args -> {
-//      IceCandidate iceCandidate = (IceCandidate) args[0];
-        Log.d(TAG, "Received onIce message"+ args);
-//        peerConnectionClient.peerConnection.addIceCandidate(iceCandidate);
+        if (args != null || args[0] != null) {
+            JSONObject msg = (JSONObject) args[0];
+            try {
+                IceCandidate iecCandidate = new IceCandidate(  msg.getString("sdpMid"),msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
+                peerConnectionClient.peerConnection.addIceCandidate(iecCandidate);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     };
 
+    public static void sendIce(IceCandidate iceCandidate) {
+        mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
+    }
+    private static JSONObject toJsonCandidate(final IceCandidate candidate) {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("sdpMLineIndex", candidate.sdpMLineIndex);
+            json.put("sdpMid", candidate.sdpMid);
+            json.put("candidate", candidate.sdp);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return json;
+    }
     class SimpleSdpObserver implements SdpObserver {
 
         @Override
