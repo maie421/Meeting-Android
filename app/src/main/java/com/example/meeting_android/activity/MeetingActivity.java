@@ -55,14 +55,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public class MeetingActivity extends AppCompatActivity {
-    public static final String VIDEO_TRACK_ID = "ARDAMSv0";
     private static final int PERMISSION_REQUEST = 2;
-    public VideoCapturer videoCapturer;
-    public SurfaceTextureHelper surfaceTextureHelper;
-    private boolean isSwappedFeeds;
-    public EglBase rootEglBase;
-    public EglBase.Context eglBaseContext;
-    public PeerConnectionFactory peerConnectionFactory;
     public SurfaceViewRenderer renderer;
     public BottomNavigationView bottomNavigationView;
     public WebSocketClientManager webSocketClientManager;
@@ -74,8 +67,8 @@ public class MeetingActivity extends AppCompatActivity {
         renderer = findViewById(R.id.View);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         onClickButtonNavigation();
-        initWebSocketClient();
         requestPermissions();
+        initWebSocketClient();
     }
 
     private void onClickButtonNavigation() {

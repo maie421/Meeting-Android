@@ -17,6 +17,7 @@ import org.webrtc.CandidatePairChangeEvent;
 import org.webrtc.DataChannel;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
+import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
@@ -51,9 +52,8 @@ public class PeerConnectionClient {
 
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
-    private boolean isError = false;
     public EglBase.Context eglBaseContext;
-    private static final String TAG = "PCRTCClient";
+    private static final String TAG = "웹소켓";
     private PeerConnection.RTCConfiguration configuration;
     public PeerConnection peerConnection;
     public PeerConnection.Observer pcObserver;
@@ -118,6 +118,8 @@ public class PeerConnectionClient {
         rootEglBase = EglBase.create();
         eglBaseContext = rootEglBase.getEglBaseContext();
         surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
+
+
         (getLocalVideo(true)).addSink(renderer);
     }
 
@@ -198,6 +200,7 @@ public class PeerConnectionClient {
             @Override
             public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
                 Log.d(TAG, "onIceConnectionChange : "+ iceConnectionState);
+
             }
 
             @Override
@@ -229,11 +232,13 @@ public class PeerConnectionClient {
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : "+ mediaStream);
+                getRemoteStream(mediaStream);
             }
 
             @Override
             public void onRemoveStream(MediaStream mediaStream) {
                 Log.d(TAG, "onRemoveStream : "+ mediaStream);
+
             }
 
             @Override
@@ -248,9 +253,17 @@ public class PeerConnectionClient {
 
             @Override
             public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
-                Log.d(TAG, "onAddTrack : ");
+                Log.d(TAG, "onAddTrack ");
             }
         };
+    }
+
+    private void getRemoteStream(MediaStream mediaStream) {
+        SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
+        VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
+        mActivity.runOnUiThread(() -> {
+            remoteVideoTrack.addSink(pip_video_view);
+        });
     }
 }
 
