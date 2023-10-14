@@ -40,7 +40,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://7648-1-211-59-18.ngrok-free.app");
+            mSocket = IO.socket("https://e5d3-27-35-20-189.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -64,20 +64,10 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onWelcome = args -> {
         Log.i(TAG, "Welcome");
-        MediaConstraints sdpMediaConstraints = new MediaConstraints();
-        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
 
         peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
-                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
-                    @Override
-                    public void onSetFailure(String error) {
-                        // 실패 시 호출됩니다.
-                        Log.e(TAG, "setLocalDescription failed: " + error);
-                    }
-                }, sessionDescription);
-
                 JSONObject message = new JSONObject();
                 try {
                     message.put("type","offer");
@@ -87,8 +77,16 @@ public class WebSocketClientManager {
                 }
 
                 mSocket.emit("offer", message, roomName);
+
+                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                    @Override
+                    public void onSetFailure(String error) {
+                        // 실패 시 호출됩니다.
+                        Log.e(TAG, "setLocalDescription failed: " + error);
+                    }
+                }, sessionDescription);
             }
-        }, sdpMediaConstraints);
+        }, peerConnectionClient.sdpMediaConstraints);
     };
     private Emitter.Listener onOffer = args -> {
         Log.d(TAG, "onOffer");
@@ -135,7 +133,7 @@ public class WebSocketClientManager {
                 mSocket.emit("answer", message, roomName);
             }
 
-        }, new MediaConstraints());
+        }, peerConnectionClient.sdpMediaConstraints);
     };
 
     private Emitter.Listener onAnswer = args -> {
@@ -147,6 +145,7 @@ public class WebSocketClientManager {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+        Log.e(TAG,_sdp);
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);

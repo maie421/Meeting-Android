@@ -59,6 +59,8 @@ public class PeerConnectionClient {
     private PeerConnection.RTCConfiguration configuration;
     public PeerConnection peerConnection;
     public PeerConnection.Observer pcObserver;
+    public MediaConstraints sdpMediaConstraints;
+
     public PeerConnectionClient(Context mContext, Activity mActivity) {
         this.mContext = mContext;
         this.mActivity = mActivity;
@@ -96,12 +98,19 @@ public class PeerConnectionClient {
     }
 
     private void createPeerConnection() {
+        Log.d(TAG,"createPeerConnection");
+        sdpMediaConstraints = new MediaConstraints();
+        sdpMediaConstraints.mandatory.add(
+                new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
+        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
+                "OfferToReceiveVideo", "true"));
+
         peerConnection = peerConnectionFactory.createPeerConnection(configuration, pcObserver);
     }
 
     public void getVideoTrack(){
         SurfaceViewRenderer renderer = mActivity.findViewById(R.id.View);
-        renderer.setMirror(false);
+//        renderer.setMirror(false);
         renderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
             //첫 번째 프레임이 렌더링되면 콜백이 실행됩니다.
             @Override
@@ -124,7 +133,6 @@ public class PeerConnectionClient {
     }
 
     public VideoTrack getLocalVideo(boolean isFront){
-
         VideoTrack localVideo;
         // 앞 카메라 요청
         videoCapturer = createVideoCapturer(isFront);
