@@ -31,7 +31,7 @@ public class WebSocketClientManager {
     public WebSocketClientManager(Context mContext, Activity mActivity) {
         Random random = new Random();
         int randomNumber = random.nextInt(100); //
-        roomName = "12345";
+        roomName = "123457";
         randomNumberAsString = Integer.toString(randomNumber);
         peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
         connect();
@@ -40,7 +40,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://cbe8-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://7648-1-211-59-18.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -65,7 +65,6 @@ public class WebSocketClientManager {
     private Emitter.Listener onWelcome = args -> {
         Log.i(TAG, "Welcome");
         MediaConstraints sdpMediaConstraints = new MediaConstraints();
-        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveAudio", "true"));
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToReceiveVideo", "true"));
 
         peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
@@ -117,7 +116,6 @@ public class WebSocketClientManager {
         peerConnectionClient.peerConnection.createAnswer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
-
                 // Answer SDP를 로컬에 설정
                 peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
                     @Override
@@ -174,6 +172,7 @@ public class WebSocketClientManager {
     };
 
     public static void sendIce(IceCandidate iceCandidate) {
+        Log.d(TAG, "ice");
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {

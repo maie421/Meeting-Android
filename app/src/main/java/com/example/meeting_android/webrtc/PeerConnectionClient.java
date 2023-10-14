@@ -64,7 +64,6 @@ public class PeerConnectionClient {
         this.mActivity = mActivity;
         initPeer();
         getVideoTrack();
-
     }
 
     private void initPeer() {
@@ -121,7 +120,6 @@ public class PeerConnectionClient {
         eglBaseContext = rootEglBase.getEglBaseContext();
         surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
 
-
         (getLocalVideo(true)).addSink(renderer);
     }
 
@@ -134,7 +132,7 @@ public class PeerConnectionClient {
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
         videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
 
-        // 비디오 캡쳐 : getUserMedia 로 스트림 받아오기 시작?
+        // 비디오 캡쳐 : getUserMedia 로 스트림 받아오기 시작
         videoCapturer.startCapture(240, 320, 30);
         localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
 
@@ -194,62 +192,78 @@ public class PeerConnectionClient {
     }
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
+            // SignalingState이 변경될 때 호출되는 콜백
             @Override
             public void onSignalingChange(PeerConnection.SignalingState signalingState) {
                 Log.d(TAG, "onSignalingChange : "+String.valueOf(signalingState));
             }
 
+            // ICE (Interactive Connectivity Establishment) 연결 상태 변경에 대한 콜백
             @Override
             public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
                 Log.d(TAG, "onIceConnectionChange : "+ iceConnectionState);
 
             }
-
+            // ICE 연결 수신 상태가 변경될 때 호출되는 콜백
             @Override
             public void onIceConnectionReceivingChange(boolean b) {
                 Log.d(TAG, "onIceConnectionReceivingChange : "+ b);
             }
-
+            // ICE 후보 수집 상태 변경에 대한 콜백
             @Override
             public void onIceGatheringChange(PeerConnection.IceGatheringState iceGatheringState) {
                 Log.d(TAG, "onIceGatheringChange : "+ iceGatheringState);
             }
-
+            // 새 ICE 후보가 생성될 때 호출되는 콜백
             @Override
             public void onIceCandidate(IceCandidate iceCandidate) {
+                Log.d(TAG, "onIceCandidate : "+ iceCandidate);
                 sendIce(iceCandidate);
             }
-
+            // 제거된 ICE 후보에 대한 콜백
             @Override
             public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
                 Log.d(TAG, "onIceCandidatesRemoved : "+ iceCandidates);
             }
-
+            // 새로운 미디어 스트림이 추가될 때 호출되는 콜백
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : " + mediaStream);
                 getRemoteStream(mediaStream);
             }
-
+            // 제거된 미디어 스트림에 대한 콜백
             @Override
             public void onRemoveStream(MediaStream mediaStream) {
                 Log.d(TAG, "onRemoveStream : "+ mediaStream);
+                SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
+
+                // 제거된 미디어 스트림의 비디오 트랙을 제거
+                if (mediaStream.videoTracks.size() > 0) {
+                    mediaStream.videoTracks.get(0).removeSink(pip_video_view);
+                }
 
             }
-
+            // 데이터 채널이 생성될 때 호출되는 콜백
             @Override
             public void onDataChannel(DataChannel dataChannel) {
                 Log.d(TAG, "onDataChannel : "+ dataChannel);
             }
-
+            // 재협상이 필요한 경우 호출되는 콜백
             @Override
             public void onRenegotiationNeeded() {
                 Log.d(TAG, "onRenegotiationNeeded : ");
             }
-
+            // 트랙이 추가될 때 호출되는 콜백
             @Override
             public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
-                Log.d(TAG, "onAddTrack ");
+//                SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
+//                for (MediaStream mediaStream : mediaStreams) {
+//                    if (mediaStream.videoTracks.size() > 0) {
+//                        Log.d(TAG, "onAddTrack: Adding video sink");
+//                        mediaStream.videoTracks.get(1).addSink(pip_video_view);
+//                    }
+//                }
+//                Log.d(TAG, "onAddTrack"+ mediaStreams);
             }
         };
     }
@@ -258,11 +272,9 @@ public class PeerConnectionClient {
         try {
             SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
             VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
-
             mActivity.runOnUiThread(() -> {
                 try {
                     remoteVideoTrack.addSink(pip_video_view);
-                    remoteVideoTrack.setEnabled(true);
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to add video sink", e);
                 }
