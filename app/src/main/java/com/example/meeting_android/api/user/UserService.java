@@ -35,4 +35,13 @@ public class UserService extends ApiService {
         Call<Authorization> call = userApi.loginUser(jsonObject);
         call.enqueue(callback);
     }
+
+    public void getUser(Callback<User> callback) {
+        TokenManager tokenManager = new TokenManager(mContext);
+        String token = tokenManager.getToken();
+
+        UserApi userApi = retrofit.create(UserApi.class); // UserApi 인터페이스 생성
+        Call<User> call = userApi.getUser("Bearer " + token); // createUser 메소드 호출
+        call.enqueue(callback);
+    }
 }

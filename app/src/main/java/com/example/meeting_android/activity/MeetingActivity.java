@@ -3,58 +3,20 @@ package com.example.meeting_android.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 
+import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.R;
-import com.example.meeting_android.webrtc.PeerConnectionClient;
 import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import org.webrtc.Camera1Enumerator;
-import org.webrtc.CameraVideoCapturer;
-import org.webrtc.EglBase;
-import org.webrtc.IceCandidate;
-import org.webrtc.Logging;
-import org.webrtc.PeerConnection;
-import org.webrtc.PeerConnectionFactory;
-import org.webrtc.RendererCommon;
-import org.webrtc.SessionDescription;
-import org.webrtc.SoftwareVideoDecoderFactory;
-import org.webrtc.SoftwareVideoEncoderFactory;
-import org.webrtc.StatsReport;
-import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.SurfaceViewRenderer;
-import org.webrtc.VideoCapturer;
-import org.webrtc.VideoDecoderFactory;
-import org.webrtc.VideoEncoderFactory;
-import org.webrtc.VideoSource;
-import org.webrtc.VideoTrack;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import java.util.Random;
 
 public class MeetingActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST = 2;
@@ -62,6 +24,7 @@ public class MeetingActivity extends AppCompatActivity {
     public WebSocketClientManager webSocketClientManager;
     public Button buttonDialog;
     private CustomDialog customDialog;
+    private String randomNumberAsString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +33,8 @@ public class MeetingActivity extends AppCompatActivity {
 
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        initRoomId();
+        customDialog = new CustomDialog(this, this, randomNumberAsString);
 
         onClickButtonNavigation();
         requestPermissions();
@@ -77,15 +42,14 @@ public class MeetingActivity extends AppCompatActivity {
         initDialog();
     }
 
-    private void initDialog() {
-        //다이얼로그 밖의 화면은 흐리게 만들어줌
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-        layoutParams.dimAmount = 0.8f;
-        getWindow().setAttributes(layoutParams);
+    private void initRoomId() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(100);
+        randomNumberAsString = Integer.toString(randomNumber);
+    }
 
+    private void initDialog() {
         buttonDialog.setOnClickListener(v->{
-            customDialog = new CustomDialog(this);
             customDialog.show();
         });
     }
@@ -158,6 +122,6 @@ public class MeetingActivity extends AppCompatActivity {
     }
 
     private void initWebSocketClient() {
-        webSocketClientManager = new WebSocketClientManager(this, this);
+        webSocketClientManager = new WebSocketClientManager(this, this, randomNumberAsString);
     }
 }

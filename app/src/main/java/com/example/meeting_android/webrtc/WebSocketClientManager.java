@@ -25,15 +25,12 @@ public class WebSocketClientManager {
     String randomNumberAsString;
     public Context mContext;
     public Activity mActivity;
+    public static String roomName;
     private static Socket mSocket;
-    private static String roomName;
     public PeerConnectionClient peerConnectionClient;
-    public WebSocketClientManager(Context mContext, Activity mActivity) {
-        Random random = new Random();
-        int randomNumber = random.nextInt(100); //
-        roomName = "123457";
-        randomNumberAsString = Integer.toString(randomNumber);
+    public WebSocketClientManager(Context mContext, Activity mActivity, String roomName) {
         peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
+        this.roomName = roomName;
         connect();
     }
 

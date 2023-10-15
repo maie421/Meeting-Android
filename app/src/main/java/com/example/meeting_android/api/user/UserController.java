@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.meeting_android.R;
 import com.example.meeting_android.activity.MainActivity;
 import com.example.meeting_android.activity.MeetingMainActivity;
 import com.example.meeting_android.activity.SplashActivity;
@@ -89,6 +91,28 @@ public class UserController {
 
             }
         });
+    }
 
+    public void getUser(String roomId){
+        userService.getUser( new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    User user = response.body();
+                    TextView nameTextView = mActivity.findViewById(R.id.nameTextView);
+                    TextView roomTextView = mActivity.findViewById(R.id.roomTextView);
+                    Log.i("API LOG", user.name);
+//                    nameTextView.setText(user.name);
+//                    roomTextView.setText(roomId);
+                }else {
+                    Toast.makeText(mContext, "토큰 만료", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+
+            }
+        });
     }
 }

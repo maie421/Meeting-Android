@@ -19,4 +19,7 @@ public interface UserApi {
 
     @POST("login")
     Call<Authorization> loginUser(@Body JsonObject body);
+
+    @GET("user")
+    Call<User> getUser(@Header("Authorization") String token);
 }
