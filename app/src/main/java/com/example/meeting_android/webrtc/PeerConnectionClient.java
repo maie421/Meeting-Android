@@ -75,32 +75,34 @@ public class PeerConnectionClient {
 
         initPeer();
 
-        SurfaceViewRendererInit(localView);
-        SurfaceViewRendererInit(remoteView);
+        initSurfaceViewRenderer(localView);
+        initSurfaceViewRenderer(remoteView);
 
         localTrack = getLocalVideo(true);
         localTrack.addSink(localView);
         peerConnection.addTrack(localTrack);
     }
-    void SurfaceViewRendererInit(SurfaceViewRenderer view){
+    // SurfaceViewRenderer 초기화 메서드
+    void initSurfaceViewRenderer(SurfaceViewRenderer view){
         view.setMirror(false);
+        //뷰의 크기에 맞게 비디오, 프레임의 크기 조정 가로 세로 비율을 유지, 검은 색 테두리가 표시 될 수 있습니다.
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
         view.removeFrameListener(new EglRenderer.FrameListener() {
             @Override
             public void onFrame(Bitmap bitmap) {
-                Log.i("removeFrameListener :","");
+                Log.i(TAG,"removeFrameListener");
             }
         });
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) {
-                Log.i("onViewAttached","ToWindow :");
+                Log.i(TAG,"onViewAttachedToWindow");
 
             }
 
             @Override
             public void onViewDetachedFromWindow(View v) {
-                Log.i("onViewDetached","FromWindow :");
+                Log.i(TAG,"onViewDetachedFromWindow");
 
             }
         });
@@ -111,20 +113,15 @@ public class PeerConnectionClient {
             }
         });
         view.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-            //            첫 번째 프레임이 렌더링되면 콜백이 실행됩니다.
             @Override
             public void onFirstFrameRendered() {
-                Log.i("RendererEvents","onFirstFrameRendered");
+                Log.i(TAG,"onFirstFrameRendered");
             }
             @Override
             public void onFrameResolutionChanged(int i, int i1, int i2) {
-                Log.i("RendererEvents","onFrameResolutionChanged");
-
-
+                Log.i(TAG,"onFrameResolutionChanged");
             }
-
         });
-
     }
 
     private void initPeer() {
@@ -184,13 +181,12 @@ public class PeerConnectionClient {
         return localVideo;
     }
 
+    //전면 카메라 설정
     private VideoCapturer createCameraCapturer(boolean isFront) {
         Camera1Enumerator enumerator = new Camera1Enumerator(false);
 
         final String[] deviceNames = enumerator.getDeviceNames();
         for (String deviceName : deviceNames) {
-
-            Log.i("deviceName : ",deviceName);
             if (isFront ? enumerator.isFrontFacing(deviceName) : enumerator.isBackFacing(deviceName)) {
                 VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, new CameraVideoCapturer.CameraEventsHandler() {
                     @Override
