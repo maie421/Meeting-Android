@@ -4,17 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.meeting_android.R;
 import com.example.meeting_android.api.user.User;
-import com.example.meeting_android.api.user.UserController;
 import com.example.meeting_android.api.user.UserService;
 
 import retrofit2.Call;
@@ -42,7 +38,7 @@ public class CustomDialog extends Dialog {
                     User user = response.body();
                     TextView nameTextView = findViewById(R.id.nameTextView);
                     TextView roomTextView = findViewById(R.id.roomTextView);
-                    Log.i("API LOG", user.name);
+
                     nameTextView.setText(user.name);
                     roomTextView.setText(roomId);
                 }else {

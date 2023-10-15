@@ -37,7 +37,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://1918-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://6d7f-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
