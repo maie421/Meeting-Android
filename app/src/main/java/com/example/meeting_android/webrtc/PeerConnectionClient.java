@@ -80,6 +80,7 @@ public class PeerConnectionClient {
 
         localTrack = getLocalVideo(true);
         localTrack.addSink(localView);
+        peerConnection.addTrack(localTrack);
 
     }
     void SurfaceViewRendererInit(SurfaceViewRenderer view){

@@ -40,7 +40,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://e5d3-27-35-20-189.ngrok-free.app");
+            mSocket = IO.socket("https://7bac-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -49,7 +49,7 @@ public class WebSocketClientManager {
             mSocket.on("ice", onIce);
             mSocket.connect();
 
-            mSocket.emit("join_room",roomName);
+            mSocket.emit("join_room", roomName);
         } catch (Exception e) {
             Log.d(TAG,"연결 실패" + e.getMessage());
             e.printStackTrace();
@@ -145,7 +145,6 @@ public class WebSocketClientManager {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        Log.e(TAG,_sdp);
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);
