@@ -174,13 +174,9 @@ public class PeerConnectionClient {
     public VideoTrack getLocalVideo(boolean status){
         VideoTrack localVideo;
         videoCapturer = createCameraCapturer(status);
-        Log.w("createCameraCapturer",videoCapturer.toString());
-
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
         videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
-        Log.i("videoSource.getObserver",videoSource.getCapturerObserver().toString());
-
         videoCapturer.startCapture(240, 320, 30);
 
         localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
@@ -199,25 +195,31 @@ public class PeerConnectionClient {
                 VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, new CameraVideoCapturer.CameraEventsHandler() {
                     @Override
                     public void onCameraError(String s) {
+                        Log.e(TAG,"onCameraError");
                     }
                     @Override
                     public void onCameraDisconnected() {
+                        Log.e(TAG,"onCameraDisconnected");
                     }
 
                     @Override
                     public void onCameraFreezed(String s) {
+                        Log.e(TAG,"onCameraFreezed");
                     }
 
                     @Override
                     public void onCameraOpening(String s) {
+                        Log.e(TAG,"onCameraOpening");
                     }
 
                     @Override
                     public void onFirstFrameAvailable() {
+                        Log.e(TAG,"onFirstFrameAvailable");
                     }
 
                     @Override
                     public void onCameraClosed() {
+                        Log.e(TAG,"onCameraClosed");
                     }
                 });
 
@@ -288,7 +290,7 @@ public class PeerConnectionClient {
             // 재협상이 필요한 경우 호출되는 콜백
             @Override
             public void onRenegotiationNeeded() {
-                Log.d(TAG, "onRenegotiationNeeded : ");
+                Log.d(TAG, "onRenegotiationNeeded");
             }
             // 트랙이 추가될 때 호출되는 콜백
             @Override
