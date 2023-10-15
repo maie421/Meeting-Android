@@ -3,6 +3,7 @@ package com.example.meeting_android.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -25,6 +26,7 @@ public class MeetingActivity extends AppCompatActivity {
     public Button buttonDialog;
     private CustomDialog customDialog;
     private String randomNumberAsString;
+    public String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,25 +35,29 @@ public class MeetingActivity extends AppCompatActivity {
 
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        initRoomId();
-        customDialog = new CustomDialog(this, this, randomNumberAsString);
+        initDialog();
 
         onClickButtonNavigation();
         requestPermissions();
         initWebSocketClient();
-        initDialog();
-    }
-
-    private void initRoomId() {
-        Random random = new Random();
-        int randomNumber = random.nextInt(100);
-        randomNumberAsString = Integer.toString(randomNumber);
-    }
-
-    private void initDialog() {
+        
         buttonDialog.setOnClickListener(v->{
             customDialog.show();
         });
+    }
+
+    private void initDialog() {
+        Intent intent = getIntent();
+        if (intent.hasExtra("name") && intent.hasExtra("joinRoom")) {
+            name = intent.getStringExtra("name");
+            randomNumberAsString = intent.getStringExtra("joinRoom");
+            customDialog = new CustomDialog(this, this, randomNumberAsString, name);
+        }else{
+            Random random = new Random();
+            int randomNumber = random.nextInt(10000);
+            randomNumberAsString = Integer.toString(randomNumber);
+            customDialog = new CustomDialog(this, this, randomNumberAsString);
+        }
     }
 
     private void onClickButtonNavigation() {

@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/joinEditText"
+            android:id="@+id/joinRoomEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="130dp"
@@ -46,7 +46,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/joinEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/joinRoomEditText" />
 
         <!-- 회의 참가 버튼 -->
         <Button
@@ -62,4 +62,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nameEditText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    
 </layout>

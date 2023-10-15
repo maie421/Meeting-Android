@@ -52,10 +52,18 @@ public class CustomDialog extends Dialog {
             }
         });
     }
+    public CustomDialog(@NonNull Context context, Activity activity, String roomId, String name) {
+        super(context);
+        setContentView(R.layout.activity_custom_dialog);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        closeButton = findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> dismiss());
+
+        TextView nameTextView = findViewById(R.id.nameTextView);
+        TextView roomTextView = findViewById(R.id.roomTextView);
+
+        nameTextView.setText(name);
+        roomTextView.setText(roomId);
 
     }
 }
