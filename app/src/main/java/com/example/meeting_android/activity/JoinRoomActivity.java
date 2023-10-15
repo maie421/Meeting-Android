@@ -7,7 +7,6 @@ import android.os.Bundle;
 
 import com.example.meeting_android.R;
 import com.example.meeting_android.databinding.ActivityJoinRoomBinding;
-import com.example.meeting_android.databinding.ActivityTermsBinding;
 
 public class JoinRoomActivity extends AppCompatActivity {
     private ActivityJoinRoomBinding binding;

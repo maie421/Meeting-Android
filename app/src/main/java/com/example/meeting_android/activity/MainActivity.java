@@ -5,11 +5,9 @@ import androidx.databinding.DataBindingUtil;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import com.example.meeting_android.R;
 import com.example.meeting_android.databinding.ActivityMainBinding;
-import com.example.meeting_android.databinding.ActivitySplashBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;

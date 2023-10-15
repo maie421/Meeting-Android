@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 import com.example.meeting_android.R;
 import com.example.meeting_android.databinding.ActivityMeetingMainBinding;
-import com.example.meeting_android.databinding.ActivitySignupBinding;
 
 public class MeetingMainActivity extends AppCompatActivity {
     private ActivityMeetingMainBinding binding;

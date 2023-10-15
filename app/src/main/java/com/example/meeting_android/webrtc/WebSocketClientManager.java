@@ -4,25 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
-import org.webrtc.MediaConstraints;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;;
-import java.lang.reflect.Type;
-import java.util.Random;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 public class WebSocketClientManager {
     private static final String TAG = "웹소켓";
-    String randomNumberAsString;
     public Context mContext;
     public Activity mActivity;
     public static String roomName;
