@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 
 import com.example.meeting_android.R;
 import com.example.meeting_android.webrtc.PeerConnectionClient;
@@ -56,19 +58,36 @@ import javax.net.ssl.X509TrustManager;
 
 public class MeetingActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST = 2;
-    public SurfaceViewRenderer renderer;
     public BottomNavigationView bottomNavigationView;
     public WebSocketClientManager webSocketClientManager;
+    public Button buttonDialog;
+    private CustomDialog customDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting);
 
-        renderer = findViewById(R.id.View);
+        buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
         onClickButtonNavigation();
         requestPermissions();
         initWebSocketClient();
+        initDialog();
+    }
+
+    private void initDialog() {
+        //다이얼로그 밖의 화면은 흐리게 만들어줌
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        layoutParams.dimAmount = 0.8f;
+        getWindow().setAttributes(layoutParams);
+
+        buttonDialog.setOnClickListener(v->{
+            customDialog = new CustomDialog(this);
+            customDialog.show();
+        });
     }
 
     private void onClickButtonNavigation() {

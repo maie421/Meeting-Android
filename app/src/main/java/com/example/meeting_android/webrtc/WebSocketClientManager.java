@@ -40,7 +40,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://7bac-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://1918-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -75,9 +75,9 @@ public class WebSocketClientManager {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
+                Log.i(TAG, sessionDescription.description);
 
                 mSocket.emit("offer", message, roomName);
-
                 peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {

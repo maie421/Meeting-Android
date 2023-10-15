@@ -41,4 +41,14 @@
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
+    <Button
+        android:id="@+id/buttonDialog"
+        android:layout_width="54dp"
+        android:layout_height="44dp"
+        android:backgroundTint="@color/white"
+        android:text="V"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
