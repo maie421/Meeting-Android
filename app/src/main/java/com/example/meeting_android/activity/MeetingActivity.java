@@ -84,10 +84,15 @@ public class MeetingActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.tab_mic) {
+                if (webSocketClientManager.peerConnectionClient.isAudio == true) {
+                    item.setIcon(R.drawable.mic_close);
+                }else{
+                    item.setIcon(R.drawable.mic);
+                }
+                webSocketClientManager.peerConnectionClient.onAudioTrackSwitch();
                 return true;
             }
             if (itemId == R.id.tab_video) {
-
                 if (webSocketClientManager.peerConnectionClient.isCamera == true) {
                     item.setIcon(R.drawable.video_icon_close);
                 }else{

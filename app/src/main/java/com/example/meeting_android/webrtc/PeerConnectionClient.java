@@ -49,9 +49,9 @@ public class PeerConnectionClient {
     public Activity mActivity;
     public VideoCapturer videoCapturer;
     public VideoTrack localTrack;
-    public AudioTrack audioTrack;
     public VideoTrack remoteTrack;
     public Boolean isCamera = true;
+    public Boolean isAudio = true;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
@@ -327,6 +327,9 @@ public class PeerConnectionClient {
 
     public void onCameraSwitch(){
         localTrack.setEnabled(isCamera = !isCamera);
+    }
+    public void onAudioTrackSwitch(){
+        localAudioTrack.setEnabled(isAudio = !isAudio);
     }
 }
 
