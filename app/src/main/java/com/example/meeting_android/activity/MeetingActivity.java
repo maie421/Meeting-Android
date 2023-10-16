@@ -16,6 +16,7 @@ import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.R;
 import com.example.meeting_android.api.room.Room;
 import com.example.meeting_android.api.room.RoomController;
+import com.example.meeting_android.api.room.RoomService;
 import com.example.meeting_android.api.user.User;
 import com.example.meeting_android.api.user.UserService;
 import com.example.meeting_android.common.TokenManager;
@@ -37,7 +38,9 @@ public class MeetingActivity extends AppCompatActivity {
     private CustomDialog customDialog;
     private String randomNumberAsString;
     public String name;
+    public String hostName;
     public UserService userService;
+    public RoomService roomService;
     public RoomController roomController;
 
     @Override
@@ -48,6 +51,8 @@ public class MeetingActivity extends AppCompatActivity {
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         roomController = new RoomController(this, this);
+        roomService = new RoomService(this, this);
+        userService = new UserService(this, this);
 
         initDialog();
 
@@ -63,8 +68,9 @@ public class MeetingActivity extends AppCompatActivity {
     private void initDialog() {
         Intent intent = getIntent();
             //비회원
-        if (intent.hasExtra("name") && intent.hasExtra("joinRoom")) {
+        if (intent.hasExtra("name") && intent.hasExtra("joinRoom") && intent.hasExtra("hostName")) {
             name = intent.getStringExtra("name");
+            hostName = intent.getStringExtra("hostName");
             randomNumberAsString = intent.getStringExtra("joinRoom");
         }else{
             //방생성
@@ -145,13 +151,12 @@ public class MeetingActivity extends AppCompatActivity {
         TokenManager tokenManager = new TokenManager(this);
         String token = tokenManager.getToken();
         if (token != null) {
-            userService = new UserService(this, this);
             userService.getUser(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
                     if (response.isSuccessful()) {
                         User user = response.body();
-                        customDialog = new CustomDialog(userService.mContext, userService.mActivity, randomNumberAsString,user.name);
+                        customDialog = new CustomDialog(userService.mContext, userService.mActivity, randomNumberAsString, user.name);
                         webSocketClientManager = new WebSocketClientManager(userService.mContext, userService.mActivity, customDialog, randomNumberAsString, user.name);
 
                         Room room = new Room(randomNumberAsString);
@@ -163,8 +168,8 @@ public class MeetingActivity extends AppCompatActivity {
                 public void onFailure(Call<User> call, Throwable t) {
                 }
             });
-        }else{
-            customDialog = new CustomDialog(this, this, randomNumberAsString, name);
+        }else {
+            customDialog = new CustomDialog(this, this, randomNumberAsString, hostName);
             webSocketClientManager = new WebSocketClientManager(this, this, customDialog, randomNumberAsString, name);
         }
     }

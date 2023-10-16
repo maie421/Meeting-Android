@@ -34,7 +34,6 @@ public class JoinRoomActivity extends AppCompatActivity {
         binding.meetingButton.setOnClickListener(v->{
             String name = binding.nameEditText.getText().toString();
             String joinRoom = binding.joinRoomEditText.getText().toString();
-
             roomController.getRoom(joinRoom, name);
 
         });

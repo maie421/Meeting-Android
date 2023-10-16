@@ -3,16 +3,10 @@ package com.example.meeting_android.api.room;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.EditText;
+import android.util.Log;
 import android.widget.Toast;
-
-import com.example.meeting_android.R;
 import com.example.meeting_android.activity.MeetingActivity;
-import com.example.meeting_android.activity.MeetingMainActivity;
-import com.example.meeting_android.api.user.Authorization;
-import com.example.meeting_android.api.user.User;
 import com.example.meeting_android.common.Common;
-import com.example.meeting_android.common.TokenManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,7 +50,9 @@ public class RoomController {
             @Override
             public void onResponse(Call<Room> call, Response<Room> response) {
                 if (response.isSuccessful()) {
+                    Room room = response.body();
                     Intent intent = new Intent(mContext, MeetingActivity.class);
+                    intent.putExtra("hostName", room.user.name);
                     intent.putExtra("name", name);
                     intent.putExtra("joinRoom", roomId);
                     mContext.startActivity(intent);
