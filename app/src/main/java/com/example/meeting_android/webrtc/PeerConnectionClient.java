@@ -9,8 +9,12 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.example.meeting_android.R;
 
+import org.webrtc.AudioSource;
+import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.DataChannel;
@@ -38,11 +42,14 @@ import java.util.List;
 
 public class PeerConnectionClient {
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
+    public static final String AUDIO_TRACK_ID = "ARDAMSa0";
+
     public Context mContext;
     public EglBase rootEglBase;
     public Activity mActivity;
     public VideoCapturer videoCapturer;
     public VideoTrack localTrack;
+    public AudioTrack audioTrack;
     public VideoTrack remoteTrack;
     public Boolean isCamera = true;
     public PeerConnectionFactory peerConnectionFactory;
@@ -55,6 +62,8 @@ public class PeerConnectionClient {
     public MediaConstraints sdpMediaConstraints;
     SurfaceViewRenderer localView;
     SurfaceViewRenderer remoteView;
+    private AudioSource audioSource;
+    private AudioTrack localAudioTrack;
 
     public PeerConnectionClient(Context mContext, Activity mActivity) {
         this.mContext = mContext;
@@ -70,6 +79,7 @@ public class PeerConnectionClient {
         localTrack = getLocalVideo(true);
         localTrack.addSink(localView);
         peerConnection.addTrack(localTrack);
+        peerConnection.addTrack(getAudioTrack());
     }
     // SurfaceViewRenderer 초기화 메서드
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
@@ -168,6 +178,13 @@ public class PeerConnectionClient {
         localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
 
         return localVideo;
+    }
+
+    private AudioTrack getAudioTrack() {
+        audioSource = peerConnectionFactory.createAudioSource(sdpMediaConstraints);
+        localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
+        localAudioTrack.setEnabled(true);
+        return localAudioTrack;
     }
 
     //전면 카메라 설정
