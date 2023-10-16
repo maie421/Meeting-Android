@@ -10,14 +10,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.R;
+import com.example.meeting_android.api.user.User;
+import com.example.meeting_android.api.user.UserService;
+import com.example.meeting_android.common.TokenManager;
 import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MeetingActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST = 2;
@@ -27,6 +35,7 @@ public class MeetingActivity extends AppCompatActivity {
     private CustomDialog customDialog;
     private String randomNumberAsString;
     public String name;
+    public UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +57,15 @@ public class MeetingActivity extends AppCompatActivity {
 
     private void initDialog() {
         Intent intent = getIntent();
+            //비회원
         if (intent.hasExtra("name") && intent.hasExtra("joinRoom")) {
             name = intent.getStringExtra("name");
             randomNumberAsString = intent.getStringExtra("joinRoom");
-            customDialog = new CustomDialog(this, this, randomNumberAsString, name);
         }else{
+            //회원
             Random random = new Random();
             int randomNumber = random.nextInt(10000);
             randomNumberAsString = Integer.toString(randomNumber);
-            customDialog = new CustomDialog(this, this, randomNumberAsString);
         }
     }
 
@@ -128,6 +137,28 @@ public class MeetingActivity extends AppCompatActivity {
     }
 
     private void initWebSocketClient() {
-        webSocketClientManager = new WebSocketClientManager(this, this, randomNumberAsString);
+        TokenManager tokenManager = new TokenManager(this);
+        String token = tokenManager.getToken();
+        if (token != null) {
+            userService = new UserService(this, this);
+            userService.getUser(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    if (response.isSuccessful()) {
+                        User user = response.body();
+                        customDialog = new CustomDialog(userService.mContext, userService.mActivity, randomNumberAsString,user.name);
+                        webSocketClientManager = new WebSocketClientManager(userService.mContext, userService.mActivity, customDialog, randomNumberAsString, user.name);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+
+                }
+            });
+        }else{
+            customDialog = new CustomDialog(this, this, randomNumberAsString, name);
+            webSocketClientManager = new WebSocketClientManager(this, this, customDialog, randomNumberAsString, name);
+        }
     }
 }

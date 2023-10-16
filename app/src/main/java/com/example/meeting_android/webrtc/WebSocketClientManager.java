@@ -3,6 +3,10 @@ package com.example.meeting_android.webrtc;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Button;
+
+import com.example.meeting_android.CustomDialog;
+import com.example.meeting_android.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,19 +21,23 @@ public class WebSocketClientManager {
     private static final String TAG = "웹소켓";
     public Context mContext;
     public Activity mActivity;
+    public CustomDialog customDialog;
     public static String roomName;
+    public static String name;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
-    public WebSocketClientManager(Context mContext, Activity mActivity, String roomName) {
+    public WebSocketClientManager(Context mContext, Activity mActivity, CustomDialog customDialog, String roomName, String name) {
         peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
+        this.customDialog = customDialog;
         this.roomName = roomName;
+        this.name = name;
         connect();
     }
 
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://6348-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://6cff-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -38,7 +46,7 @@ public class WebSocketClientManager {
             mSocket.on("ice", onIce);
             mSocket.connect();
 
-            mSocket.emit("join_room", roomName);
+            mSocket.emit("join_room", roomName, name);
         } catch (Exception e) {
             Log.d(TAG,"연결 실패" + e.getMessage());
             e.printStackTrace();
@@ -70,7 +78,6 @@ public class WebSocketClientManager {
                 peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
-                        // 실패 시 호출됩니다.
                         Log.e(TAG, "setLocalDescription failed: " + error);
                     }
                 }, sessionDescription);
@@ -149,12 +156,11 @@ public class WebSocketClientManager {
         if (args != null || args[0] != null) {
             JSONObject msg = (JSONObject) args[0];
             try {
-                IceCandidate iecCandidate = new IceCandidate(  msg.getString("sdpMid"),msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
+                IceCandidate iecCandidate = new IceCandidate(  msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
                 peerConnectionClient.peerConnection.addIceCandidate(iecCandidate);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-
         }
     };
 
