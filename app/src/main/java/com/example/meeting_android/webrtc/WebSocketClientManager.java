@@ -163,7 +163,9 @@ public class WebSocketClientManager {
             }
         }
     };
+    public void onCameraSwitch(){
 
+    }
     public static void sendIce(IceCandidate iceCandidate) {
         Log.d(TAG, "ice");
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);

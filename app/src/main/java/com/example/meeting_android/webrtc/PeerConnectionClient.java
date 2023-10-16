@@ -44,6 +44,7 @@ public class PeerConnectionClient {
     public VideoCapturer videoCapturer;
     public VideoTrack localTrack;
     public VideoTrack remoteTrack;
+    public Boolean isCamera = true;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
@@ -305,6 +306,10 @@ public class PeerConnectionClient {
         } catch (Exception e) {
             Log.e(TAG, "Failed to get video track", e);
         }
+    }
+
+    public void onCameraSwitch(){
+        localTrack.setEnabled(isCamera = !isCamera);
     }
 }
 

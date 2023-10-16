@@ -87,6 +87,13 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_video) {
+
+                if (webSocketClientManager.peerConnectionClient.isCamera == true) {
+                    item.setIcon(R.drawable.video_icon_close);
+                }else{
+                    item.setIcon(R.drawable.video_icon_128703);
+                }
+                webSocketClientManager.peerConnectionClient.onCameraSwitch();
                 return true;
             }
             if (itemId == R.id.tab_chat) {
