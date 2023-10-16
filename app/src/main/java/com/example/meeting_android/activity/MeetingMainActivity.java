@@ -20,5 +20,11 @@ public class MeetingMainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MeetingActivity.class);
             startActivity(intent);
         });
+
+        binding.addRoomButton.setOnClickListener(v->{
+            Intent intent = new Intent(this, JoinRoomActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 }

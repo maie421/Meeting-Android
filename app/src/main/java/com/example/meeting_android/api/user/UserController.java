@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,17 +94,14 @@ public class UserController {
         });
     }
 
-    public void getUser(String roomId){
+    public void getUser(){
         userService.getUser( new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     User user = response.body();
-                    TextView nameTextView = mActivity.findViewById(R.id.nameTextView);
-                    TextView roomTextView = mActivity.findViewById(R.id.roomTextView);
-                    Log.i("API LOG", user.name);
-//                    nameTextView.setText(user.name);
-//                    roomTextView.setText(roomId);
+                    EditText nameEditText = mActivity.findViewById(R.id.nameEditText);
+                    nameEditText.setText(user.name);
                 }else {
                     Toast.makeText(mContext, "토큰 만료", Toast.LENGTH_SHORT).show();
                 }
@@ -111,7 +109,7 @@ public class UserController {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-
+                Toast.makeText(mContext, "서버 연결 안됨", Toast.LENGTH_SHORT).show();
             }
         });
     }
