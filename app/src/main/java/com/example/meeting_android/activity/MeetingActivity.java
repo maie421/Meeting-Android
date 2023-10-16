@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.R;
+import com.example.meeting_android.api.room.Room;
+import com.example.meeting_android.api.room.RoomController;
 import com.example.meeting_android.api.user.User;
 import com.example.meeting_android.api.user.UserService;
 import com.example.meeting_android.common.TokenManager;
@@ -36,6 +38,7 @@ public class MeetingActivity extends AppCompatActivity {
     private String randomNumberAsString;
     public String name;
     public UserService userService;
+    public RoomController roomController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,8 @@ public class MeetingActivity extends AppCompatActivity {
 
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        roomController = new RoomController(this, this);
+
         initDialog();
 
         onClickButtonNavigation();
@@ -62,9 +67,9 @@ public class MeetingActivity extends AppCompatActivity {
             name = intent.getStringExtra("name");
             randomNumberAsString = intent.getStringExtra("joinRoom");
         }else{
-            //회원
+            //방생성
             Random random = new Random();
-            int randomNumber = random.nextInt(10000);
+            int randomNumber = random.nextInt(100000);
             randomNumberAsString = Integer.toString(randomNumber);
         }
     }
@@ -148,12 +153,14 @@ public class MeetingActivity extends AppCompatActivity {
                         User user = response.body();
                         customDialog = new CustomDialog(userService.mContext, userService.mActivity, randomNumberAsString,user.name);
                         webSocketClientManager = new WebSocketClientManager(userService.mContext, userService.mActivity, customDialog, randomNumberAsString, user.name);
+
+                        Room room = new Room(randomNumberAsString);
+                        roomController.createRoom(room);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
-
                 }
             });
         }else{
