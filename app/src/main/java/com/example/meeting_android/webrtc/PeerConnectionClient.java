@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meeting_android.R;
+import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -64,22 +67,30 @@ public class PeerConnectionClient {
     SurfaceViewRenderer remoteView;
     private AudioSource audioSource;
     private AudioTrack localAudioTrack;
+    private SurfaceRendererAdapter surfaceRendererAdapter;
 
-    public PeerConnectionClient(Context mContext, Activity mActivity) {
+    public PeerConnectionClient(Context mContext, Activity mActivity){
         this.mContext = mContext;
         this.mActivity = mActivity;
-        localView = mActivity.findViewById(R.id.View);
-        remoteView = mActivity.findViewById(R.id.pip_video_view);
+
+        RecyclerView userRecyclerView = mActivity.findViewById(R.id.recyclerView);
 
         initPeer();
 
-        initSurfaceViewRenderer(localView);
-        initSurfaceViewRenderer(remoteView);
+        surfaceRendererAdapter = new SurfaceRendererAdapter(new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
+        userRecyclerView.setAdapter(surfaceRendererAdapter);
+        userRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
-        localTrack = getLocalVideo(true);
-        localTrack.addSink(localView);
-        peerConnection.addTrack(localTrack);
-        peerConnection.addTrack(getAudioTrack());
+        // 사용자 추가 예시:
+        surfaceRendererAdapter.addUser("User1");
+
+//        initSurfaceViewRenderer(localView);
+//        initSurfaceViewRenderer(remoteView);
+
+//        localTrack = getLocalVideo(true);
+//        localTrack.addSink(localView);
+//        peerConnection.addTrack(localTrack);
+//        peerConnection.addTrack(getAudioTrack());
     }
     // SurfaceViewRenderer 초기화 메서드
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
@@ -167,25 +178,25 @@ public class PeerConnectionClient {
         peerConnection = peerConnectionFactory.createPeerConnection(configuration, pcObserver);
     }
 
-    public VideoTrack getLocalVideo(boolean status){
-        VideoTrack localVideo;
-        videoCapturer = createCameraCapturer(status);
-        VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
-
-        videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
-        videoCapturer.startCapture(240, 320, 30);
-
-        localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
-
-        return localVideo;
-    }
-
-    private AudioTrack getAudioTrack() {
-        audioSource = peerConnectionFactory.createAudioSource(sdpMediaConstraints);
-        localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
-        localAudioTrack.setEnabled(true);
-        return localAudioTrack;
-    }
+//    public VideoTrack getLocalVideo(boolean status){
+//        VideoTrack localVideo;
+//        videoCapturer = createCameraCapturer(status);
+//        VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
+//
+//        videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
+//        videoCapturer.startCapture(240, 320, 30);
+//
+//        localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
+//
+//        return localVideo;
+//    }
+//
+//    private AudioTrack getAudioTrack() {
+//        audioSource = peerConnectionFactory.createAudioSource(sdpMediaConstraints);
+//        localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
+//        localAudioTrack.setEnabled(true);
+//        return localAudioTrack;
+//    }
 
     //전면 카메라 설정
     private VideoCapturer createCameraCapturer(boolean isFront) {
@@ -275,13 +286,13 @@ public class PeerConnectionClient {
             // 제거된 미디어 스트림에 대한 콜백
             @Override
             public void onRemoveStream(MediaStream mediaStream) {
-                Log.d(TAG, "onRemoveStream : "+ mediaStream);
-                SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
-
-                // 제거된 미디어 스트림의 비디오 트랙을 제거
-                if (mediaStream.videoTracks.size() > 0) {
-                    mediaStream.videoTracks.get(0).removeSink(pip_video_view);
-                }
+//                Log.d(TAG, "onRemoveStream : "+ mediaStream);
+//                SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
+//
+//                // 제거된 미디어 스트림의 비디오 트랙을 제거
+//                if (mediaStream.videoTracks.size() > 0) {
+//                    mediaStream.videoTracks.get(0).removeSink(pip_video_view);
+//                }
 
             }
             // 데이터 채널이 생성될 때 호출되는 콜백
@@ -310,26 +321,26 @@ public class PeerConnectionClient {
     }
 
     private void getRemoteStream(MediaStream mediaStream) {
-        try {
-            SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
-            VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
-            mActivity.runOnUiThread(() -> {
-                try {
-                    remoteVideoTrack.addSink(pip_video_view);
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to add video sink", e);
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get video track", e);
-        }
+//        try {
+//            SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
+//            VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
+//            mActivity.runOnUiThread(() -> {
+//                try {
+//                    remoteVideoTrack.addSink(pip_video_view);
+//                } catch (Exception e) {
+//                    Log.e(TAG, "Failed to add video sink", e);
+//                }
+//            });
+//        } catch (Exception e) {
+//            Log.e(TAG, "Failed to get video track", e);
+//        }
     }
 
-    public void onCameraSwitch(){
-        localTrack.setEnabled(isCamera = !isCamera);
-    }
-    public void onAudioTrackSwitch(){
-        localAudioTrack.setEnabled(isAudio = !isAudio);
-    }
+//    public void onCameraSwitch(){
+//        localTrack.setEnabled(isCamera = !isCamera);
+//    }
+//    public void onAudioTrackSwitch(){
+//        localAudioTrack.setEnabled(isAudio = !isAudio);
+//    }
 }
 
