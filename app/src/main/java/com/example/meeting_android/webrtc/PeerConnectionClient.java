@@ -1,5 +1,7 @@
 package com.example.meeting_android.webrtc;
 
+import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
+import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
@@ -45,28 +47,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PeerConnectionClient {
-    public static final String VIDEO_TRACK_ID = "ARDAMSv0";
-    public static final String AUDIO_TRACK_ID = "ARDAMSa0";
-
     public Context mContext;
     public EglBase rootEglBase;
     public Activity mActivity;
-    public VideoCapturer videoCapturer;
-    public VideoTrack localTrack;
-    public VideoTrack remoteTrack;
     public Boolean isCamera = true;
     public Boolean isAudio = true;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
-    private static final String TAG = "웹소켓";
+    private String TAG = "웹소켓";
     private PeerConnection.RTCConfiguration configuration;
     public PeerConnection peerConnection;
     public PeerConnection.Observer pcObserver;
     public MediaConstraints sdpMediaConstraints;
-    SurfaceViewRenderer localView;
-    SurfaceViewRenderer remoteView;
-    private AudioSource audioSource;
     private SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
     private int gridCount = 1;
@@ -85,48 +78,6 @@ public class PeerConnectionClient {
 
         surfaceRendererAdapter.addMeetingVideoName("User1");
     }
-    // SurfaceViewRenderer 초기화 메서드
-    void initSurfaceViewRenderer(SurfaceViewRenderer view){
-        view.setMirror(false);
-        //뷰의 크기에 맞게 비디오, 프레임의 크기 조정 가로 세로 비율을 유지, 검은 색 테두리가 표시 될 수 있습니다.
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
-        view.removeFrameListener(new EglRenderer.FrameListener() {
-            @Override
-            public void onFrame(Bitmap bitmap) {
-                Log.i(TAG,"removeFrameListener");
-            }
-        });
-        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-                Log.i(TAG,"onViewAttachedToWindow");
-
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                Log.i(TAG,"onViewDetachedFromWindow");
-
-            }
-        });
-        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-
-            }
-        });
-        view.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-            @Override
-            public void onFirstFrameRendered() {
-                Log.i(TAG,"onFirstFrameRendered");
-            }
-            @Override
-            public void onFrameResolutionChanged(int i, int i1, int i2) {
-                Log.i(TAG,"onFrameResolutionChanged");
-            }
-        });
-    }
-
     private void initPeer() {
         PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
                 .builder(mContext)
@@ -171,71 +122,6 @@ public class PeerConnectionClient {
         peerConnection = peerConnectionFactory.createPeerConnection(configuration, pcObserver);
     }
 
-//    public VideoTrack getLocalVideo(boolean status){
-//        VideoTrack localVideo;
-//        videoCapturer = createCameraCapturer(status);
-//        VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
-//
-//        videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
-//        videoCapturer.startCapture(240, 320, 30);
-//
-//        localVideo = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
-//
-//        return localVideo;
-//    }
-//
-//    private AudioTrack getAudioTrack() {
-//        audioSource = peerConnectionFactory.createAudioSource(sdpMediaConstraints);
-//        localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
-//        localAudioTrack.setEnabled(true);
-//        return localAudioTrack;
-//    }
-
-    //전면 카메라 설정
-//    private VideoCapturer createCameraCapturer(boolean isFront) {
-//        Camera1Enumerator enumerator = new Camera1Enumerator(false);
-//
-//        final String[] deviceNames = enumerator.getDeviceNames();
-//        for (String deviceName : deviceNames) {
-//            if (isFront ? enumerator.isFrontFacing(deviceName) : enumerator.isBackFacing(deviceName)) {
-//                VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, new CameraVideoCapturer.CameraEventsHandler() {
-//                    @Override
-//                    public void onCameraError(String s) {
-//                        Log.e(TAG,"onCameraError");
-//                    }
-//                    @Override
-//                    public void onCameraDisconnected() {
-//                        Log.e(TAG,"onCameraDisconnected");
-//                    }
-//
-//                    @Override
-//                    public void onCameraFreezed(String s) {
-//                        Log.e(TAG,"onCameraFreezed");
-//                    }
-//
-//                    @Override
-//                    public void onCameraOpening(String s) {
-//                        Log.e(TAG,"onCameraOpening");
-//                    }
-//
-//                    @Override
-//                    public void onFirstFrameAvailable() {
-//                        Log.e(TAG,"onFirstFrameAvailable");
-//                    }
-//
-//                    @Override
-//                    public void onCameraClosed() {
-//                        Log.e(TAG,"onCameraClosed");
-//                    }
-//                });
-//
-//                if (videoCapturer != null) {
-//                    return videoCapturer;
-//                }
-//            }
-//        }
-//        return null;
-//    }
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
             @Override
@@ -328,11 +214,11 @@ public class PeerConnectionClient {
         }
     }
 //
-//    public void onCameraSwitch(){
-//        localVideoTrack.setEnabled(isCamera = !isCamera);
-//    }
-//    public void onAudioTrackSwitch(){
-//        localAudioTrack.setEnabled(isAudio = !isAudio);
-//    }
+    public void onCameraSwitch(){
+        localVideoTrack.setEnabled(isCamera = !isCamera);
+    }
+    public void onAudioTrackSwitch(){
+        localAudioTrack.setEnabled(isAudio = !isAudio);
+    }
 }
 

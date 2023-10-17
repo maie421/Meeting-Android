@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +19,6 @@ import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
 import org.webrtc.EglRenderer;
 import org.webrtc.MediaConstraints;
-import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
@@ -35,7 +33,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public String VIDEO_TRACK_ID = "ARDAMSv0";
     public String AUDIO_TRACK_ID = "ARDAMSa0";
     private String TAG = "웹소켓";
-
+    public static VideoTrack localVideoTrack;
+    public static AudioTrack localAudioTrack;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
@@ -63,7 +62,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public void localBind(MeetingVideo meetingVideo){
         initSurfaceViewRenderer(surfaceViewRenderer);
 
-        VideoTrack localVideoTrack = getLocalVideo(true);
+        localVideoTrack = getLocalVideo(true);
         localVideoTrack.addSink(surfaceViewRenderer);
         peerConnection.addTrack(localVideoTrack);
         peerConnection.addTrack(getAudioTrack());
@@ -138,7 +137,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
 
     private AudioTrack getAudioTrack() {
         AudioSource audioSource = peerConnectionFactory.createAudioSource(sdpMediaConstraints);
-        AudioTrack localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
+        localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
         localAudioTrack.setEnabled(true);
         return localAudioTrack;
     }

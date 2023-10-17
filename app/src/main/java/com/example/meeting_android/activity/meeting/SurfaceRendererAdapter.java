@@ -24,10 +24,7 @@ import java.util.List;
 public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRendererViewHolder> {
     private List<MeetingVideo> meetings;
 
-    private static final String TAG = "웹소켓";
     public EglBase.Context eglBaseContext;
-    public static VideoTrack localVideoTrack;
-    public static AudioTrack localAudioTrack;
     public PeerConnectionFactory peerConnectionFactory;
     public PeerConnection peerConnection;
     public MediaConstraints sdpMediaConstraints;
