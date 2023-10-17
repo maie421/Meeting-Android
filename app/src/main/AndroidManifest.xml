@@ -38,7 +38,7 @@
             android:name=".activity.CustomDialogActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.MeetingActivity"
+            android:name=".activity.meeting.MeetingActivity"
             android:exported="false" />
         <activity
             android:name=".activity.PrivacyActivity"

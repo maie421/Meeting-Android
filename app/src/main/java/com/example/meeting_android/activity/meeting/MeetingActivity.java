@@ -1,4 +1,4 @@
-package com.example.meeting_android.activity;
+package com.example.meeting_android.activity.meeting;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -169,7 +169,7 @@ public class MeetingActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         User user = response.body();
                         customDialog = new CustomDialog(userService.mContext, userService.mActivity, randomNumberAsString, user.name);
-                        webSocketClientManager = new WebSocketClientManager(userService.mContext, userService.mActivity, customDialog, randomNumberAsString, user.name);
+                        webSocketClientManager = new WebSocketClientManager(userService.mContext, userService.mActivity, randomNumberAsString, user.name);
 
                         Room room = new Room(randomNumberAsString);
                         roomController.createRoom(room);
@@ -182,7 +182,7 @@ public class MeetingActivity extends AppCompatActivity {
             });
         }else {
             customDialog = new CustomDialog(this, this, randomNumberAsString, hostName);
-            webSocketClientManager = new WebSocketClientManager(this, this, customDialog, randomNumberAsString, name);
+            webSocketClientManager = new WebSocketClientManager(this, this, randomNumberAsString, name);
         }
     }
 }

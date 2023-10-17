@@ -26,9 +26,8 @@ public class WebSocketClientManager {
     public static String name;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
-    public WebSocketClientManager(Context mContext, Activity mActivity, CustomDialog customDialog, String roomName, String name) {
+    public WebSocketClientManager(Context mContext, Activity mActivity, String roomName, String name) {
         peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
-        this.customDialog = customDialog;
         this.roomName = roomName;
         this.name = name;
         connect();

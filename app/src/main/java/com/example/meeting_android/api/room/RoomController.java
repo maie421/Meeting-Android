@@ -3,9 +3,8 @@ package com.example.meeting_android.api.room;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
-import com.example.meeting_android.activity.MeetingActivity;
+import com.example.meeting_android.activity.meeting.MeetingActivity;
 import com.example.meeting_android.common.Common;
 
 import retrofit2.Call;

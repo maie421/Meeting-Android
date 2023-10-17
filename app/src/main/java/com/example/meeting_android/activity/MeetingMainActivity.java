@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.meeting_android.R;
+import com.example.meeting_android.activity.meeting.MeetingActivity;
 import com.example.meeting_android.databinding.ActivityMeetingMainBinding;
 
 public class MeetingMainActivity extends AppCompatActivity {
