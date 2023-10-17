@@ -5,12 +5,16 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.meeting_android.CustomDialog;
+import com.example.meeting_android.activity.meeting.MeetingVideo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -57,13 +61,15 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onWelcome = args -> {
         Log.i(TAG, "Welcome");
-
+        createOfferAndSend();
+    };
+    private void createOfferAndSend() {
         peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 JSONObject message = new JSONObject();
                 try {
-                    message.put("type","offer");
+                    message.put("type", "offer");
                     message.put("sdp", sessionDescription.description);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -79,7 +85,7 @@ public class WebSocketClientManager {
                 }, sessionDescription);
             }
         }, peerConnectionClient.sdpMediaConstraints);
-    };
+    }
     private Emitter.Listener onOffer = args -> {
         Log.d(TAG, "onOffer");
         String _sdp;
