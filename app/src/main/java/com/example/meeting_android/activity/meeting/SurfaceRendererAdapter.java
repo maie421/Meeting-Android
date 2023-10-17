@@ -35,8 +35,8 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     private List<String> users; // List of user IDs or other identifiers
     private static final String TAG = "웹소켓";
     public EglBase.Context eglBaseContext;
-    public VideoTrack videoTrack;
-    public AudioTrack audioTrack;
+    public static VideoTrack localVideoTrack;
+    public static AudioTrack localAudioTrack;
     public PeerConnectionFactory peerConnectionFactory;
     public PeerConnection peerConnection;
     public MediaConstraints sdpMediaConstraints;
@@ -90,9 +90,9 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
             initSurfaceViewRenderer(surfaceRenderer);
             if (users.size() == 1){
                 Log.d("디버그","local");
-                videoTrack = getLocalVideo(true);
-                videoTrack.addSink(surfaceRenderer);
-                peerConnection.addTrack(videoTrack);
+                localVideoTrack = getLocalVideo(true);
+                localVideoTrack.addSink(surfaceRenderer);
+                peerConnection.addTrack(localVideoTrack);
                 peerConnection.addTrack(getAudioTrack());
             }
         }
@@ -152,7 +152,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
 
     private AudioTrack getAudioTrack() {
         AudioSource audioSource = peerConnectionFactory.createAudioSource(sdpMediaConstraints);
-        AudioTrack localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
+        localAudioTrack = peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);
         localAudioTrack.setEnabled(true);
         return localAudioTrack;
     }

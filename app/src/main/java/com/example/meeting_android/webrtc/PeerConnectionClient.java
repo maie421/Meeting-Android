@@ -1,5 +1,7 @@
 package com.example.meeting_android.webrtc;
 
+import static com.example.meeting_android.activity.meeting.SurfaceRendererAdapter.localAudioTrack;
+import static com.example.meeting_android.activity.meeting.SurfaceRendererAdapter.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
@@ -66,7 +68,6 @@ public class PeerConnectionClient {
     SurfaceViewRenderer localView;
     SurfaceViewRenderer remoteView;
     private AudioSource audioSource;
-    private AudioTrack localAudioTrack;
     private SurfaceRendererAdapter surfaceRendererAdapter;
 
     public PeerConnectionClient(Context mContext, Activity mActivity){
@@ -336,11 +337,11 @@ public class PeerConnectionClient {
 //        }
     }
 
-//    public void onCameraSwitch(){
-//        localTrack.setEnabled(isCamera = !isCamera);
-//    }
-//    public void onAudioTrackSwitch(){
-//        localAudioTrack.setEnabled(isAudio = !isAudio);
-//    }
+    public void onCameraSwitch(){
+        localVideoTrack.setEnabled(isCamera = !isCamera);
+    }
+    public void onAudioTrackSwitch(){
+        localAudioTrack.setEnabled(isAudio = !isAudio);
+    }
 }
 
