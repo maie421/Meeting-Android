@@ -89,7 +89,7 @@ public class MeetingActivity extends AppCompatActivity {
                 }else{
                     item.setIcon(R.drawable.mic);
                 }
-                webSocketClientManager.peerConnectionClient.onAudioTrackSwitch();
+//                webSocketClientManager.peerConnectionClient.onAudioTrackSwitch();
                 return true;
             }
             if (itemId == R.id.tab_video) {
@@ -98,7 +98,7 @@ public class MeetingActivity extends AppCompatActivity {
                 }else{
                     item.setIcon(R.drawable.video_icon_128703);
                 }
-                webSocketClientManager.peerConnectionClient.onCameraSwitch();
+//                webSocketClientManager.peerConnectionClient.onCameraSwitch();
                 return true;
             }
             if (itemId == R.id.tab_chat) {

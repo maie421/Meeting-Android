@@ -1,7 +1,5 @@
 package com.example.meeting_android.webrtc;
 
-import static com.example.meeting_android.activity.meeting.SurfaceRendererAdapter.localAudioTrack;
-import static com.example.meeting_android.activity.meeting.SurfaceRendererAdapter.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
@@ -82,8 +80,7 @@ public class PeerConnectionClient {
         userRecyclerView.setAdapter(surfaceRendererAdapter);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
-        // 사용자 추가 예시:
-        surfaceRendererAdapter.addUser("User1");
+        surfaceRendererAdapter.addMeetingVideoName("User1");
 
 //        initSurfaceViewRenderer(localView);
 //        initSurfaceViewRenderer(remoteView);
@@ -282,7 +279,7 @@ public class PeerConnectionClient {
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : " + mediaStream);
-                getRemoteStream(mediaStream);
+//                getRemoteStream(mediaStream);
             }
             // 제거된 미디어 스트림에 대한 콜백
             @Override
@@ -321,17 +318,17 @@ public class PeerConnectionClient {
         };
     }
 
-    private void getRemoteStream(MediaStream mediaStream) {
-        if (mediaStream.videoTracks.size() > 0) {
-            surfaceRendererAdapter.addMediaStream("User2", mediaStream);
-        }
-    }
-
-    public void onCameraSwitch(){
-        localVideoTrack.setEnabled(isCamera = !isCamera);
-    }
-    public void onAudioTrackSwitch(){
-        localAudioTrack.setEnabled(isAudio = !isAudio);
-    }
+//    private void getRemoteStream(MediaStream mediaStream) {
+//        if (mediaStream.videoTracks.size() > 0) {
+//            surfaceRendererAdapter.addMediaStream("User2", mediaStream);
+//        }
+//    }
+//
+//    public void onCameraSwitch(){
+//        localVideoTrack.setEnabled(isCamera = !isCamera);
+//    }
+//    public void onAudioTrackSwitch(){
+//        localAudioTrack.setEnabled(isAudio = !isAudio);
+//    }
 }
 
