@@ -3,10 +3,8 @@ package com.example.meeting_android.webrtc;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Button;
 
 import com.example.meeting_android.CustomDialog;
-import com.example.meeting_android.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +34,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://cbdd-27-35-20-189.ngrok-free.app");
+            mSocket = IO.socket("https://e051-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -162,9 +160,6 @@ public class WebSocketClientManager {
             }
         }
     };
-    public void onCameraSwitch(){
-
-    }
     public static void sendIce(IceCandidate iceCandidate) {
         Log.d(TAG, "ice");
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);

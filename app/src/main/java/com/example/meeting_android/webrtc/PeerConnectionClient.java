@@ -78,7 +78,7 @@ public class PeerConnectionClient {
 
         initPeer();
 
-        surfaceRendererAdapter = new SurfaceRendererAdapter(new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
+        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
@@ -200,50 +200,50 @@ public class PeerConnectionClient {
 //    }
 
     //전면 카메라 설정
-    private VideoCapturer createCameraCapturer(boolean isFront) {
-        Camera1Enumerator enumerator = new Camera1Enumerator(false);
-
-        final String[] deviceNames = enumerator.getDeviceNames();
-        for (String deviceName : deviceNames) {
-            if (isFront ? enumerator.isFrontFacing(deviceName) : enumerator.isBackFacing(deviceName)) {
-                VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, new CameraVideoCapturer.CameraEventsHandler() {
-                    @Override
-                    public void onCameraError(String s) {
-                        Log.e(TAG,"onCameraError");
-                    }
-                    @Override
-                    public void onCameraDisconnected() {
-                        Log.e(TAG,"onCameraDisconnected");
-                    }
-
-                    @Override
-                    public void onCameraFreezed(String s) {
-                        Log.e(TAG,"onCameraFreezed");
-                    }
-
-                    @Override
-                    public void onCameraOpening(String s) {
-                        Log.e(TAG,"onCameraOpening");
-                    }
-
-                    @Override
-                    public void onFirstFrameAvailable() {
-                        Log.e(TAG,"onFirstFrameAvailable");
-                    }
-
-                    @Override
-                    public void onCameraClosed() {
-                        Log.e(TAG,"onCameraClosed");
-                    }
-                });
-
-                if (videoCapturer != null) {
-                    return videoCapturer;
-                }
-            }
-        }
-        return null;
-    }
+//    private VideoCapturer createCameraCapturer(boolean isFront) {
+//        Camera1Enumerator enumerator = new Camera1Enumerator(false);
+//
+//        final String[] deviceNames = enumerator.getDeviceNames();
+//        for (String deviceName : deviceNames) {
+//            if (isFront ? enumerator.isFrontFacing(deviceName) : enumerator.isBackFacing(deviceName)) {
+//                VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, new CameraVideoCapturer.CameraEventsHandler() {
+//                    @Override
+//                    public void onCameraError(String s) {
+//                        Log.e(TAG,"onCameraError");
+//                    }
+//                    @Override
+//                    public void onCameraDisconnected() {
+//                        Log.e(TAG,"onCameraDisconnected");
+//                    }
+//
+//                    @Override
+//                    public void onCameraFreezed(String s) {
+//                        Log.e(TAG,"onCameraFreezed");
+//                    }
+//
+//                    @Override
+//                    public void onCameraOpening(String s) {
+//                        Log.e(TAG,"onCameraOpening");
+//                    }
+//
+//                    @Override
+//                    public void onFirstFrameAvailable() {
+//                        Log.e(TAG,"onFirstFrameAvailable");
+//                    }
+//
+//                    @Override
+//                    public void onCameraClosed() {
+//                        Log.e(TAG,"onCameraClosed");
+//                    }
+//                });
+//
+//                if (videoCapturer != null) {
+//                    return videoCapturer;
+//                }
+//            }
+//        }
+//        return null;
+//    }
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
             @Override
@@ -316,25 +316,15 @@ public class PeerConnectionClient {
 //                        mediaStream.videoTracks.get(1).addSink(pip_video_view);
 //                    }
 //                }
-//                Log.d(TAG, "onAddTrack"+ mediaStreams);
+//                Log.d(TAG, "onAddTrack"+ 그mediaStreams);
             }
         };
     }
 
     private void getRemoteStream(MediaStream mediaStream) {
-//        try {
-//            SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
-//            VideoTrack remoteVideoTrack = mediaStream.videoTracks.get(0);
-//            mActivity.runOnUiThread(() -> {
-//                try {
-//                    remoteVideoTrack.addSink(pip_video_view);
-//                } catch (Exception e) {
-//                    Log.e(TAG, "Failed to add video sink", e);
-//                }
-//            });
-//        } catch (Exception e) {
-//            Log.e(TAG, "Failed to get video track", e);
-//        }
+        if (mediaStream.videoTracks.size() > 0) {
+            surfaceRendererAdapter.addMediaStream("User2", mediaStream);
+        }
     }
 
     public void onCameraSwitch(){

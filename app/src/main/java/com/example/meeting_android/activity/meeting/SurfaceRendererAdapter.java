@@ -2,6 +2,7 @@ package com.example.meeting_android.activity.meeting;
 
 import static org.webrtc.ContextUtils.getApplicationContext;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
 import org.webrtc.EglRenderer;
 import org.webrtc.MediaConstraints;
+import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
@@ -32,7 +34,7 @@ import java.util.List;
 public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRendererAdapter.RendererViewHolder> {
     public String VIDEO_TRACK_ID = "ARDAMSv0";
     public String AUDIO_TRACK_ID = "ARDAMSa0";
-    private List<String> users; // List of user IDs or other identifiers
+    private List<MeetingVideo> meetings;
     private static final String TAG = "웹소켓";
     public EglBase.Context eglBaseContext;
     public static VideoTrack localVideoTrack;
@@ -41,13 +43,15 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public PeerConnection peerConnection;
     public MediaConstraints sdpMediaConstraints;
     public SurfaceTextureHelper surfaceTextureHelper;
-    public SurfaceRendererAdapter(List<String> users, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
-        this.users = users;
+    public Activity mActivity;
+    public SurfaceRendererAdapter(Activity activity, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
+        this.meetings = meetings;
         this.eglBaseContext = eglBaseContext;
         this.peerConnectionFactory = peerConnectionFactory;
         this.peerConnection = peerConnection;
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
+        this.mActivity = activity;
     }
 
     @Override
@@ -58,26 +62,51 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
 
     @Override
     public void onBindViewHolder(RendererViewHolder holder, int position) {
-        // Initialize and set up the SurfaceViewRenderer for each user
-        String userId = users.get(position);
-        // Here you can set up the SurfaceViewRenderer for this user using userId
+// Initialize and set up the SurfaceViewRenderer for each user
+        MeetingVideo meetingVideo = meetings.get(position);
         SurfaceViewRenderer renderer = holder.surfaceRenderer;
+
         // Set renderer properties and add it to the appropriate view hierarchy
-        // Example: renderer.init(context, null);
+        initSurfaceViewRenderer(renderer);
+        Log.d("디버그", "뭐냐");
+        // Handle local or remote video tracks
+        if (position == 0) {
+            Log.d("디버그", "여긴어디");
+            // Local user
+            localVideoTrack = getLocalVideo(true);
+            localVideoTrack.addSink(renderer);
+            peerConnection.addTrack(localVideoTrack);
+            peerConnection.addTrack(getAudioTrack());
+        } else {
+            Log.d("디버그", "여기?");
+            // Remote user
+            if (meetingVideo.mediaStream != null && !meetingVideo.mediaStream.videoTracks.isEmpty()) {
+                Log.d("디버그", "들어와...?");
+                VideoTrack remoteVideoTrack = meetingVideo.mediaStream.videoTracks.get(0);
+                remoteVideoTrack.addSink(renderer);
+                notifyItemInserted(meetings.size() - 1);
+            }
+        }
     }
 
     @Override
     public int getItemCount() {
-        return users.size();
+        return meetings.size();
     }
 
     public void addUser(String userId) {
-        users.add(userId);
-        notifyItemInserted(users.size() - 1);
+        MeetingVideo meetingVideo = new MeetingVideo(userId);
+        meetings.add(meetingVideo);
+        notifyItemInserted(meetings.size() - 1);
+    }
+    public void addMediaStream(String userId, MediaStream mediaStream) {
+        MeetingVideo meetingVideo = new MeetingVideo(userId, mediaStream);
+        meetings.add(meetingVideo);
+//        notifyDataSetChanged();
     }
 
     public void removeUser(int position) {
-        users.remove(position);
+        meetings.remove(position);
         notifyItemRemoved(position);
     }
 
@@ -87,14 +116,6 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
         RendererViewHolder(View itemView) {
             super(itemView);
             surfaceRenderer = itemView.findViewById(R.id.surfaceRenderer);
-            initSurfaceViewRenderer(surfaceRenderer);
-            if (users.size() == 1){
-                Log.d("디버그","local");
-                localVideoTrack = getLocalVideo(true);
-                localVideoTrack.addSink(surfaceRenderer);
-                peerConnection.addTrack(localVideoTrack);
-                peerConnection.addTrack(getAudioTrack());
-            }
         }
     }
 
