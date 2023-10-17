@@ -2,6 +2,7 @@ package com.example.meeting_android.activity.meeting;
 
 import static org.webrtc.ContextUtils.getApplicationContext;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
@@ -46,7 +47,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     SurfaceViewRenderer remoteView;
     private AudioSource audioSource;
     private SurfaceRendererAdapter surfaceRendererAdapter;
-    public SurfaceRendererViewHolder(@NonNull View itemView, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
+    public Activity mActivity;
+    public SurfaceRendererViewHolder(@NonNull View itemView, Activity activity, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
         super(itemView);
         surfaceViewRenderer = itemView.findViewById(R.id.surfaceRenderer);
 
@@ -55,21 +57,31 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         this.peerConnection = peerConnection;
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
+        this.mActivity = activity;
     }
 
     public void localBind(MeetingVideo meetingVideo){
-        // Set renderer properties and add it to the appropriate view hierarchy
         initSurfaceViewRenderer(surfaceViewRenderer);
 
         VideoTrack localVideoTrack = getLocalVideo(true);
         localVideoTrack.addSink(surfaceViewRenderer);
         peerConnection.addTrack(localVideoTrack);
         peerConnection.addTrack(getAudioTrack());
-
     }
 
     public void remoteBind(MeetingVideo meetingVideo){
-
+        initSurfaceViewRenderer(surfaceViewRenderer);
+        Log.d("디버그","remoteBind");
+        VideoTrack remoteVideoTrack = meetingVideo.mediaStream.videoTracks.get(0);
+        if (meetingVideo.mediaStream.videoTracks.size() > 0) {
+            mActivity.runOnUiThread(() -> {
+                try {
+                    remoteVideoTrack.addSink(surfaceViewRenderer);
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to add video sink", e);
+                }
+            });
+        }
     }
 
     void initSurfaceViewRenderer(SurfaceViewRenderer view){

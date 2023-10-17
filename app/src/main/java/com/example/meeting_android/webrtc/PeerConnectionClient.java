@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -67,28 +68,22 @@ public class PeerConnectionClient {
     SurfaceViewRenderer remoteView;
     private AudioSource audioSource;
     private SurfaceRendererAdapter surfaceRendererAdapter;
-
+    public RecyclerView userRecyclerView;
+    private int gridCount = 1;
     public PeerConnectionClient(Context mContext, Activity mActivity){
         this.mContext = mContext;
         this.mActivity = mActivity;
 
-        RecyclerView userRecyclerView = mActivity.findViewById(R.id.recyclerView);
+        userRecyclerView = mActivity.findViewById(R.id.recyclerView);
 
         initPeer();
 
         surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
-        userRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
+        userRecyclerView.setLayoutManager(gridLayoutManager);
 
         surfaceRendererAdapter.addMeetingVideoName("User1");
-
-//        initSurfaceViewRenderer(localView);
-//        initSurfaceViewRenderer(remoteView);
-
-//        localTrack = getLocalVideo(true);
-//        localTrack.addSink(localView);
-//        peerConnection.addTrack(localTrack);
-//        peerConnection.addTrack(getAudioTrack());
     }
     // SurfaceViewRenderer 초기화 메서드
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
@@ -279,7 +274,7 @@ public class PeerConnectionClient {
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : " + mediaStream);
-//                getRemoteStream(mediaStream);
+                getRemoteStream(mediaStream);
             }
             // 제거된 미디어 스트림에 대한 콜백
             @Override
@@ -318,11 +313,20 @@ public class PeerConnectionClient {
         };
     }
 
-//    private void getRemoteStream(MediaStream mediaStream) {
-//        if (mediaStream.videoTracks.size() > 0) {
-//            surfaceRendererAdapter.addMediaStream("User2", mediaStream);
-//        }
-//    }
+    private void getRemoteStream(MediaStream mediaStream) {
+        if (mediaStream.videoTracks.size() > 0) {
+            gridCount++;
+            userRecyclerView.post(new Runnable() {
+                public void run() {
+                    surfaceRendererAdapter.addMeetingVideo("User2", mediaStream);
+                    GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
+                    layoutManager.setSpanCount(gridCount);
+                    surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
+                }
+            });
+
+        }
+    }
 //
 //    public void onCameraSwitch(){
 //        localVideoTrack.setEnabled(isCamera = !isCamera);
