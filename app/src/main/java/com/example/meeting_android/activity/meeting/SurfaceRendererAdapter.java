@@ -30,7 +30,6 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public MediaConstraints sdpMediaConstraints;
     public SurfaceTextureHelper surfaceTextureHelper;
     public Activity mActivity;
-    private int gridCount = 1;
     public SurfaceRendererAdapter(Activity activity, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
         this.meetings = meetings;
         this.eglBaseContext = eglBaseContext;
@@ -53,7 +52,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
         MeetingVideo meetingVideo = meetings.get(position);
 
         if (meetings.size() <= 1) {
-            holder.localBind(meetingVideo);
+            holder.localBind();
         }else {
             holder.remoteBind(meetingVideo);
         }
@@ -67,7 +66,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public void addMeetingVideoName(String userName){
        MeetingVideo meetingVideo = new MeetingVideo(userName);
        this.meetings.add(meetingVideo);
-        notifyItemInserted(meetings.size()-1);
+       notifyItemInserted(meetings.size()-1);
     }
 
     public void addMeetingVideo(String userName, MediaStream mediaStream){

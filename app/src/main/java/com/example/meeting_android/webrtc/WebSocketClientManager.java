@@ -19,7 +19,6 @@ public class WebSocketClientManager {
     private static final String TAG = "웹소켓";
     public Context mContext;
     public Activity mActivity;
-    public CustomDialog customDialog;
     public static String roomName;
     public static String name;
     private static Socket mSocket;

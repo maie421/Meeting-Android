@@ -38,14 +38,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
-    private PeerConnection.RTCConfiguration configuration;
     public PeerConnection peerConnection;
-    public PeerConnection.Observer pcObserver;
     public MediaConstraints sdpMediaConstraints;
-    SurfaceViewRenderer localView;
-    SurfaceViewRenderer remoteView;
-    private AudioSource audioSource;
-    private SurfaceRendererAdapter surfaceRendererAdapter;
     public Activity mActivity;
     public SurfaceRendererViewHolder(@NonNull View itemView, Activity activity, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
         super(itemView);
@@ -59,7 +53,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         this.mActivity = activity;
     }
 
-    public void localBind(MeetingVideo meetingVideo){
+    public void localBind(){
         initSurfaceViewRenderer(surfaceViewRenderer);
 
         localVideoTrack = getLocalVideo(true);
