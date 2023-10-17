@@ -97,10 +97,16 @@ public class PeerConnectionClient {
                 .setVideoDecoderFactory(decoderFactory)
                 .createPeerConnectionFactory();
 
-        // STUN 서버 설정
+        //서버 설정
         List<PeerConnection.IceServer> iceServers = new ArrayList<>();
         PeerConnection.IceServer stunServer = PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer();
+        PeerConnection.IceServer turnServer = PeerConnection.IceServer.builder("turn:13.124.5.88:3478")
+                .setUsername("username1")
+                .setPassword("key1")
+                .createIceServer();
+
         iceServers.add(stunServer);
+        iceServers.add(turnServer);
 
         configuration = new PeerConnection.RTCConfiguration(iceServers);
         rootEglBase = EglBase.create();
