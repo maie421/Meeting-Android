@@ -16,6 +16,7 @@ import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -41,7 +42,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://1324-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://e9f1-27-35-20-189.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -65,7 +66,15 @@ public class WebSocketClientManager {
     };
 
     private Emitter.Listener onWelcome = args -> {
-        Log.i(TAG, "Welcome");
+        Log.i(TAG, "Welcome" + peerConnectionClient.surfaceRendererAdapter.getItemCount());
+
+        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+            name = (String) args[1];
+        }
+
+        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+            peerConnectionClient.createPeerConnection(name);
+        }
         createOfferAndSend();
     };
     private void createOfferAndSend() {
@@ -133,7 +142,7 @@ public class WebSocketClientManager {
                     throw new RuntimeException(e);
                 }
 
-                mSocket.emit("answer", message, roomName);
+                mSocket.emit("answer", message, roomName, name);
             }
 
         }, peerConnectionClient.sdpMediaConstraints);
@@ -141,6 +150,7 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onAnswer = args -> {
         Log.d(TAG, "onAnswer");
+        String toName = (String) args[1];
         String _sdp;
         try {
             JSONObject offerData = (JSONObject) args[0];

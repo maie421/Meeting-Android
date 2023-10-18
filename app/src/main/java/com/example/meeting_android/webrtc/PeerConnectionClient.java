@@ -77,7 +77,7 @@ public class PeerConnectionClient {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
         userRecyclerView.setLayoutManager(gridLayoutManager);
 
-        surfaceRendererAdapter.addMeetingVideoName("User1");
+        surfaceRendererAdapter.addMeetingVideoName(name);
     }
     private void initPeer(String name) {
         PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
@@ -125,7 +125,7 @@ public class PeerConnectionClient {
         createPeerConnection(name);
     }
 
-    private void createPeerConnection(String name) {
+    public void createPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
     }
 
@@ -211,7 +211,7 @@ public class PeerConnectionClient {
             gridCount++;
             userRecyclerView.post(new Runnable() {
                 public void run() {
-                    surfaceRendererAdapter.addMeetingVideo("User2", mediaStream);
+                    surfaceRendererAdapter.addMeetingVideo(WebSocketClientManager.name, mediaStream);
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
