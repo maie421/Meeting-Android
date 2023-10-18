@@ -60,9 +60,9 @@ public class PeerConnectionClient {
     public PeerConnection peerConnection;
     public PeerConnection.Observer pcObserver;
     public MediaConstraints sdpMediaConstraints;
-    private SurfaceRendererAdapter surfaceRendererAdapter;
+    public SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
-    private int gridCount = 1;
+    public int gridCount = 1;
     public PeerConnectionClient(Context mContext, Activity mActivity){
         this.mContext = mContext;
         this.mActivity = mActivity;

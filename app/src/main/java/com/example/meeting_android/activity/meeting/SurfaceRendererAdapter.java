@@ -20,6 +20,7 @@ import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoTrack;
 import java.util.List;
+import java.util.Objects;
 
 public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRendererViewHolder> {
     private List<MeetingVideo> meetings;
@@ -72,5 +73,12 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public void addMeetingVideo(String userName, MediaStream mediaStream){
         MeetingVideo meetingVideo = new MeetingVideo(userName, mediaStream);
         this.meetings.add(meetingVideo);
+    }
+
+    public void deleteMeetingVideo(String userName){
+        this.meetings.removeIf((item) -> Objects.equals(item.name, userName));
+    }
+    public void clearMeetingVideo(){
+        this.meetings.clear();
     }
 }

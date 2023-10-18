@@ -1,5 +1,8 @@
 package com.example.meeting_android.activity.meeting;
 
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
@@ -184,5 +187,12 @@ public class MeetingActivity extends AppCompatActivity {
             customDialog = new CustomDialog(this, this, randomNumberAsString, hostName);
             webSocketClientManager = new WebSocketClientManager(this, this, randomNumberAsString, name);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        webSocketClientManager.peerConnectionClient.surfaceRendererAdapter.clearMeetingVideo();
+        sendLeave();
     }
 }

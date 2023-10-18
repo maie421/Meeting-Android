@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.recyclerview.widget.GridLayoutManager;
+
 import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.activity.meeting.MeetingVideo;
 
@@ -27,8 +29,10 @@ public class WebSocketClientManager {
     public static String name;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
-    public WebSocketClientManager(Context mContext, Activity mActivity, String roomName, String name) {
-        peerConnectionClient = new PeerConnectionClient(mContext, mActivity);
+    public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
+        peerConnectionClient = new PeerConnectionClient(Context, activity);
+        this.mActivity = activity;
+        this.mContext = Context;
         this.roomName = roomName;
         this.name = name;
         connect();
@@ -37,13 +41,14 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://e051-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://1324-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
             mSocket.on("offer", onOffer);
             mSocket.on("answer", onAnswer);
             mSocket.on("ice", onIce);
+            mSocket.on("leave_room", onLeaveRoom);
             mSocket.connect();
 
             mSocket.emit("join_room", roomName, name);
@@ -154,11 +159,30 @@ public class WebSocketClientManager {
         }, sdp);
     };
 
+    private Emitter.Listener onLeaveRoom = args -> {
+        if (args != null || args[0] != null) {
+            String msg = (String) args[0];
+            Log.d("디버그","나간 회원"+ msg);
+            if (peerConnectionClient.gridCount >= 2) {
+                peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
+                peerConnectionClient.peerConnection.close();
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        GridLayoutManager layoutManager = (GridLayoutManager) peerConnectionClient.userRecyclerView.getLayoutManager();
+                        layoutManager.setSpanCount(--peerConnectionClient.gridCount);
+                        //peerConnectionClient.surfaceRendererAdapter.getItemCount()
+//                        peerConnectionClient.surfaceRendererAdapter.notifyItemRemoved(0);
+                    }
+                });
+            }
+        }
+    };
     private Emitter.Listener onIce = args -> {
         if (args != null || args[0] != null) {
             JSONObject msg = (JSONObject) args[0];
             try {
-                IceCandidate iecCandidate = new IceCandidate(  msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
+                IceCandidate iecCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
                 peerConnectionClient.peerConnection.addIceCandidate(iecCandidate);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
@@ -168,6 +192,10 @@ public class WebSocketClientManager {
     public static void sendIce(IceCandidate iceCandidate) {
         Log.d(TAG, "ice");
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
+    }
+    public static void sendLeave() {
+        Log.d(TAG, "sendLeave");
+        mSocket.emit("leave_room", roomName, name);
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {
         JSONObject json = new JSONObject();
