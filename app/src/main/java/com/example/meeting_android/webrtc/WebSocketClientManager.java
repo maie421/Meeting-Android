@@ -30,7 +30,7 @@ public class WebSocketClientManager {
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
     public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
-        peerConnectionClient = new PeerConnectionClient(Context, activity);
+        peerConnectionClient = new PeerConnectionClient(Context, activity, name);
         this.mActivity = activity;
         this.mContext = Context;
         this.roomName = roomName;
@@ -69,7 +69,7 @@ public class WebSocketClientManager {
         createOfferAndSend();
     };
     private void createOfferAndSend() {
-        peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).createOffer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 JSONObject message = new JSONObject();
@@ -82,7 +82,7 @@ public class WebSocketClientManager {
                 Log.i(TAG, sessionDescription.description);
 
                 mSocket.emit("offer", message, roomName);
-                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
                         Log.e(TAG, "setLocalDescription failed: " + error);
@@ -106,7 +106,7 @@ public class WebSocketClientManager {
                 SessionDescription.Type.OFFER, _sdp);
 
         // 로컬 PeerConnection에 Offer를 설정
-        peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
                 Log.e(TAG, "setRemoteDescription failed: " + error);
@@ -114,11 +114,11 @@ public class WebSocketClientManager {
         }, sdp);
 
         // Answer 생성
-        peerConnectionClient.peerConnection.createAnswer(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).createAnswer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 // Answer SDP를 로컬에 설정
-                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
                         Log.e(TAG, "setRemoteDescription1 failed: " + error);
@@ -151,7 +151,7 @@ public class WebSocketClientManager {
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);
-        peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
                 Log.e(TAG, "setRemoteDescription failed: " + error);
@@ -165,7 +165,7 @@ public class WebSocketClientManager {
             Log.d("디버그","나간 회원"+ msg);
             if (peerConnectionClient.gridCount >= 2) {
                 peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
-                peerConnectionClient.peerConnection.close();
+                peerConnectionClient.peerConnectionMap.get(name).close();
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -183,7 +183,7 @@ public class WebSocketClientManager {
             JSONObject msg = (JSONObject) args[0];
             try {
                 IceCandidate iecCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
-                peerConnectionClient.peerConnection.addIceCandidate(iecCandidate);
+                peerConnectionClient.peerConnectionMap.get(name).addIceCandidate(iecCandidate);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
