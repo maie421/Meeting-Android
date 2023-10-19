@@ -1,5 +1,8 @@
 package com.example.meeting_android.webrtc;
 
+import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
+import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -42,7 +45,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://0bc3-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://baa2-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -74,6 +77,8 @@ public class WebSocketClientManager {
 
         if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
             peerConnectionClient.createPeerConnection(name);
+            peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
+            peerConnectionClient.peerConnectionMap.get(name).addTrack(localAudioTrack);
         }
         createOfferAndSend();
     };
@@ -159,13 +164,15 @@ public class WebSocketClientManager {
             throw new RuntimeException(e);
         }
 
-        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
-            name = (String) args[1];
-        }
-
-        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
-            peerConnectionClient.createPeerConnection(name);
-        }
+//        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+//            name = (String) args[1];
+//        }
+//
+//        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+//            peerConnectionClient.createPeerConnection(name);
+//            peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
+//            peerConnectionClient.peerConnectionMap.get(name).addTrack(localAudioTrack);
+//        }
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);

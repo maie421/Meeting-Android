@@ -128,7 +128,6 @@ public class PeerConnectionClient {
     public void createPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
     }
-
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
             @Override
