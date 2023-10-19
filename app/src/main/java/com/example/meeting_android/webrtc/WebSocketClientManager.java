@@ -42,7 +42,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://e9f1-27-35-20-189.ngrok-free.app");
+            mSocket = IO.socket("https://0bc3-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -90,7 +90,7 @@ public class WebSocketClientManager {
                 }
                 Log.i(TAG, sessionDescription.description);
 
-                mSocket.emit("offer", message, roomName);
+                mSocket.emit("offer", message, roomName, name);
                 peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
@@ -103,6 +103,7 @@ public class WebSocketClientManager {
     private Emitter.Listener onOffer = args -> {
         Log.d(TAG, "onOffer");
         String _sdp;
+
         try {
             JSONObject offerData = (JSONObject) args[0];
             _sdp = offerData.getString("sdp");
@@ -142,7 +143,7 @@ public class WebSocketClientManager {
                     throw new RuntimeException(e);
                 }
 
-                mSocket.emit("answer", message, roomName, name);
+                mSocket.emit("answer", message, roomName);
             }
 
         }, peerConnectionClient.sdpMediaConstraints);
@@ -150,13 +151,20 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onAnswer = args -> {
         Log.d(TAG, "onAnswer");
-        String toName = (String) args[1];
         String _sdp;
         try {
             JSONObject offerData = (JSONObject) args[0];
             _sdp = offerData.getString("sdp");
         } catch (JSONException e) {
             throw new RuntimeException(e);
+        }
+
+        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+            name = (String) args[1];
+        }
+
+        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+            peerConnectionClient.createPeerConnection(name);
         }
 
         SessionDescription sdp = new SessionDescription(
