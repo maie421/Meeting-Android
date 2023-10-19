@@ -63,7 +63,8 @@ public class PeerConnectionClient {
     public SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
     public int gridCount = 1;
-    public PeerConnectionClient(Context mContext, Activity mActivity){
+    public String name;
+    public PeerConnectionClient(Context mContext, Activity mActivity, String name){
         this.mContext = mContext;
         this.mActivity = mActivity;
 
@@ -76,7 +77,7 @@ public class PeerConnectionClient {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
         userRecyclerView.setLayoutManager(gridLayoutManager);
 
-        surfaceRendererAdapter.addMeetingVideoName("User1");
+        surfaceRendererAdapter.addMeetingVideoName(name);
     }
     private void initPeer() {
         PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions

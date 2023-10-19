@@ -14,8 +14,6 @@ import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -30,7 +28,7 @@ public class WebSocketClientManager {
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
     public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
-        peerConnectionClient = new PeerConnectionClient(Context, activity);
+        peerConnectionClient = new PeerConnectionClient(Context, activity, name);
         this.mActivity = activity;
         this.mContext = Context;
         this.roomName = roomName;
@@ -41,7 +39,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://1324-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://0bc3-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);

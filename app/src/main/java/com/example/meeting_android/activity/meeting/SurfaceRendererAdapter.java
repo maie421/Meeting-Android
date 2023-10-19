@@ -76,7 +76,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     }
 
     public void deleteMeetingVideo(String userName){
-        this.meetings.removeIf((item) -> Objects.equals(item.name, userName));
+        this.meetings.removeIf((item) -> Objects.equals(item.name, "User2"));
     }
     public void clearMeetingVideo(){
         this.meetings.clear();
