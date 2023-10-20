@@ -74,7 +74,8 @@ public class PeerConnectionClient {
 
         surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1, GridLayoutManager.HORIZONTAL, false);;
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
         userRecyclerView.setLayoutManager(gridLayoutManager);
 
         surfaceRendererAdapter.addMeetingVideoName(name);
