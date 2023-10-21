@@ -65,9 +65,11 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     }
 
     public void addMeetingVideoName(String userName){
-       MeetingVideo meetingVideo = new MeetingVideo(userName);
-       this.meetings.add(meetingVideo);
-       notifyItemInserted(meetings.size()-1);
+            MeetingVideo meetingVideo = new MeetingVideo(userName);
+            mActivity.runOnUiThread(() -> {
+                this.meetings.add(meetingVideo);
+                notifyItemInserted(meetings.size() - 1);
+            });
     }
 
     public void addMeetingVideo(String userName, MediaStream mediaStream){
