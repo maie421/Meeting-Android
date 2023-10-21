@@ -3,15 +3,19 @@ package com.example.meeting_android.activity.meeting;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 
+import static org.webrtc.ContextUtils.getApplicationContext;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -25,6 +29,16 @@ import com.example.meeting_android.api.user.UserService;
 import com.example.meeting_android.common.TokenManager;
 import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.webrtc.AudioSource;
+import org.webrtc.AudioTrack;
+import org.webrtc.EglBase;
+import org.webrtc.EglRenderer;
+import org.webrtc.RendererCommon;
+import org.webrtc.SurfaceViewRenderer;
+import org.webrtc.VideoCapturer;
+import org.webrtc.VideoSource;
+import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -78,7 +92,7 @@ public class MeetingActivity extends AppCompatActivity {
         }else{
             //방생성
             Random random = new Random();
-            int randomNumber = random.nextInt(100000);
+            int randomNumber = random.nextInt(10000);
             randomNumberAsString = Integer.toString(randomNumber);
         }
     }
@@ -193,6 +207,7 @@ public class MeetingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         webSocketClientManager.peerConnectionClient.surfaceRendererAdapter.clearMeetingVideo();
+        webSocketClientManager.peerConnectionClient.peerConnection.close();
         sendLeave();
     }
 }

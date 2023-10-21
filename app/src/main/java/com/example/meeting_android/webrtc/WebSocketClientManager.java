@@ -39,7 +39,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://1cbf-220-75-212-41.ngrok-free.app");
+            mSocket = IO.socket("https://74d4-27-35-20-189.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -163,7 +163,6 @@ public class WebSocketClientManager {
             Log.d("디버그","나간 회원"+ msg);
             if (peerConnectionClient.gridCount >= 2) {
                 peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
-                peerConnectionClient.peerConnection.close();
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -74,7 +74,7 @@ public class PeerConnectionClient {
 
         surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1, GridLayoutManager.HORIZONTAL, false);;
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1, GridLayoutManager.HORIZONTAL, false);
 //        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
         userRecyclerView.setLayoutManager(gridLayoutManager);
 
@@ -102,25 +102,33 @@ public class PeerConnectionClient {
         //서버 설정
         List<PeerConnection.IceServer> iceServers = new ArrayList<>();
         PeerConnection.IceServer stunServer = PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer();
-        PeerConnection.IceServer turnServer = PeerConnection.IceServer.builder("turn:13.124.5.88:3478")
-                .setUsername("username1")
-                .setPassword("key1")
-                .createIceServer();
+        PeerConnection.IceServer stunServer1 = PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer();
+        PeerConnection.IceServer stunServer2= PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer();
+        PeerConnection.IceServer stunServer3 = PeerConnection.IceServer.builder("stun:stun3.l.google.com:19302").createIceServer();
+        PeerConnection.IceServer stunServer4 = PeerConnection.IceServer.builder("stun:stun4.l.google.com:19302").createIceServer();
+//        PeerConnection.IceServer turnServer = PeerConnection.IceServer.builder("turn:54.180.156.201:3478")
+//                .setUsername("username1")
+//                .setPassword("key1")
+//                .createIceServer();
 
         iceServers.add(stunServer);
-        iceServers.add(turnServer);
+        iceServers.add(stunServer1);
+        iceServers.add(stunServer2);
+        iceServers.add(stunServer3);
+        iceServers.add(stunServer4);
+//        iceServers.add(turnServer);
 
         configuration = new PeerConnection.RTCConfiguration(iceServers);
         rootEglBase = EglBase.create();
         eglBaseContext= rootEglBase.getEglBaseContext();
         surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
 
-        Log.d(TAG,"createPeerConnection");
+        Log.d(TAG,"createPeerConnectionChannel");
         sdpMediaConstraints = new MediaConstraints();
         sdpMediaConstraints.mandatory.add(
-                new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
+                new MediaConstraints.KeyValuePair("OfferToReceiveAudioChannel", "true"));
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-                "OfferToReceiveVideo", "true"));
+                "OfferToReceiveVideoChannel", "true"));
 
         pcObserver();
         createPeerConnection();
@@ -215,7 +223,9 @@ public class PeerConnectionClient {
                     surfaceRendererAdapter.addMeetingVideo("User2", mediaStream);
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
+
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
+//                    surfaceRendererAdapter.notifyDataSetChanged();;
                 }
             });
 

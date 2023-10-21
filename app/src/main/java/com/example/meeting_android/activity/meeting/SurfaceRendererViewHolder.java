@@ -54,16 +54,15 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void localBind(){
-        initSurfaceViewRenderer(surfaceViewRenderer);
-
         localVideoTrack = getLocalVideo(true);
         localVideoTrack.addSink(surfaceViewRenderer);
         peerConnection.addTrack(localVideoTrack);
         peerConnection.addTrack(getAudioTrack());
+
+        initSurfaceViewRenderer(surfaceViewRenderer);
     }
 
     public void remoteBind(MeetingVideo meetingVideo){
-        initSurfaceViewRenderer(surfaceViewRenderer);
         Log.d("디버그","remoteBind");
         VideoTrack remoteVideoTrack = meetingVideo.mediaStream.videoTracks.get(0);
         if (meetingVideo.mediaStream.videoTracks.size() > 0) {
@@ -75,6 +74,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
                 }
             });
         }
+        initSurfaceViewRenderer(surfaceViewRenderer);
     }
 
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
@@ -123,7 +123,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         VideoCapturer videoCapturer = createCameraCapturer(status);
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
-        videoCapturer.initialize(surfaceTextureHelper, getApplicationContext(), videoSource.getCapturerObserver());
+        videoCapturer.initialize(surfaceTextureHelper,mActivity, videoSource.getCapturerObserver());
         videoCapturer.startCapture(240, 320, 30);
 
         return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
@@ -155,7 +155,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
 
                     @Override
                     public void onCameraFreezed(String s) {
-                        Log.e(TAG, "onCameraFreezed");
+                        Log.e(TAG, "onCameraFreezed"+ s);
                     }
 
                     @Override
