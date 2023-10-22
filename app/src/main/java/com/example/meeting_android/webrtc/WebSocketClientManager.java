@@ -61,13 +61,18 @@ public class WebSocketClientManager {
     private Emitter.Listener onWelcome = args -> {
         Log.i(TAG, "Welcome" + peerConnectionClient.surfaceRendererAdapter.getItemCount());
 
-        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+        if (isRenderAdapterBoolean(2)) {
             name = (String) args[1];
             peerConnectionClient.createPeerConnection(name);
         }
-
+        Log.i(TAG, "Welcome: " + name);
         createOfferAndSend();
     };
+
+    private boolean isRenderAdapterBoolean(int count) {
+        return peerConnectionClient.surfaceRendererAdapter.getItemCount() >= count;
+    }
+
     private void createOfferAndSend() {
         peerConnectionClient.peerConnectionMap.get(name).createOffer(new SimpleSdpObserver() {
             @Override
@@ -106,15 +111,11 @@ public class WebSocketClientManager {
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.OFFER, _sdp);
 
-        if (isCreateConnection()) {
+        if (isCreateConnection() && isRenderAdapterBoolean(3)) {
             name = (String) args[1];
             peerConnectionClient.createPeerConnection(name);
         }
 
-//        if (peerConnectionClient.peerConnectionMap.get(name) == null) {
-//            Log.i(TAG, "createPeerConnection: " + name);
-//
-//        }
         Log.i(TAG, "setRemoteDescription " + name);
         // 로컬 PeerConnection에 Offer를 설정
         peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
@@ -152,7 +153,8 @@ public class WebSocketClientManager {
     };
 
     private boolean isCreateConnection() {
-        return peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2 && peerConnectionClient.peerConnectionMap.get(name) == null;
+        Log.d(TAG, "isCreateConnection : " + name);
+        return  peerConnectionClient.peerConnectionMap.get(name) == null;
     }
 
     private Emitter.Listener onAnswer = args -> {
@@ -164,15 +166,6 @@ public class WebSocketClientManager {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
-//        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
-//            name = (String) args[1];
-//        }
-
-//        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
-//            Log.e(TAG, "Answer createPeerConnection" + name);
-//            peerConnectionClient.createPeerConnection(name);
-//        }
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);
@@ -215,7 +208,7 @@ public class WebSocketClientManager {
         }
     };
     public static void sendIce(IceCandidate iceCandidate) {
-        Log.d(TAG, "ice");
+        Log.d("디버그1", "ice : " + name);
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
     public static void sendLeave() {

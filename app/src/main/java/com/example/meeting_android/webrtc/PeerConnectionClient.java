@@ -2,6 +2,7 @@ package com.example.meeting_android.webrtc;
 
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 
 import android.app.Activity;
@@ -169,6 +170,7 @@ public class PeerConnectionClient {
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : " + mediaStream);
+                Log.d("디버그1", "onAddStream : " + mediaStream + "( "+ name+ " )");
                 getRemoteStream(mediaStream);
             }
             // 제거된 미디어 스트림에 대한 콜백
