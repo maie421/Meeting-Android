@@ -21,6 +21,7 @@ import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoTrack;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRendererViewHolder> {
@@ -28,27 +29,29 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
 
     public EglBase.Context eglBaseContext;
     public PeerConnectionFactory peerConnectionFactory;
-    public PeerConnection peerConnection;
+    private Map<String, PeerConnection> peerConnectionMap;
     public MediaConstraints sdpMediaConstraints;
     public SurfaceTextureHelper surfaceTextureHelper;
     public Activity mActivity;
     public Context mContext;
-    public SurfaceRendererAdapter(Activity activity, Context context, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
+    public String name;
+    public SurfaceRendererAdapter(Activity activity, Context context, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, Map<String, PeerConnection> peerConnectionMap, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper, String name) {
         this.meetings = meetings;
         this.eglBaseContext = eglBaseContext;
         this.peerConnectionFactory = peerConnectionFactory;
-        this.peerConnection = peerConnection;
+        this.peerConnectionMap = peerConnectionMap;
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
         this.mContext = context;
         this.mActivity = activity;
+        this.name = name;
     }
 
     @NonNull
     @Override
     public SurfaceRendererViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_surface_renderer, parent, false);
-        return new SurfaceRendererViewHolder(view,mActivity,mContext, eglBaseContext,peerConnectionFactory ,peerConnection, sdpMediaConstraints, surfaceTextureHelper);
+        return new SurfaceRendererViewHolder(view,mActivity, eglBaseContext,peerConnectionFactory ,peerConnectionMap, sdpMediaConstraints, surfaceTextureHelper, name);
     }
 
     @Override
@@ -81,7 +84,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     }
 
     public void deleteMeetingVideo(String userName){
-        this.meetings.removeIf((item) -> Objects.equals(item.name, "User2"));
+        this.meetings.removeIf((item) -> Objects.equals(item.name, userName));
     }
     public void clearMeetingVideo(){
         this.meetings.clear();

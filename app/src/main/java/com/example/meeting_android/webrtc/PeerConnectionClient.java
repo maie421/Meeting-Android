@@ -57,30 +57,30 @@ public class PeerConnectionClient {
     public EglBase.Context eglBaseContext;
     private String TAG = "웹소켓";
     private PeerConnection.RTCConfiguration configuration;
-    public PeerConnection peerConnection;
+    public Map<String, PeerConnection> peerConnectionMap = new HashMap<>();
     public PeerConnection.Observer pcObserver;
     public MediaConstraints sdpMediaConstraints;
     public SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
     public int gridCount = 1;
-    public String name;
     public PeerConnectionClient(Context mContext, Activity mActivity, String name){
         this.mContext = mContext;
         this.mActivity = mActivity;
 
         userRecyclerView = mActivity.findViewById(R.id.recyclerView);
 
-        initPeer();
+        initPeer(name);
 
-        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,mContext, new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnection ,sdpMediaConstraints, surfaceTextureHelper);
+        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnectionMap ,sdpMediaConstraints, surfaceTextureHelper, name);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
         userRecyclerView.setItemAnimator(null);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1, GridLayoutManager.HORIZONTAL, false);
 //        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1);
         userRecyclerView.setLayoutManager(gridLayoutManager);
+
         surfaceRendererAdapter.addMeetingVideoName(name);
     }
-    private void initPeer() {
+    private void initPeer(String name) {
         PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
                 .builder(mContext)
                 .setEnableInternalTracer(true)
@@ -131,13 +131,12 @@ public class PeerConnectionClient {
                 "OfferToReceiveVideoChannel", "true"));
 
         pcObserver();
-        createPeerConnection();
+        createPeerConnection(name);
     }
 
-    private void createPeerConnection() {
-        peerConnection = peerConnectionFactory.createPeerConnection(configuration, pcObserver);
+    public void createPeerConnection(String name) {
+        peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
     }
-
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
             @Override
@@ -220,12 +219,10 @@ public class PeerConnectionClient {
             gridCount++;
             userRecyclerView.post(new Runnable() {
                 public void run() {
-                    surfaceRendererAdapter.addMeetingVideo("User2", mediaStream);
+                    surfaceRendererAdapter.addMeetingVideo(WebSocketClientManager.name, mediaStream);
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
-
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
-//                    surfaceRendererAdapter.notifyDataSetChanged();;
                 }
             });
 

@@ -30,6 +30,11 @@ import org.webrtc.VideoCapturer;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
+import java.util.Map;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public SurfaceViewRenderer surfaceViewRenderer;
     public String VIDEO_TRACK_ID = "ARDAMSv0";
@@ -40,21 +45,22 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
-    public PeerConnection peerConnection;
+    private Map<String, PeerConnection> peerConnectionMap;
     public MediaConstraints sdpMediaConstraints;
     public Activity mActivity;
     public Context mContext;
-    public SurfaceRendererViewHolder(@NonNull View itemView, Activity activity, Context context, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
+    public String name;
+    public SurfaceRendererViewHolder(@NonNull View itemView, Activity activity, Context context, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, Map<String, PeerConnection> peerConnectionMap, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper, String name) {
         super(itemView);
         surfaceViewRenderer = itemView.findViewById(R.id.surfaceRenderer);
 
         this.eglBaseContext = eglBaseContext;
         this.peerConnectionFactory = peerConnectionFactory;
-        this.peerConnection = peerConnection;
+        this.peerConnectionMap = peerConnectionMap;
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
         this.mActivity = activity;
-        this.mContext = context;
+        this.name = name;
     }
 
     public void localBind(){
@@ -63,8 +69,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
             localVideoTrack.addSink(surfaceViewRenderer);
             initSurfaceViewRenderer(surfaceViewRenderer);
         });
-            peerConnection.addTrack(localVideoTrack);
-//        peerConnection.addTrack(getAudioTrack());
+        peerConnectionMap.get(name).addTrack(localVideoTrack);
+        peerConnectionMap.get(name).addTrack(getAudioTrack());
     }
 
     public void remoteBind(MeetingVideo meetingVideo){
@@ -142,7 +148,6 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     }
 
     private VideoCapturer createCameraCapturer(boolean isFront) {
-        // Using Camera2Enumerator instead of Camera1Enumerator
         Camera2Enumerator enumerator = new Camera2Enumerator(mContext);
 
         final String[] deviceNames = enumerator.getDeviceNames();
@@ -178,13 +183,6 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
                     public void onCameraClosed() {
                         Log.e(TAG, "onCameraClosed");
                     }
-
-                    // Assuming there might be new callback methods in Camera2Enumerator
-                    // Example:
-                    // @Override
-                    // public void onNewCamera2Event() {
-                    //     Log.e(TAG, "onNewCamera2Event");
-                    // }
                 });
 
                 if (videoCapturer != null) {

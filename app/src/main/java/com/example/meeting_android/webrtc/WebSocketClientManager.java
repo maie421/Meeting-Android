@@ -63,11 +63,21 @@ public class WebSocketClientManager {
     };
 
     private Emitter.Listener onWelcome = args -> {
-        Log.i(TAG, "Welcome");
+        Log.i(TAG, "Welcome" + peerConnectionClient.surfaceRendererAdapter.getItemCount());
+
+        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+            name = (String) args[1];
+        }
+
+        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+            peerConnectionClient.createPeerConnection(name);
+            peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
+            peerConnectionClient.peerConnectionMap.get(name).addTrack(localAudioTrack);
+        }
         createOfferAndSend();
     };
     private void createOfferAndSend() {
-        peerConnectionClient.peerConnection.createOffer(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).createOffer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 JSONObject message = new JSONObject();
@@ -79,8 +89,8 @@ public class WebSocketClientManager {
                 }
                 Log.i(TAG, sessionDescription.description);
 
-                mSocket.emit("offer", message, roomName);
-                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                mSocket.emit("offer", message, roomName, name);
+                peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
                         Log.e(TAG, "setLocalDescription failed: " + error);
@@ -92,6 +102,7 @@ public class WebSocketClientManager {
     private Emitter.Listener onOffer = args -> {
         Log.d(TAG, "onOffer");
         String _sdp;
+
         try {
             JSONObject offerData = (JSONObject) args[0];
             _sdp = offerData.getString("sdp");
@@ -104,7 +115,7 @@ public class WebSocketClientManager {
                 SessionDescription.Type.OFFER, _sdp);
 
         // 로컬 PeerConnection에 Offer를 설정
-        peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
                 Log.e(TAG, "setRemoteDescription failed: " + error);
@@ -112,11 +123,11 @@ public class WebSocketClientManager {
         }, sdp);
 
         // Answer 생성
-        peerConnectionClient.peerConnection.createAnswer(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).createAnswer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 // Answer SDP를 로컬에 설정
-                peerConnectionClient.peerConnection.setLocalDescription(new SimpleSdpObserver() {
+                peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
                         Log.e(TAG, "setRemoteDescription1 failed: " + error);
@@ -147,9 +158,19 @@ public class WebSocketClientManager {
             throw new RuntimeException(e);
         }
 
+//        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+//            name = (String) args[1];
+//        }
+//
+//        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+//            peerConnectionClient.createPeerConnection(name);
+//            peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
+//            peerConnectionClient.peerConnectionMap.get(name).addTrack(localAudioTrack);
+//        }
+
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);
-        peerConnectionClient.peerConnection.setRemoteDescription(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
                 Log.e(TAG, "setRemoteDescription failed: " + error);
@@ -163,6 +184,7 @@ public class WebSocketClientManager {
             Log.d("디버그","나간 회원"+ msg);
             if (peerConnectionClient.gridCount >= 2) {
                 peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
+                peerConnectionClient.peerConnectionMap.get(name).close();
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -180,7 +202,7 @@ public class WebSocketClientManager {
             JSONObject msg = (JSONObject) args[0];
             try {
                 IceCandidate iecCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
-                peerConnectionClient.peerConnection.addIceCandidate(iecCandidate);
+                peerConnectionClient.peerConnectionMap.get(name).addIceCandidate(iecCandidate);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
