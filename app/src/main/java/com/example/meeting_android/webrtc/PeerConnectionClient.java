@@ -2,7 +2,6 @@ package com.example.meeting_android.webrtc;
 
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
-import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 
 import android.app.Activity;
@@ -125,6 +124,7 @@ public class PeerConnectionClient {
     }
 
     public void createPeerConnection(String name) {
+        Log.i("디버그2", "여기" + name);
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
         peerConnectionMap.get(name).addTrack(localVideoTrack);
         peerConnectionMap.get(name).addTrack(localAudioTrack);
@@ -170,7 +170,6 @@ public class PeerConnectionClient {
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : " + mediaStream);
-                Log.d("디버그1", "onAddStream : " + mediaStream + "( "+ name+ " )");
                 getRemoteStream(mediaStream);
             }
             // 제거된 미디어 스트림에 대한 콜백
@@ -215,7 +214,7 @@ public class PeerConnectionClient {
             gridCount++;
             userRecyclerView.post(new Runnable() {
                 public void run() {
-                    surfaceRendererAdapter.addMeetingVideo(WebSocketClientManager.name, mediaStream);
+                    surfaceRendererAdapter.addMeetingVideo("생각중", mediaStream);
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);

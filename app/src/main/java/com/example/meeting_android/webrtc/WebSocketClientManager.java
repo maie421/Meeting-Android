@@ -9,7 +9,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SdpObserver;
-import org.webrtc.SessionDescription;;
+import org.webrtc.SessionDescription;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -17,12 +20,15 @@ import io.socket.emitter.Emitter;
 
 public class WebSocketClientManager {
     private static final String TAG = "웹소켓";
+    private static String TAG2 = "디버그2";
     public Context mContext;
     public Activity mActivity;
     public static String roomName;
-    public static String name;
+    public String name;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
+    public static boolean isFirst = true;
+    public List<String> offerList = new ArrayList<>();
     public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
         peerConnectionClient = new PeerConnectionClient(Context, activity, name);
         this.mActivity = activity;
@@ -35,7 +41,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://12f8-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://9b8c-27-35-20-189.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -59,13 +65,14 @@ public class WebSocketClientManager {
     };
 
     private Emitter.Listener onWelcome = args -> {
-        Log.i(TAG, "Welcome" + peerConnectionClient.surfaceRendererAdapter.getItemCount());
 
         if (isRenderAdapterBoolean(2)) {
             name = (String) args[1];
             peerConnectionClient.createPeerConnection(name);
+            Log.i(TAG2, "onWelcome 들어옴 : " + name);
         }
-        Log.i(TAG, "Welcome: " + name);
+        Log.i(TAG2, "onWelcome Welcome: " + name);
+        offerList.add(name);
         createOfferAndSend();
     };
 
@@ -110,13 +117,14 @@ public class WebSocketClientManager {
         // SDP 생성
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.OFFER, _sdp);
-
+//TODO  해당 조건문 타고 들어가는지 확인 첫번째 화면이 정상적으로 동작하나 두번째 create peer 부터는 이상하게 보인다...?
         if (isCreateConnection() && isRenderAdapterBoolean(3)) {
             name = (String) args[1];
             peerConnectionClient.createPeerConnection(name);
         }
+        offerList.add(name);
+        Log.i(TAG2, "onOffer " + name);
 
-        Log.i(TAG, "setRemoteDescription " + name);
         // 로컬 PeerConnection에 Offer를 설정
         peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
             @Override
@@ -124,7 +132,7 @@ public class WebSocketClientManager {
                 Log.e(TAG, "setRemoteDescription failed: " + error + "( "+ name +" )");
             }
         }, sdp);
-        Log.i(TAG, "createAnswer " + name);
+        Log.i(TAG2, "createAnswer " + name);
         // Answer 생성
         peerConnectionClient.peerConnectionMap.get(name).createAnswer(new SimpleSdpObserver() {
             @Override
@@ -158,7 +166,6 @@ public class WebSocketClientManager {
     }
 
     private Emitter.Listener onAnswer = args -> {
-        Log.d(TAG, "onAnswer");
         String _sdp;
         try {
             JSONObject offerData = (JSONObject) args[0];
@@ -169,10 +176,11 @@ public class WebSocketClientManager {
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);
+        Log.d(TAG, "onAnswer" + name);
         peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
-                Log.e(TAG, "setRemoteDescription failed: " + error + "( "+ name +" )");
+                Log.e(TAG, "setRemoteDescription failed: " + error);
             }
         }, sdp);
     };
@@ -197,23 +205,27 @@ public class WebSocketClientManager {
         }
     };
     private Emitter.Listener onIce = args -> {
+        isFirst = false;
         if (args != null || args[0] != null) {
             JSONObject msg = (JSONObject) args[0];
             try {
                 IceCandidate iecCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
-                peerConnectionClient.peerConnectionMap.get(name).addIceCandidate(iecCandidate);
+                for (String name : offerList) {
+                    peerConnectionClient.peerConnectionMap.get(name).addIceCandidate(iecCandidate);
+                    Log.i(TAG2, "offerList " + name);
+                }
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }
     };
     public static void sendIce(IceCandidate iceCandidate) {
-        Log.d("디버그1", "ice : " + name);
+        isFirst = false;
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
     public static void sendLeave() {
         Log.d(TAG, "sendLeave");
-        mSocket.emit("leave_room", roomName, name);
+        mSocket.emit("leave_room", roomName, "TEST");
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {
         JSONObject json = new JSONObject();
