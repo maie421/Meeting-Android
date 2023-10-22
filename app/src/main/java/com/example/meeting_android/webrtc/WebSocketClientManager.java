@@ -1,13 +1,9 @@
 package com.example.meeting_android.webrtc;
-
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
 import androidx.recyclerview.widget.GridLayoutManager;
-
-import com.example.meeting_android.CustomDialog;
-import com.example.meeting_android.activity.meeting.MeetingVideo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,8 +67,6 @@ public class WebSocketClientManager {
 
         if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
             peerConnectionClient.createPeerConnection(name);
-            peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
-            peerConnectionClient.peerConnectionMap.get(name).addTrack(localAudioTrack);
         }
         createOfferAndSend();
     };
@@ -89,7 +83,7 @@ public class WebSocketClientManager {
                 }
                 Log.i(TAG, sessionDescription.description);
 
-                mSocket.emit("offer", message, roomName, name);
+                mSocket.emit("offer", message, roomName);
                 peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
@@ -113,6 +107,14 @@ public class WebSocketClientManager {
         // SDP 생성
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.OFFER, _sdp);
+
+//        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+//            name = (String) args[1];
+//        }
+//
+//        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+//            peerConnectionClient.createPeerConnection(name);
+//        }
 
         // 로컬 PeerConnection에 Offer를 설정
         peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
@@ -158,15 +160,13 @@ public class WebSocketClientManager {
             throw new RuntimeException(e);
         }
 
-//        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
-//            name = (String) args[1];
-//        }
-//
-//        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
-//            peerConnectionClient.createPeerConnection(name);
-//            peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
-//            peerConnectionClient.peerConnectionMap.get(name).addTrack(localAudioTrack);
-//        }
+        if (peerConnectionClient.surfaceRendererAdapter.getItemCount() >= 2) {
+            name = (String) args[1];
+        }
+
+        if ( peerConnectionClient.peerConnectionMap.get(name) == null) {
+            peerConnectionClient.createPeerConnection(name);
+        }
 
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.ANSWER, _sdp);
@@ -184,7 +184,7 @@ public class WebSocketClientManager {
             Log.d("디버그","나간 회원"+ msg);
             if (peerConnectionClient.gridCount >= 2) {
                 peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
-                peerConnectionClient.peerConnectionMap.get(name).close();
+//                peerConnectionClient.peerConnectionMap.get(name).close();
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

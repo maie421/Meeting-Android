@@ -193,7 +193,7 @@ public class MeetingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         webSocketClientManager.peerConnectionClient.surfaceRendererAdapter.clearMeetingVideo();
-        webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
+//        webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
         sendLeave();
     }
 }

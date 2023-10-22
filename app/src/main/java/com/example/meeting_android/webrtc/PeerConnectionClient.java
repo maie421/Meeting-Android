@@ -3,35 +3,23 @@ package com.example.meeting_android.webrtc;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
-import static org.webrtc.ContextUtils.getApplicationContext;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
-import android.view.View;
-
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meeting_android.R;
 import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
-import org.webrtc.AudioSource;
-import org.webrtc.AudioTrack;
-import org.webrtc.Camera1Enumerator;
-import org.webrtc.CameraVideoCapturer;
 import org.webrtc.DataChannel;
 import org.webrtc.EglBase;
-import org.webrtc.EglRenderer;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
-import org.webrtc.RendererCommon;
 import org.webrtc.RtpReceiver;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
@@ -44,7 +32,9 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PeerConnectionClient {
     public Context mContext;
@@ -63,15 +53,15 @@ public class PeerConnectionClient {
     public SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
     public int gridCount = 1;
-    public PeerConnectionClient(Context mContext, Activity mActivity, String name){
-        this.mContext = mContext;
-        this.mActivity = mActivity;
+    public PeerConnectionClient(Context context, Activity activity, String name){
+        this.mContext = context;
+        this.mActivity = activity;
 
         userRecyclerView = mActivity.findViewById(R.id.recyclerView);
 
         initPeer(name);
 
-        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity,new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnectionMap ,sdpMediaConstraints, surfaceTextureHelper, name);
+        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity, mContext, new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnectionMap ,sdpMediaConstraints, surfaceTextureHelper, name);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
         userRecyclerView.setItemAnimator(null);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1, GridLayoutManager.HORIZONTAL, false);
@@ -131,10 +121,15 @@ public class PeerConnectionClient {
                 "OfferToReceiveVideoChannel", "true"));
 
         pcObserver();
-        createPeerConnection(name);
+        createFirstPeerConnection(name);
     }
 
     public void createPeerConnection(String name) {
+        peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
+        peerConnectionMap.get(name).addTrack(localVideoTrack);
+        peerConnectionMap.get(name).addTrack(localAudioTrack);
+    }
+    public void createFirstPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
     }
     private void pcObserver() {

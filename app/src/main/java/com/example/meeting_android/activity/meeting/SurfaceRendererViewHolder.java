@@ -60,6 +60,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
         this.mActivity = activity;
+        this.mContext = context;
         this.name = name;
     }
 
