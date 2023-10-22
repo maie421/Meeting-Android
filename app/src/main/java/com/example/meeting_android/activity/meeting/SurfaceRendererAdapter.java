@@ -1,5 +1,6 @@
 package com.example.meeting_android.activity.meeting;
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,13 +32,15 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public MediaConstraints sdpMediaConstraints;
     public SurfaceTextureHelper surfaceTextureHelper;
     public Activity mActivity;
-    public SurfaceRendererAdapter(Activity activity, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
+    public Context mContext;
+    public SurfaceRendererAdapter(Activity activity, Context context, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
         this.meetings = meetings;
         this.eglBaseContext = eglBaseContext;
         this.peerConnectionFactory = peerConnectionFactory;
         this.peerConnection = peerConnection;
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
+        this.mContext = context;
         this.mActivity = activity;
     }
 
@@ -45,7 +48,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     @Override
     public SurfaceRendererViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_surface_renderer, parent, false);
-        return new SurfaceRendererViewHolder(view,mActivity, eglBaseContext,peerConnectionFactory ,peerConnection, sdpMediaConstraints, surfaceTextureHelper);
+        return new SurfaceRendererViewHolder(view,mActivity,mContext, eglBaseContext,peerConnectionFactory ,peerConnection, sdpMediaConstraints, surfaceTextureHelper);
     }
 
     @Override

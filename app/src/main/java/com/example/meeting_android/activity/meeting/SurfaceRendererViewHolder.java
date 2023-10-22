@@ -3,6 +3,7 @@ package com.example.meeting_android.activity.meeting;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.example.meeting_android.R;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
+import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
 import org.webrtc.EglRenderer;
@@ -41,7 +43,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public PeerConnection peerConnection;
     public MediaConstraints sdpMediaConstraints;
     public Activity mActivity;
-    public SurfaceRendererViewHolder(@NonNull View itemView, Activity activity, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
+    public Context mContext;
+    public SurfaceRendererViewHolder(@NonNull View itemView, Activity activity, Context context, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, PeerConnection peerConnection, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper) {
         super(itemView);
         surfaceViewRenderer = itemView.findViewById(R.id.surfaceRenderer);
 
@@ -51,15 +54,17 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         this.sdpMediaConstraints = sdpMediaConstraints;
         this.surfaceTextureHelper = surfaceTextureHelper;
         this.mActivity = activity;
+        this.mContext = context;
     }
 
     public void localBind(){
-        localVideoTrack = getLocalVideo(true);
-        localVideoTrack.addSink(surfaceViewRenderer);
-        peerConnection.addTrack(localVideoTrack);
-        peerConnection.addTrack(getAudioTrack());
-
-        initSurfaceViewRenderer(surfaceViewRenderer);
+        mActivity.runOnUiThread(() -> {
+            localVideoTrack = getLocalVideo(true);
+            localVideoTrack.addSink(surfaceViewRenderer);
+            initSurfaceViewRenderer(surfaceViewRenderer);
+        });
+            peerConnection.addTrack(localVideoTrack);
+//        peerConnection.addTrack(getAudioTrack());
     }
 
     public void remoteBind(MeetingVideo meetingVideo){
@@ -97,7 +102,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
 
             @Override
             public void onViewDetachedFromWindow(View v) {
-                Log.i(TAG,"onViewDetachedFromWindow");
+                Log.i(TAG,"onViewDetachedFromWindow" +v);
 
             }
         });
@@ -124,7 +129,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
         videoCapturer.initialize(surfaceTextureHelper,mActivity, videoSource.getCapturerObserver());
-        videoCapturer.startCapture(240, 320, 30);
+        videoCapturer.startCapture(10, 10, 25);
 
         return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
     }
@@ -137,7 +142,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     }
 
     private VideoCapturer createCameraCapturer(boolean isFront) {
-        Camera1Enumerator enumerator = new Camera1Enumerator(false);
+        // Using Camera2Enumerator instead of Camera1Enumerator
+        Camera2Enumerator enumerator = new Camera2Enumerator(mContext);
 
         final String[] deviceNames = enumerator.getDeviceNames();
         for (String deviceName : deviceNames) {
@@ -155,7 +161,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
 
                     @Override
                     public void onCameraFreezed(String s) {
-                        Log.e(TAG, "onCameraFreezed"+ s);
+                        Log.e(TAG, "onCameraFreezed" + s);
                     }
 
                     @Override
@@ -172,6 +178,13 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
                     public void onCameraClosed() {
                         Log.e(TAG, "onCameraClosed");
                     }
+
+                    // Assuming there might be new callback methods in Camera2Enumerator
+                    // Example:
+                    // @Override
+                    // public void onNewCamera2Event() {
+                    //     Log.e(TAG, "onNewCamera2Event");
+                    // }
                 });
 
                 if (videoCapturer != null) {

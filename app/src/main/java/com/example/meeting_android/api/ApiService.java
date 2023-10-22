@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiService {
 //    public static final String BASE = "https://4117-221-148-25-236.ngrok-free.app/";
-    public static final String BASE = "http://54.180.156.201/";
+    public static final String BASE = "http://3.38.192.133/";
     public static final String BASE_URL = BASE +"api/";
 
     public Retrofit retrofit;
