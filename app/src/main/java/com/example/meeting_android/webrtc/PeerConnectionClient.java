@@ -113,7 +113,6 @@ public class PeerConnectionClient {
         eglBaseContext = rootEglBase.getEglBaseContext();
         surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
 
-        Log.d(TAG,"createPeerConnectionChannel");
         sdpMediaConstraints = new MediaConstraints();
         sdpMediaConstraints.mandatory.add(
                 new MediaConstraints.KeyValuePair("OfferToReceiveAudioChannel", "true"));
