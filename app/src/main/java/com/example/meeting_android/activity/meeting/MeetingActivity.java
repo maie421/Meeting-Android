@@ -1,6 +1,5 @@
 package com.example.meeting_android.activity.meeting;
 
-import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 
 import androidx.appcompat.app.AppCompatActivity;

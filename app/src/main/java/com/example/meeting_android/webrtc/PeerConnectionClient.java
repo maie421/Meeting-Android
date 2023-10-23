@@ -124,10 +124,12 @@ public class PeerConnectionClient {
     }
 
     public void createPeerConnection(String name) {
-        Log.i("디버그2", "여기" + name);
-        peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
-        peerConnectionMap.get(name).addTrack(localVideoTrack);
-        peerConnectionMap.get(name).addTrack(localAudioTrack);
+        if (peerConnectionMap.get(name) == null) {
+            Log.i("디버그2", "welcome participants " + name);
+            peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
+            peerConnectionMap.get(name).addTrack(localVideoTrack);
+            peerConnectionMap.get(name).addTrack(localAudioTrack);
+        }
     }
     public void createFirstPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
@@ -159,6 +161,7 @@ public class PeerConnectionClient {
             @Override
             public void onIceCandidate(IceCandidate iceCandidate) {
                 Log.d(TAG, "onIceCandidate : "+ iceCandidate);
+
                 sendIce(iceCandidate);
             }
             // 제거된 ICE 후보에 대한 콜백
