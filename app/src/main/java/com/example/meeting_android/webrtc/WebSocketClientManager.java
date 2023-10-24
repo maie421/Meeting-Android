@@ -72,33 +72,12 @@ public class WebSocketClientManager {
     };
 
     private Emitter.Listener onWelcome = args -> {
-        JSONObject participants;
-        try {
-            JSONObject room = (JSONObject) args[0];
-            participants = room.getJSONObject("participants");
+        String name = (String) args[1];
+        peerConnectionClient.createPeerConnection(name);
+        offerList.add(name);
+        createOfferAndSend(name);
 
-            Iterator<String> keys = participants.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-
-                Log.i(TAG2, "welcome participants " + key);
-                if ( peerConnectionClient.peerConnectionMap.get(key) == null ){
-                    Log.i(TAG2, "welcome participants null " + key);
-                    peerConnectionClient.createPeerConnection(key);
-                    offerList.add(key);
-                    if (!Objects.equals(key, "fff")) {
-                        createOfferAndSend(key);
-                    }
-                }
-            }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
     };
-
-    private boolean isRenderAdapterBoolean(int count) {
-        return peerConnectionClient.surfaceRendererAdapter.getItemCount() >= count;
-    }
 
     private void createOfferAndSend(String _name) {
         peerConnectionClient.peerConnectionMap.get(_name).createOffer(new SimpleSdpObserver() {
@@ -141,15 +120,12 @@ public class WebSocketClientManager {
         // SDP 생성
         SessionDescription sdp = new SessionDescription(
                 SessionDescription.Type.OFFER, _sdp);
-//        if (isCreateConnection() && isRenderAdapterBoolean(3)) {
-//            name = (String) args[1];
-//            peerConnectionClient.createPeerConnection(name);
-//        }
+
         if (!offerList.contains(socketId)) {
             offerList.add(socketId);
             peerConnectionClient.createPeerConnection(socketId);
+            Log.i(TAG2, "createPeerConnection " + socketId);
         }
-        Log.i(TAG2, "createPeerConnection " + socketId);
 
         // 로컬 PeerConnection에 Offer를 설정
         peerConnectionClient.peerConnectionMap.get(socketId).setRemoteDescription(new SimpleSdpObserver() {
@@ -179,7 +155,7 @@ public class WebSocketClientManager {
                     throw new RuntimeException(e);
                 }
                 Log.i(TAG2, "sendAnswer " + name);
-                mSocket.emit("answer", message, roomName, name);
+                mSocket.emit("answer", message, roomName, name, socketId);
             }
 
         }, peerConnectionClient.sdpMediaConstraints);
@@ -226,7 +202,7 @@ public class WebSocketClientManager {
     };
     private Emitter.Listener onIce = args -> {
         JSONObject msg = (JSONObject) args[0];
-        offerList.forEach(key -> {Log.d(TAG,"offerList"+ key);});
+        offerList.forEach(key -> {Log.d(TAG,"offerList "+ key);});
         offerList.forEach(key -> {
             try {
                 IceCandidate iceCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
