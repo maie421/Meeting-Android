@@ -26,6 +26,7 @@ import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import retrofit2.Call;
@@ -192,7 +193,8 @@ public class MeetingActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         webSocketClientManager.peerConnectionClient.surfaceRendererAdapter.clearMeetingVideo();
-//        webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
+        webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
+        webSocketClientManager.offerList.clear();
         sendLeave();
     }
 }

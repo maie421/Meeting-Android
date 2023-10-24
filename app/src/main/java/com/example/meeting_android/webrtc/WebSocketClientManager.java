@@ -34,7 +34,6 @@ public class WebSocketClientManager {
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
     public List<String> offerList = new ArrayList<>();
-    public Map<String,Boolean> isCandidate = new HashMap<>();
     public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
         peerConnectionClient = new PeerConnectionClient(Context, activity, name);
         this.mActivity = activity;
@@ -47,7 +46,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://9b8c-27-35-20-189.ngrok-free.app");
+            mSocket = IO.socket("https://76a2-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -81,12 +80,15 @@ public class WebSocketClientManager {
             Iterator<String> keys = participants.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
+
                 Log.i(TAG2, "welcome participants " + key);
-                if (!name.equals(key) && peerConnectionClient.peerConnectionMap.get(key) == null){
+                if ( peerConnectionClient.peerConnectionMap.get(key) == null ){
                     Log.i(TAG2, "welcome participants null " + key);
                     peerConnectionClient.createPeerConnection(key);
                     offerList.add(key);
-                    createOfferAndSend(key);
+                    if (!Objects.equals(key, "fff")) {
+                        createOfferAndSend(key);
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -98,8 +100,8 @@ public class WebSocketClientManager {
         return peerConnectionClient.surfaceRendererAdapter.getItemCount() >= count;
     }
 
-    private void createOfferAndSend(String name) {
-        peerConnectionClient.peerConnectionMap.get(name).createOffer(new SimpleSdpObserver() {
+    private void createOfferAndSend(String _name) {
+        peerConnectionClient.peerConnectionMap.get(_name).createOffer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 JSONObject message = new JSONObject();
@@ -110,27 +112,28 @@ public class WebSocketClientManager {
                     throw new RuntimeException(e);
                 }
 
-                Log.i(TAG2, "send offer " + name);
-                mSocket.emit("offer", message, roomName, name);
-                peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
+                mSocket.emit("offer", message, roomName, _name);
+                peerConnectionClient.peerConnectionMap.get(_name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
-                        Log.e(TAG, "setLocalDescription failed: " + error + "( "+ name +" )");
+                        Log.e(TAG, "setLocalDescription failed: " + error + "( "+ _name +" )");
                     }
                 }, sessionDescription);
             }
         }, peerConnectionClient.sdpMediaConstraints);
     }
     private Emitter.Listener onOffer = args -> {
-        Log.d(TAG, "onOffer");
         String _sdp;
         String name;
+        String socketId;
 
         try {
             JSONObject offerData = (JSONObject) args[0];
             _sdp = offerData.getString("sdp");
 
             name = (String) args[1];
+            socketId = (String) args[2];
+            Log.d(TAG2, "onOffer "+ name);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -142,27 +145,29 @@ public class WebSocketClientManager {
 //            name = (String) args[1];
 //            peerConnectionClient.createPeerConnection(name);
 //        }
-        offerList.add(name);
-        peerConnectionClient.createPeerConnection(name);
-        Log.i(TAG2, "createPeerConnection " + name);
+        if (!offerList.contains(socketId)) {
+            offerList.add(socketId);
+            peerConnectionClient.createPeerConnection(socketId);
+        }
+        Log.i(TAG2, "createPeerConnection " + socketId);
 
         // 로컬 PeerConnection에 Offer를 설정
-        peerConnectionClient.peerConnectionMap.get(name).setRemoteDescription(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(socketId).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
-                Log.e(TAG, "setRemoteDescription failed: " + error + "( "+ name +" )");
+                Log.e(TAG, "setRemoteDescription failed: " + error + "( "+ socketId +" )");
             }
         }, sdp);
-        Log.i(TAG2, "setRemoteDescription " + name);
+        Log.i(TAG2, "setRemoteDescription " + socketId);
         // Answer 생성
-        peerConnectionClient.peerConnectionMap.get(name).createAnswer(new SimpleSdpObserver() {
+        peerConnectionClient.peerConnectionMap.get(socketId).createAnswer(new SimpleSdpObserver() {
             @Override
             public void onCreateSuccess(SessionDescription sessionDescription) {
                 // Answer SDP를 로컬에 설정
-                peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new SimpleSdpObserver() {
+                peerConnectionClient.peerConnectionMap.get(socketId).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
-                        Log.e(TAG, "setRemoteDescription1 failed: " + error + "( "+ name +" )");
+                        Log.e(TAG, "setRemoteDescription1 failed: " + error + "( "+ socketId +" )");
                     }
                 }, sessionDescription);
 
@@ -221,20 +226,18 @@ public class WebSocketClientManager {
     };
     private Emitter.Listener onIce = args -> {
         JSONObject msg = (JSONObject) args[0];
-
+        offerList.forEach(key -> {Log.d(TAG,"offerList"+ key);});
         offerList.forEach(key -> {
             try {
-                Log.d(TAG2, "여긴???");
                 IceCandidate iceCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
                 peerConnectionClient.peerConnectionMap.get(key).addIceCandidate(iceCandidate);
-                isCandidate.put(key, true);
-
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         });
 
     };
+
     public static void sendIce(IceCandidate iceCandidate) {
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
