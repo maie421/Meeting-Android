@@ -1,4 +1,6 @@
 package com.example.meeting_android.activity.meeting;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -20,6 +22,8 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoTrack;
+
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,11 +75,11 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     }
 
     public void addMeetingVideoName(String userName){
-            MeetingVideo meetingVideo = new MeetingVideo(userName);
-            mActivity.runOnUiThread(() -> {
-                this.meetings.add(meetingVideo);
-                notifyItemInserted(meetings.size() - 1);
-            });
+        MeetingVideo meetingVideo = new MeetingVideo(userName);
+        mActivity.runOnUiThread(() -> {
+            this.meetings.add(meetingVideo);
+            notifyItemInserted(meetings.size() - 1);
+        });
     }
 
     public void addMeetingVideo(String userName, MediaStream mediaStream){
@@ -83,8 +87,15 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
         this.meetings.add(meetingVideo);
     }
 
-    public void deleteMeetingVideo(String userName){
-        this.meetings.removeIf((item) -> Objects.equals(item.name, userName));
+    public int deleteMeetingVideo(String userName){
+        for(int i = 0 ; i< meetings.size() ; i++){
+            if (Objects.equals(meetings.get(i).name, userName)){
+                Log.d("meetings","미디어 삭제 : " + meetings.get(i).name);
+                meetings.remove(i);
+                return i;
+            }
+        }
+        return 404;
     }
     public void clearMeetingVideo(){
         this.meetings.clear();

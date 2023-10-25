@@ -31,6 +31,7 @@ public class WebSocketClientManager {
     public Activity mActivity;
     public static String roomName;
     public static String name;
+    public static String fromName;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
     public List<String> offerList = new ArrayList<>();
@@ -40,13 +41,14 @@ public class WebSocketClientManager {
         this.mContext = Context;
         this.roomName = roomName;
         this.name = name;
+        this.fromName = name;
         connect();
     }
 
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://76a2-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://ce7b-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -73,10 +75,10 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onWelcome = args -> {
         String name = (String) args[1];
+        fromName = name;
         peerConnectionClient.createPeerConnection(name);
         offerList.add(name);
         createOfferAndSend(name);
-
     };
 
     private void createOfferAndSend(String _name) {
@@ -91,7 +93,7 @@ public class WebSocketClientManager {
                     throw new RuntimeException(e);
                 }
 
-                mSocket.emit("offer", message, roomName, _name);
+                mSocket.emit("offer", message, roomName, _name, name);
                 peerConnectionClient.peerConnectionMap.get(_name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
@@ -112,6 +114,7 @@ public class WebSocketClientManager {
 
             name = (String) args[1];
             socketId = (String) args[2];
+            fromName = (String) args[3];
             Log.d(TAG2, "onOffer "+ name);
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -164,9 +167,11 @@ public class WebSocketClientManager {
     private Emitter.Listener onAnswer = args -> {
         String _sdp;
         String name;
+
         try {
             JSONObject offerData = (JSONObject) args[0];
             name = (String) args[1];
+            fromName = name;
             _sdp = offerData.getString("sdp");
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -185,24 +190,25 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onLeaveRoom = args -> {
         String msg = (String) args[0];
-        Log.d("디버그","나간 회원"+ msg);
+        Log.d("미디어","나간 회원 name :"+ msg);
         if (peerConnectionClient.gridCount >= 2) {
-            peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
-//                peerConnectionClient.peerConnectionMap.get(name).close();
+            int i = peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
+            peerConnectionClient.peerConnectionMap.get(name).close();
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    GridLayoutManager layoutManager = (GridLayoutManager) peerConnectionClient.userRecyclerView.getLayoutManager();
-                    layoutManager.setSpanCount(--peerConnectionClient.gridCount);
-                    //peerConnectionClient.surfaceRendererAdapter.getItemCount()
-//                        peerConnectionClient.surfaceRendererAdapter.notifyItemRemoved(0);
+                    if (i != 404) {
+                        Log.d("미디어","나간 회원 if 문 들어옴:" + i);
+                        peerConnectionClient.surfaceRendererAdapter.notifyItemRemoved(i);
+                        GridLayoutManager layoutManager = (GridLayoutManager) peerConnectionClient.userRecyclerView.getLayoutManager();
+                        layoutManager.setSpanCount(--peerConnectionClient.gridCount);
+                    }
                 }
             });
         }
     };
     private Emitter.Listener onIce = args -> {
         JSONObject msg = (JSONObject) args[0];
-        offerList.forEach(key -> {Log.d(TAG,"offerList "+ key);});
         offerList.forEach(key -> {
             try {
                 IceCandidate iceCandidate = new IceCandidate(msg.getString("sdpMid"), msg.getInt("sdpMLineIndex"), msg.getString("candidate"));
@@ -218,7 +224,7 @@ public class WebSocketClientManager {
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
     public static void sendLeave() {
-        Log.d(TAG, "sendLeave");
+        Log.d(TAG, "sendLeave :" + name);
         mSocket.emit("leave_room", roomName, name);
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {

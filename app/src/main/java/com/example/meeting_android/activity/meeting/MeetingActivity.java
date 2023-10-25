@@ -26,6 +26,7 @@ import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -62,7 +63,7 @@ public class MeetingActivity extends AppCompatActivity {
         onClickButtonNavigation();
         requestPermissions();
         initWebSocketClient();
-        
+
         buttonDialog.setOnClickListener(v->{
             customDialog.show();
         });
@@ -70,7 +71,7 @@ public class MeetingActivity extends AppCompatActivity {
 
     private void initDialog() {
         Intent intent = getIntent();
-            //비회원
+        //비회원
         if (intent.hasExtra("name") && intent.hasExtra("joinRoom") && intent.hasExtra("hostName")) {
             name = intent.getStringExtra("name");
             hostName = intent.getStringExtra("hostName");
@@ -192,6 +193,13 @@ public class MeetingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Iterator<String> keys = webSocketClientManager.peerConnectionClient.peerConnectionMap.keySet().iterator();
+
+        while( keys.hasNext() ){
+            String strKey = keys.next();
+            webSocketClientManager.peerConnectionClient.peerConnectionMap.get(strKey).close();
+        }
+
         webSocketClientManager.peerConnectionClient.surfaceRendererAdapter.clearMeetingVideo();
         webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
         webSocketClientManager.offerList.clear();

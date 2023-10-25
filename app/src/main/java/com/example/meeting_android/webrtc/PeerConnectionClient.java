@@ -2,6 +2,7 @@ package com.example.meeting_android.webrtc;
 
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 
@@ -218,8 +219,8 @@ public class PeerConnectionClient {
             gridCount++;
             userRecyclerView.post(new Runnable() {
                 public void run() {
-                    Log.d("미디어","미디어"+mediaStream);
-                    surfaceRendererAdapter.addMeetingVideo(name, mediaStream);
+                    Log.d("미디어","미디어 추가: "+ fromName);
+                    surfaceRendererAdapter.addMeetingVideo(fromName, mediaStream);
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
