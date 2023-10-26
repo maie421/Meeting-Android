@@ -34,9 +34,10 @@ public class WebSocketClientManager {
     public static String fromName;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
-    public List<String> offerList = new ArrayList<>();
+    public List<String> offerList;
     public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
         peerConnectionClient = new PeerConnectionClient(Context, activity, name);
+        this.offerList = new ArrayList<>();
         this.mActivity = activity;
         this.mContext = Context;
         this.roomName = roomName;
@@ -48,7 +49,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://ce7b-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://c247-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
