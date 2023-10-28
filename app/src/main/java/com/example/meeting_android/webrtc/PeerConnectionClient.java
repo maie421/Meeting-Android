@@ -1,5 +1,7 @@
 package com.example.meeting_android.webrtc;
 
+import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
+import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
@@ -8,11 +10,15 @@ import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meeting_android.R;
+import com.example.meeting_android.activity.chatting.MemberData;
+import com.example.meeting_android.activity.chatting.Message;
 import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
 import org.webrtc.DataChannel;
@@ -33,6 +39,8 @@ import org.webrtc.VideoEncoderFactory;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +56,10 @@ public class PeerConnectionClient {
     public SurfaceTextureHelper surfaceTextureHelper;
     public EglBase.Context eglBaseContext;
     private String TAG = "웹소켓";
+    private String CHATTING_TAG = "채팅";
     private PeerConnection.RTCConfiguration configuration;
     public Map<String, PeerConnection> peerConnectionMap = new HashMap<>();
-    public Map<String, DataChannel> peerDataChannelnMap = new HashMap<>();
+    public static Map<String, DataChannel> peerDataChannelnMap = new HashMap<>();
     public PeerConnection.Observer pcObserver;
     public MediaConstraints sdpMediaConstraints;
     public SurfaceRendererAdapter surfaceRendererAdapter;
@@ -139,6 +148,7 @@ public class PeerConnectionClient {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
         peerDataChannelnMap.put(name,peerConnectionMap.get(name).createDataChannel("channel",new DataChannel.Init()));
     }
+
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
             @Override
@@ -195,7 +205,24 @@ public class PeerConnectionClient {
             // 데이터 채널이 생성될 때 호출되는 콜백
             @Override
             public void onDataChannel(DataChannel dataChannel) {
-                Log.d(TAG, "onDataChannel : "+ dataChannel);
+                Log.d(CHATTING_TAG, "onDataChannel : "+ dataChannel);
+                dataChannel.registerObserver(new DataChannel.Observer() {
+                    @Override
+                    public void onBufferedAmountChange(long l) {
+
+                    }
+
+                    @Override
+                    public void onStateChange() {
+                        Log.d(TAG, "onStateChange: remote data channel state: " + dataChannel.state().toString());
+                    }
+
+                    @Override
+                    public void onMessage(DataChannel.Buffer buffer) {
+                        Log.d(CHATTING_TAG, "onMessage: got message : " + buffer);
+                        readIncomingMessage(buffer.data);
+                    }
+                });
             }
             // 재협상이 필요한 경우 호출되는 콜백
             @Override
@@ -215,6 +242,33 @@ public class PeerConnectionClient {
 //                Log.d(TAG, "onAddTrack"+ 그mediaStreams);
             }
         };
+    }
+
+    private void readIncomingMessage(ByteBuffer buffer) {
+        Log.d(CHATTING_TAG,"받은 메세지 : " + buffer);
+        byte[] bytes;
+        if (buffer.hasArray()) {
+            bytes = buffer.array();
+        } else {
+            bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+        }
+
+        String firstMessage = new String(bytes, Charset.defaultCharset());
+        String type = firstMessage.substring(0, 2);
+
+         if (type.equals("-s")) {
+             String _message = firstMessage.substring(2, firstMessage.length());
+             String[] parts = _message.split("::");
+             String _name = parts[0];
+             String _text = parts[1];
+
+             Log.d(CHATTING_TAG, _text);
+             MemberData memberData = new MemberData(_name, getRandomColor());
+             Message message = new Message(_text, memberData, false);
+
+             messageAdapter.add(message);
+        }
     }
 
     private void getRemoteStream(MediaStream mediaStream) {

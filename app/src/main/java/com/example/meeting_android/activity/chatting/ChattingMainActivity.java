@@ -2,6 +2,7 @@ package com.example.meeting_android.activity.chatting;
 
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
 import static com.example.meeting_android.common.Common.getNowTime;
+import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
 
 import androidx.annotation.Nullable;
@@ -16,10 +17,15 @@ import android.widget.ListView;
 
 import com.example.meeting_android.R;
 
+import org.webrtc.DataChannel;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 public class ChattingMainActivity extends AppCompatActivity {
     public ListView chatListView;
     public ImageButton sendButton;
-    public MessageAdapter messageAdapter;
+    public static MessageAdapter messageAdapter;
     public EditText editText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +36,7 @@ public class ChattingMainActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.sendButton);
         editText = findViewById(R.id.editText);
 
-        messageAdapter = new MessageAdapter(this);
+        messageAdapter = new MessageAdapter(this, this);
         chatListView.setAdapter(messageAdapter);
         chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL); // 스크롤 모드 설정
 
@@ -49,9 +55,24 @@ public class ChattingMainActivity extends AppCompatActivity {
     public void sendMessage(String messageString) {
         if (messageString != null && !messageString.isEmpty()) {
             MemberData memberData = new MemberData(name, getRandomColor());
-            Message message = new Message(messageString, memberData, false);
+            StringBuffer sb1 = new StringBuffer();
+            sb1.append(messageString);
+
+            Message message = new Message(messageString, memberData, true);
             messageAdapter.add(message);
+
+            ByteBuffer data = stringToByteBuffer("-s" +name+"::"+messageString, Charset.defaultCharset());
+
+            peerDataChannelnMap.forEach((key, value)->{
+                peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, false));
+            });
+
             editText.getText().clear();
         }
     }
+
+    private ByteBuffer stringToByteBuffer(String msg, Charset charset) {
+        return ByteBuffer.wrap(msg.getBytes(charset));
+    }
+
 }

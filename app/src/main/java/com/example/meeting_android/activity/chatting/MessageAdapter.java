@@ -1,5 +1,7 @@
 package com.example.meeting_android.activity.chatting;
 
+import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -19,14 +21,18 @@ public class MessageAdapter extends BaseAdapter {
 
     List<Message> messages = new ArrayList<Message>();
     Context context;
+    Activity activity;
 
-    public MessageAdapter(Context context) {
+    public MessageAdapter(Context context, Activity activity) {
         this.context = context;
+        this.activity = activity;
     }
 
     public void add(Message message) {
-        this.messages.add(message);
-        notifyDataSetChanged(); // to render the list we need to notify
+        activity.runOnUiThread(() -> {
+            this.messages.add(message);
+            notifyDataSetChanged();
+        });
     }
 
     @Override
