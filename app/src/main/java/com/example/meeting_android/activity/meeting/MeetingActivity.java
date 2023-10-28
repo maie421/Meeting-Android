@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.R;
+import com.example.meeting_android.activity.MeetingMainActivity;
+import com.example.meeting_android.activity.chatting.ChattingMainActivity;
 import com.example.meeting_android.api.room.Room;
 import com.example.meeting_android.api.room.RoomController;
 import com.example.meeting_android.api.room.RoomService;
@@ -106,6 +108,8 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_chat) {
+                Intent intent = new Intent(this, ChattingMainActivity.class);
+                startActivity(intent);
                 return true;
             }
             return false;
