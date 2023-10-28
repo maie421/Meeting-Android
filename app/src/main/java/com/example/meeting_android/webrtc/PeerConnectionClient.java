@@ -50,6 +50,7 @@ public class PeerConnectionClient {
     private String TAG = "웹소켓";
     private PeerConnection.RTCConfiguration configuration;
     public Map<String, PeerConnection> peerConnectionMap = new HashMap<>();
+    public Map<String, DataChannel> peerDataChannelnMap = new HashMap<>();
     public PeerConnection.Observer pcObserver;
     public MediaConstraints sdpMediaConstraints;
     public SurfaceRendererAdapter surfaceRendererAdapter;
@@ -131,10 +132,12 @@ public class PeerConnectionClient {
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
+            peerDataChannelnMap.put(name, peerConnectionMap.get(name).createDataChannel("channel",new DataChannel.Init()));
         }
     }
     public void createFirstPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
+        peerDataChannelnMap.put(name,peerConnectionMap.get(name).createDataChannel("channel",new DataChannel.Init()));
     }
     private void pcObserver() {
         pcObserver = new PeerConnection.Observer() {
