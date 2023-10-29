@@ -1,6 +1,7 @@
 package com.example.meeting_android.activity.chatting;
 
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
+import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
@@ -60,7 +61,7 @@ public class ChattingMainActivity extends AppCompatActivity {
             StringBuffer sb1 = new StringBuffer();
             sb1.append(messageString);
 
-            Message message = new Message(messageString, memberData, true);
+            Message message = new Message(messageString, memberData, true, MESSAGE);
             messageAdapter.add(message);
 
             peerDataChannelnMap.forEach((key, value)->{
@@ -73,7 +74,7 @@ public class ChattingMainActivity extends AppCompatActivity {
         }
     }
 
-    private ByteBuffer stringToByteBuffer(String msg, Charset charset) {
+    public static ByteBuffer stringToByteBuffer(String msg, Charset charset) {
         return ByteBuffer.wrap(msg.getBytes(charset));
     }
 

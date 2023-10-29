@@ -1,18 +1,25 @@
 package com.example.meeting_android.activity.chatting;
 
 public class Message {
-    private String text; // message body
-    private MemberData memberData; // data of the user that sent this message
-    private boolean belongsToCurrentUser; // is this message sent by us?
+    private String text;
+    private MemberData memberData;
+    private boolean belongsToCurrentUser;
+    private String type;
+    public static String MESSAGE = "text";
+    public static String GUIDE = "guide";
 
-    public Message(String text, MemberData memberData, boolean belongsToCurrentUser) {
+    public Message(String text, MemberData memberData, boolean belongsToCurrentUser, String type) {
         this.text = text;
         this.memberData = memberData;
         this.belongsToCurrentUser = belongsToCurrentUser;
+        this.type = type;
     }
 
     public String getText() {
         return text;
+    }
+    public String getType() {
+        return type;
     }
 
     public MemberData getMemberData() {

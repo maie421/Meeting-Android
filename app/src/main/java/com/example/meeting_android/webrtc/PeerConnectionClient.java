@@ -1,7 +1,10 @@
 package com.example.meeting_android.webrtc;
 
 import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
+import static com.example.meeting_android.activity.chatting.ChattingMainActivity.stringToByteBuffer;
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
+import static com.example.meeting_android.activity.chatting.Message.GUIDE;
+import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
@@ -264,19 +267,26 @@ public class PeerConnectionClient {
         String type = firstMessage.substring(0, 2);
 
          if (type.equals("-s")) {
-             String _message = firstMessage.substring(2, firstMessage.length());
-             String[] parts = _message.split("::");
-             String _name = parts[0];
-             String _text = parts[1];
+             addMessage(firstMessage, MESSAGE);
+         }
+        if (type.equals("-a")) {
+            addMessage(firstMessage, GUIDE);
+        }
+    }
 
-             Log.d(CHATTING_TAG, "텍스트: " + _text);
-             MemberData memberData = new MemberData(_name, getRandomColor());
-             Message message = new Message(_text, memberData, false);
-             if (messageAdapter == null){
-                 messages.add(message);
-             }else {
-                 messageAdapter.add(message);
-             }
+    private void addMessage(String firstMessage, String type) {
+        String _message = firstMessage.substring(2, firstMessage.length());
+        String[] parts = _message.split("::");
+        String _name = parts[0];
+        String _text = parts[1];
+
+        Log.d(CHATTING_TAG, "텍스트: " + _text);
+        MemberData memberData = new MemberData(_name, getRandomColor());
+        Message message = new Message(_text, memberData, false, type);
+        if (messageAdapter == null){
+            messages.add(message);
+        }else {
+            messageAdapter.add(message);
         }
     }
 
@@ -290,6 +300,15 @@ public class PeerConnectionClient {
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
+
+//                    MemberData memberData = new MemberData(fromName, getRandomColor());
+//                    Message message = new Message(" 님이 방에 참가했습니다.", memberData, true, MESSAGE);
+//                    messageAdapter.add(message);
+//
+//                    peerDataChannelnMap.forEach((key, value)->{
+//                        ByteBuffer data = stringToByteBuffer("-a" +name+"::"+" 님이 방에 참가했습니다.", Charset.defaultCharset());
+//                        peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, false));
+//                    });
                 }
             });
 
