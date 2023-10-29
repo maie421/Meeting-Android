@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class PeerConnectionClient {
     public Context mContext;
@@ -138,12 +139,14 @@ public class PeerConnectionClient {
 
     public void createPeerConnection(String name) {
         if (peerConnectionMap.get(name) == null) {
+            Random rand = new Random();
+
+            String  n = String.valueOf(rand.nextInt(1000));
             Log.i("디버그2", "welcome participants " + name);
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
-            peerDataChannelnMap.put(name, peerConnectionMap.get(name).createDataChannel("channel", new DataChannel.Init()));
-            Log.i("채팅", "peerDataChannel " + peerDataChannelnMap.get(name).id());
+            peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
 
         }
     }
@@ -209,6 +212,7 @@ public class PeerConnectionClient {
             // 데이터 채널이 생성될 때 호출되는 콜백
             @Override
             public void onDataChannel(DataChannel dataChannel) {
+                Log.d(CHATTING_TAG, "onDataChannel : "+ dataChannel.label());
                 Log.d(CHATTING_TAG, "onDataChannel : "+ dataChannel);
                 dataChannel.registerObserver(new DataChannel.Observer() {
                     @Override
@@ -218,7 +222,7 @@ public class PeerConnectionClient {
 
                     @Override
                     public void onStateChange() {
-                        Log.d(TAG, "onStateChange: remote data channel state: " + dataChannel.state().toString());
+                        Log.d(CHATTING_TAG, "onStateChange: remote data channel state: " + dataChannel.state());
                     }
 
                     @Override
