@@ -1,4 +1,9 @@
 package com.example.meeting_android.webrtc;
+import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
+import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
+import static com.example.meeting_android.activity.chatting.Message.GUIDE;
+import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
+import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 
 import android.app.Activity;
@@ -6,6 +11,9 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.example.meeting_android.activity.chatting.MemberData;
+import com.example.meeting_android.activity.chatting.Message;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +91,14 @@ public class WebSocketClientManager {
         peerConnectionClient.createPeerConnection(name);
         offerList.add(name);
         createOfferAndSend(name);
+
+        MemberData memberData = new MemberData(fromName, getRandomColor());
+        Message message = new Message(" 님이 방에 참가했습니다.", memberData, true, GUIDE);
+        if (messageAdapter == null){
+            messages.add(message);
+        }else {
+            messageAdapter.add(message);
+        }
     };
 
     private void createOfferAndSend(String _name) {

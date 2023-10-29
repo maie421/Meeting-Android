@@ -82,15 +82,11 @@ public class MessageAdapter extends BaseAdapter {
         }
 
         if (Objects.equals(message.getType(), GUIDE)){
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            TextView dateTextView = new TextView(context);
-            dateTextView.setLayoutParams(layoutParams);
-            dateTextView.setText(message.getMemberData().getName() + message.getText());
-            dateTextView.setTextColor(Color.BLACK);
-            dateTextView.setPadding(10, 5, 10, 5);
-            ((RelativeLayout) convertView).addView(dateTextView);
+            convertView = messageInflater.inflate(R.layout.guide_message, null);
+            holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+            holder.messageBody.setText("["+message.getMemberData().getName()+"]"+ message.getText());
         }
+
         return convertView;
     }
 

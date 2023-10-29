@@ -242,14 +242,6 @@ public class PeerConnectionClient {
             // 트랙이 추가될 때 호출되는 콜백
             @Override
             public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
-//                SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
-//                for (MediaStream mediaStream : mediaStreams) {
-//                    if (mediaStream.videoTracks.size() > 0) {
-//                        Log.d(TAG, "onAddTrack: Adding video sink");
-//                        mediaStream.videoTracks.get(1).addSink(pip_video_view);
-//                    }
-//                }
-//                Log.d(TAG, "onAddTrack"+ 그mediaStreams);
             }
         };
     }
@@ -269,9 +261,6 @@ public class PeerConnectionClient {
          if (type.equals("-s")) {
              addMessage(firstMessage, MESSAGE);
          }
-        if (type.equals("-a")) {
-            addMessage(firstMessage, GUIDE);
-        }
     }
 
     private void addMessage(String firstMessage, String type) {
