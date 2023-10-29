@@ -164,7 +164,7 @@ public class Common {
     //현재 년도,달,일,시간,분,초
     public static String getNowTime() {
         LocalDateTime currentTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH시 mm분");
 
         String formattedTime = currentTime.format(formatter);
         return formattedTime;

@@ -8,6 +8,7 @@ import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
+import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
@@ -268,10 +269,11 @@ public class PeerConnectionClient {
         String[] parts = _message.split("::");
         String _name = parts[0];
         String _text = parts[1];
+        String _time = parts[2];
 
         Log.d(CHATTING_TAG, "텍스트: " + _text);
         MemberData memberData = new MemberData(_name, getRandomColor());
-        Message message = new Message(_text, memberData, false, type);
+        Message message = new Message(_text, memberData, false, type, _time);
         if (messageAdapter == null){
             messages.add(message);
         }else {

@@ -55,7 +55,7 @@ public class MessageAdapter extends BaseAdapter {
     }
 
     /**
-     * 채팅 참고 ui
+     * 채팅 참고 UI
      * https://www.scaledrone.com/blog/android-chat-tutorial/
      */
     @Override
@@ -65,7 +65,7 @@ public class MessageAdapter extends BaseAdapter {
         Message message = messages.get(i);
 
         if (Objects.equals(message.getType(), MESSAGE)) {
-            if (message.isBelongsToCurrentUser()) { // this message was sent by us so let's create a basic chat bubble on the right
+            if (message.isBelongsToCurrentUser()) {
                 convertView = messageInflater.inflate(R.layout.my_message, null);
                 holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
                 convertView.setTag(holder);
@@ -74,10 +74,12 @@ public class MessageAdapter extends BaseAdapter {
                 convertView = messageInflater.inflate(R.layout.their_message, null);
                 holder.name = (TextView) convertView.findViewById(R.id.name);
                 holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+                holder.messageTime = (TextView) convertView.findViewById(R.id.message_time);
                 convertView.setTag(holder);
 
                 holder.name.setText(message.getMemberData().getName());
                 holder.messageBody.setText(message.getText());
+                holder.messageTime.setText(message.getTime());
             }
         }
 
@@ -95,4 +97,5 @@ public class MessageAdapter extends BaseAdapter {
 class MessageViewHolder {
     public TextView name;
     public TextView messageBody;
+    public TextView messageTime;
 }

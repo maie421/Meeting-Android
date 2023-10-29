@@ -61,11 +61,12 @@ public class ChattingMainActivity extends AppCompatActivity {
             StringBuffer sb1 = new StringBuffer();
             sb1.append(messageString);
 
-            Message message = new Message(messageString, memberData, true, MESSAGE);
+            String time = getNowTime();
+            Message message = new Message(messageString, memberData, true, MESSAGE, time);
             messageAdapter.add(message);
 
             peerDataChannelnMap.forEach((key, value)->{
-                ByteBuffer data = stringToByteBuffer("-s" +name+"::"+messageString, Charset.defaultCharset());
+                ByteBuffer data = stringToByteBuffer("-s" +name+"::"+messageString+"::"+ time, Charset.defaultCharset());
                 Log.d(CHATTING_TAG, "send data : "+ data + " key : " + key);
                 peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, false));
             });

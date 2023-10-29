@@ -4,6 +4,7 @@ import static com.example.meeting_android.activity.chatting.MemberData.getRandom
 import static com.example.meeting_android.activity.chatting.Message.GUIDE;
 import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
+import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 
 import android.app.Activity;
@@ -60,7 +61,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://99e8-27-35-20-189.ngrok-free.app");
+            mSocket = IO.socket("https://fd2a-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -93,7 +94,7 @@ public class WebSocketClientManager {
         createOfferAndSend(name);
 
         MemberData memberData = new MemberData(fromName, getRandomColor());
-        Message message = new Message(" 님이 방에 참가했습니다.", memberData, true, GUIDE);
+        Message message = new Message(" 님이 방에 참가했습니다.", memberData, true, GUIDE, getNowTime());
         if (messageAdapter == null){
             messages.add(message);
         }else {
@@ -213,7 +214,7 @@ public class WebSocketClientManager {
         Log.d("미디어","나간 회원 name :"+ msg);
 
         MemberData memberData = new MemberData(msg, getRandomColor());
-        Message message = new Message(" 님이 방에서 나갔습니다.", memberData, true, GUIDE);
+        Message message = new Message(" 님이 방에서 나갔습니다.", memberData, true, GUIDE, getNowTime());
         if (messageAdapter == null){
             messages.add(message);
         }else {
