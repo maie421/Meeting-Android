@@ -1,5 +1,6 @@
 package com.example.meeting_android.activity.meeting;
 
+import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 
@@ -209,6 +210,7 @@ public class MeetingActivity extends AppCompatActivity {
         webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
         peerDataChannelnMap.clear();
         webSocketClientManager.offerList.clear();
+        messages.clear();
         sendLeave();
     }
 }

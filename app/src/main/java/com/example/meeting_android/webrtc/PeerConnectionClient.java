@@ -2,6 +2,7 @@ package com.example.meeting_android.webrtc;
 
 import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
+import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
@@ -141,12 +142,15 @@ public class PeerConnectionClient {
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
-            peerDataChannelnMap.put(name, peerConnectionMap.get(name).createDataChannel("channel",new DataChannel.Init()));
+            peerDataChannelnMap.put(name, peerConnectionMap.get(name).createDataChannel("channel", new DataChannel.Init()));
+            Log.i("채팅", "peerDataChannel " + peerDataChannelnMap.get(name).id());
+
         }
     }
     public void createFirstPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
-        peerDataChannelnMap.put(name,peerConnectionMap.get(name).createDataChannel("channel",new DataChannel.Init()));
+//        peerDataChannelnMap.put(name,peerConnectionMap.get(name).createDataChannel("channel", new DataChannel.Init()));
+//        Log.i("채팅", "peerDataChannel " + peerDataChannelnMap.get(name).id());
     }
 
     private void pcObserver() {
@@ -219,7 +223,6 @@ public class PeerConnectionClient {
 
                     @Override
                     public void onMessage(DataChannel.Buffer buffer) {
-                        Log.d(CHATTING_TAG, "onMessage: got message : " + buffer);
                         readIncomingMessage(buffer.data);
                     }
                 });
@@ -245,7 +248,6 @@ public class PeerConnectionClient {
     }
 
     private void readIncomingMessage(ByteBuffer buffer) {
-        Log.d(CHATTING_TAG,"받은 메세지 : " + buffer);
         byte[] bytes;
         if (buffer.hasArray()) {
             bytes = buffer.array();
@@ -263,11 +265,14 @@ public class PeerConnectionClient {
              String _name = parts[0];
              String _text = parts[1];
 
-             Log.d(CHATTING_TAG, _text);
+             Log.d(CHATTING_TAG, "텍스트: " + _text);
              MemberData memberData = new MemberData(_name, getRandomColor());
              Message message = new Message(_text, memberData, false);
-
-             messageAdapter.add(message);
+             if (messageAdapter == null){
+                 messages.add(message);
+             }else {
+                 messageAdapter.add(message);
+             }
         }
     }
 

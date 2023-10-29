@@ -19,7 +19,7 @@ import java.util.List;
 
 public class MessageAdapter extends BaseAdapter {
 
-    List<Message> messages = new ArrayList<Message>();
+    public static List<Message> messages = new ArrayList<Message>();
     Context context;
     Activity activity;
 

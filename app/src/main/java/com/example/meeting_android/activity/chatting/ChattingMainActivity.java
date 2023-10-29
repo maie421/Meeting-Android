@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -26,6 +27,7 @@ public class ChattingMainActivity extends AppCompatActivity {
     public ListView chatListView;
     public ImageButton sendButton;
     public static MessageAdapter messageAdapter;
+    private String CHATTING_TAG = "채팅";
     public EditText editText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,8 @@ public class ChattingMainActivity extends AppCompatActivity {
             ByteBuffer data = stringToByteBuffer("-s" +name+"::"+messageString, Charset.defaultCharset());
 
             peerDataChannelnMap.forEach((key, value)->{
-                peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, false));
+                Log.d(CHATTING_TAG, "send data : "+ key);
+                peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, true));
             });
 
             editText.getText().clear();
