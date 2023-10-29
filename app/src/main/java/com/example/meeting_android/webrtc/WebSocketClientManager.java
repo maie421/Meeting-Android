@@ -211,6 +211,15 @@ public class WebSocketClientManager {
     private Emitter.Listener onLeaveRoom = args -> {
         String msg = (String) args[0];
         Log.d("미디어","나간 회원 name :"+ msg);
+
+        MemberData memberData = new MemberData(msg, getRandomColor());
+        Message message = new Message(" 님이 방에서 나갔습니다.", memberData, true, GUIDE);
+        if (messageAdapter == null){
+            messages.add(message);
+        }else {
+            messageAdapter.add(message);
+        }
+
         if (peerConnectionClient.gridCount >= 2) {
             int i = peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
             peerConnectionClient.peerConnectionMap.get(name).close();
