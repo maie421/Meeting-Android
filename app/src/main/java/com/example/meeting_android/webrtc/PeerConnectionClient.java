@@ -156,8 +156,6 @@ public class PeerConnectionClient {
     }
     public void createFirstPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
-//        peerDataChannelnMap.put(name,peerConnectionMap.get(name).createDataChannel("channel", new DataChannel.Init()));
-//        Log.i("채팅", "peerDataChannel " + peerDataChannelnMap.get(name).id());
     }
 
     private void pcObserver() {
@@ -204,13 +202,6 @@ public class PeerConnectionClient {
             // 제거된 미디어 스트림에 대한 콜백
             @Override
             public void onRemoveStream(MediaStream mediaStream) {
-//                Log.d(TAG, "onRemoveStream : "+ mediaStream);
-//                SurfaceViewRenderer pip_video_view = mActivity.findViewById(R.id.pip_video_view);
-//
-//                // 제거된 미디어 스트림의 비디오 트랙을 제거
-//                if (mediaStream.videoTracks.size() > 0) {
-//                    mediaStream.videoTracks.get(0).removeSink(pip_video_view);
-//                }
 
             }
             // 데이터 채널이 생성될 때 호출되는 콜백
@@ -291,15 +282,6 @@ public class PeerConnectionClient {
                     GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
                     layoutManager.setSpanCount(gridCount);
                     surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
-
-//                    MemberData memberData = new MemberData(fromName, getRandomColor());
-//                    Message message = new Message(" 님이 방에 참가했습니다.", memberData, true, MESSAGE);
-//                    messageAdapter.add(message);
-//
-//                    peerDataChannelnMap.forEach((key, value)->{
-//                        ByteBuffer data = stringToByteBuffer("-a" +name+"::"+" 님이 방에 참가했습니다.", Charset.defaultCharset());
-//                        peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, false));
-//                    });
                 }
             });
 

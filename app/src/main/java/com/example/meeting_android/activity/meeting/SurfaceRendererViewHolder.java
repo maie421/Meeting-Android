@@ -137,7 +137,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         VideoCapturer videoCapturer = createCameraCapturer(status);
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
-        videoCapturer.initialize(surfaceTextureHelper,mActivity, videoSource.getCapturerObserver());
+        videoCapturer.initialize(surfaceTextureHelper, mActivity, videoSource.getCapturerObserver());
         videoCapturer.startCapture(10, 10, 25);
 
         return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
