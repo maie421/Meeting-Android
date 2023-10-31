@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -53,6 +54,7 @@ public class MeetingActivity extends AppCompatActivity {
     public UserService userService;
     public RoomService roomService;
     public RoomController roomController;
+    private boolean isButtonClicked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,9 +114,20 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_chat) {
-                Intent intent = new Intent(this, ChattingMainActivity.class);
-                startActivity(intent);
+                if (!isButtonClicked) {
+                    isButtonClicked = true;
+                    Intent intent = new Intent(this, ChattingMainActivity.class);
+                    startActivity(intent);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            isButtonClicked = false;
+                        }
+                    }, 1000);  // 예: 1초 동안 클릭 무시
+                }
                 return true;
+
             }
             return false;
         });
