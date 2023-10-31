@@ -13,7 +13,9 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.meeting_android.CustomDialog;
@@ -40,6 +42,7 @@ import retrofit2.Response;
 
 public class MeetingActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST = 2;
+    public static int messageCount = 0;
     public BottomNavigationView bottomNavigationView;
     public WebSocketClientManager webSocketClientManager;
     public Button buttonDialog;
@@ -50,7 +53,6 @@ public class MeetingActivity extends AppCompatActivity {
     public UserService userService;
     public RoomService roomService;
     public RoomController roomController;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -212,5 +214,13 @@ public class MeetingActivity extends AppCompatActivity {
         webSocketClientManager.offerList.clear();
         messages.clear();
         sendLeave();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        TextView textView = findViewById(R.id.messageCount);
+        textView.setVisibility(View.GONE);
+        messageCount = 0;
     }
 }

@@ -6,6 +6,7 @@ import static com.example.meeting_android.activity.chatting.MemberData.getRandom
 import static com.example.meeting_android.activity.chatting.Message.GUIDE;
 import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
+import static com.example.meeting_android.activity.meeting.MeetingActivity.messageCount;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.common.Common.getNowTime;
@@ -18,6 +19,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -261,7 +265,7 @@ public class PeerConnectionClient {
         String _name = parts[0];
         String _text = parts[1];
         String _time = parts[2];
-
+        messageCount += 1;
         Log.d(CHATTING_TAG, "텍스트: " + _text);
         MemberData memberData = new MemberData(_name, getRandomColor());
         Message message = new Message(_text, memberData, false, type, _time);
@@ -270,6 +274,11 @@ public class PeerConnectionClient {
         }else {
             messageAdapter.add(message);
         }
+        mActivity.runOnUiThread(() -> {
+            TextView textView = mActivity.findViewById(R.id.messageCount);
+            textView.setText(String.valueOf(messageCount));
+            textView.setVisibility(View.VISIBLE);
+        });
     }
 
     private void getRemoteStream(MediaStream mediaStream) {
