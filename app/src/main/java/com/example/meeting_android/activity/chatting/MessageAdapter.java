@@ -68,8 +68,10 @@ public class MessageAdapter extends BaseAdapter {
             if (message.isBelongsToCurrentUser()) {
                 convertView = messageInflater.inflate(R.layout.my_message, null);
                 holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
+                holder.messageTime = (TextView) convertView.findViewById(R.id.message_time);
                 convertView.setTag(holder);
                 holder.messageBody.setText(message.getText());
+                holder.messageTime.setText(message.getTime());
             } else {
                 convertView = messageInflater.inflate(R.layout.their_message, null);
                 holder.name = (TextView) convertView.findViewById(R.id.name);

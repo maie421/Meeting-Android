@@ -20,4 +20,16 @@
         android:text="Placeholder message"
         />
 
+    <TextView
+        android:id="@+id/message_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/message_body"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="20dp"
+        android:layout_toLeftOf="@id/message_body"
+        android:text="TextView"
+        android:textSize="10dp" />
 </RelativeLayout>
