@@ -5,6 +5,7 @@ import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataCh
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -54,6 +55,7 @@ public class MeetingActivity extends AppCompatActivity {
     public UserService userService;
     public RoomService roomService;
     public RoomController roomController;
+    public Recorder recorder;
     private boolean isButtonClicked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class MeetingActivity extends AppCompatActivity {
         roomController = new RoomController(this, this);
         roomService = new RoomService(this, this);
         userService = new UserService(this, this);
+        recorder = new Recorder(this, this);
 
         initDialog();
 
@@ -111,6 +114,14 @@ public class MeetingActivity extends AppCompatActivity {
                     item.setIcon(R.drawable.video_icon_128703);
                 }
                 webSocketClientManager.peerConnectionClient.onCameraSwitch();
+                return true;
+            }
+            if (itemId == R.id.tab_recorder) {
+                if (recorder.recording){
+                    recorder.stopRecording();
+                }else{
+                    recorder.startScreenCapture();
+                }
                 return true;
             }
             if (itemId == R.id.tab_chat) {
@@ -236,4 +247,17 @@ public class MeetingActivity extends AppCompatActivity {
         textView.setVisibility(View.GONE);
         messageCount = 0;
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1000) {
+            if (resultCode == RESULT_OK && data != null) {
+                recorder.mediaProjection = recorder.projectionManager.getMediaProjection(resultCode, data);
+//                Log.d("녹화", recorder.projectionManager.getMediaProjection(resultCode, data).toString());
+                recorder.initVirtualDisplay();
+                recorder.mediaRecorder.start();
+            }
+        }
+    }
+
 }
