@@ -48,7 +48,6 @@ public class Recorder {
         String mFileName =  Environment.getExternalStorageDirectory().getAbsolutePath();
         mFileName += "/Movies/"+System.currentTimeMillis()+"test.mp4";
         try {
-            isRecording = true;
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);

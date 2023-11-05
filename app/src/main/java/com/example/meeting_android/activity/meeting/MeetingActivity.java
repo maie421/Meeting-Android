@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -123,13 +124,12 @@ public class MeetingActivity extends AppCompatActivity {
             if (itemId == R.id.tab_recorder) {
                 if (hostName == null || hostName.equals(name)){
                     if (isRecording){
-                        item.setIcon(R.drawable.recorder);
                         recorder.stopRecording();
+                        item.setIcon(R.drawable.recorder);
                     }else{
-                        item.setIcon(R.drawable.stop_circled);
                         recorder.startScreenCapture();
+                        item.setIcon(R.drawable.stop_circled);
                     }
-                    sendRecorderRoom();
                 }else{
                     Toast.makeText(this, "호스트만 기록할 수 있습니다.", Toast.LENGTH_SHORT).show();
                 }
@@ -267,6 +267,8 @@ public class MeetingActivity extends AppCompatActivity {
                 recorder.initVirtualDisplay();
                 recorder.mediaRecorder.start();
                 recorderView.setVisibility(View.VISIBLE);
+                isRecording = true;
+                sendRecorderRoom();
             }
         }
     }

@@ -10,14 +10,18 @@ import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.meeting_android.R;
+import com.example.meeting_android.activity.MainActivity;
 import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
 
@@ -74,7 +78,8 @@ public class WebSocketClientManager {
             mSocket.on("answer", onAnswer);
             mSocket.on("ice", onIce);
             mSocket.on("leave_room", onLeaveRoom);
-            mSocket.on("recorder_room", onRecorderRoom);
+            mSocket.on("recorder_room", onRecorder);
+            mSocket.on("recorder_name", onRecorder);
             mSocket.connect();
 
             mSocket.emit("join_room", roomName, name);
@@ -119,7 +124,9 @@ public class WebSocketClientManager {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-
+                if (isRecording) {
+                    mSocket.emit("recorder_name", roomName, _name);
+                }
                 mSocket.emit("offer", message, roomName, _name, name);
                 peerConnectionClient.peerConnectionMap.get(_name).setLocalDescription(new SimpleSdpObserver() {
                     @Override
@@ -255,8 +262,8 @@ public class WebSocketClientManager {
         });
     };
 
-    private Emitter.Listener onRecorderRoom = args -> {
-        Log.d("녹화", "onRecorderRoom");
+    private Emitter.Listener onRecorder = args -> {
+        Log.d("녹화", "onRecorder");
         mActivity.runOnUiThread(new Runnable() {
             TextView recorderView = mActivity.findViewById(R.id.recorderView);
             @Override
@@ -266,9 +273,8 @@ public class WebSocketClientManager {
                     recorderView.setVisibility(View.GONE);
                     isRecording = false;
                 }else{
+                    showDialog();
                     Log.d("녹화", "isRecording 활성화");
-                    recorderView.setVisibility(View.VISIBLE);
-                    isRecording = true;
                 }
             }
         });
@@ -313,5 +319,27 @@ public class WebSocketClientManager {
         public void onSetFailure(String s) {
         }
 
+    }
+    void showDialog() {
+        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(mContext)
+                .setTitle("이 방은 기록되고 있습니다.")
+                .setMessage("회의 대화 내용을 저장하고 공유할 수도 있습니다.\n " +
+                        "이 회의에 머무르면 귀하는 기록되는 것에 동의하는 것입니다.")
+                .setPositiveButton("화의 나가기", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mActivity.finish();
+                    }
+                })
+                .setNegativeButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        TextView recorderView = mActivity.findViewById(R.id.recorderView);
+                        recorderView.setVisibility(View.VISIBLE);
+                        isRecording = true;
+                    }
+                });
+        AlertDialog msgDlg = msgBuilder.create();
+        msgDlg.show();
     }
 }
