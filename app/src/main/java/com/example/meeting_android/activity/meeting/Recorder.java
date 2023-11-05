@@ -18,6 +18,9 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.ExecuteCallback;
+import com.arthenica.mobileffmpeg.FFmpeg;
 import com.example.meeting_android.R;
 
 import org.w3c.dom.Text;
@@ -25,6 +28,9 @@ import org.webrtc.MediaStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Recorder {
     public Activity mActivity;
@@ -37,6 +43,7 @@ public class Recorder {
     private static final int DISPLAY_WIDTH = 720;
     private static final int DISPLAY_HEIGHT = 1280;
     private static final int REQUEST_CODE = 1000;
+    private String mFileName;
 
     public Recorder(Activity activity, Context context){
         this.mActivity = activity;
@@ -45,7 +52,7 @@ public class Recorder {
     }
 
     private void initRecorder() {
-        String mFileName =  Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFileName =  Environment.getExternalStorageDirectory().getAbsolutePath();
         mFileName += "/Movies/"+System.currentTimeMillis()+"test.mp4";
         try {
             mediaRecorder = new MediaRecorder();
@@ -105,7 +112,28 @@ public class Recorder {
         if (mediaProjection != null) {
             mediaProjection.stop();
         }
+
+        String baseDirectory = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String audioFileName = "AUDIO_" + timeStamp + ".mp3"; // Use ".mp3" or ".aac" if required
+        String fullAudioFilePath = baseDirectory + "/Music/" + audioFileName;
+        extractAudioFromVideo(mFileName, fullAudioFilePath);
     }
 
+    private void extractAudioFromVideo(String videoFilePath, String outputAudioFilePath) {
+        String cmd = "-i \"" + videoFilePath + "\" -vn -ar 44100 -ac 2 -ab 192k -f mp3 \"" + outputAudioFilePath;
 
+        FFmpeg.executeAsync(cmd, new ExecuteCallback() {
+            @Override
+            public void apply(long executionId, int returnCode) {
+                if (returnCode == Config.RETURN_CODE_SUCCESS) {
+                    Log.i("FFmpeg", "Audio extraction successful");
+                } else if (returnCode == Config.RETURN_CODE_CANCEL) {
+                    Log.i("FFmpeg", "Audio extraction cancelled");
+                } else {
+                    Log.e("FFmpeg", "Audio extraction failed with return code: " + returnCode);
+                }
+            }
+        });
+    }
 }
