@@ -46,6 +46,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public static AudioTrack localAudioTrack;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
+    private boolean isRendererInitialized = false;
     public EglBase.Context eglBaseContext;
     private Map<String, PeerConnection> peerConnectionMap;
     public MediaConstraints sdpMediaConstraints;
@@ -121,16 +122,20 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
 
             }
         });
-        view.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-            @Override
-            public void onFirstFrameRendered() {
-                Log.i(TAG,"onFirstFrameRendered");
-            }
-            @Override
-            public void onFrameResolutionChanged(int i, int i1, int i2) {
-                Log.i(TAG,"onFrameResolutionChanged");
-            }
-        });
+        if (!isRendererInitialized) {
+            view.init(eglBaseContext, new RendererCommon.RendererEvents() {
+                @Override
+                public void onFirstFrameRendered() {
+                    Log.i(TAG, "onFirstFrameRendered");
+                }
+
+                @Override
+                public void onFrameResolutionChanged(int i, int i1, int i2) {
+                    Log.i(TAG, "onFrameResolutionChanged");
+                }
+            });
+            isRendererInitialized = true;
+        }
     }
 
     public VideoTrack getLocalVideo(boolean status){

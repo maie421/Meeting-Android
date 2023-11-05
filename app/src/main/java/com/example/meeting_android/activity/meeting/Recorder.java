@@ -106,24 +106,6 @@ public class Recorder {
             mediaProjection.stop();
         }
     }
-    private String getFilePath() {
-        final String directory = Environment.getExternalStorageDirectory() + File.separator + "Recordings";
-        if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-
-        }
-
-        final File folder = new File(directory);
-        boolean success = true;
-        if (!folder.exists()) {
-            success = folder.mkdir();
-        }
-        if (success) {
-            String filePath = directory + File.separator + "capture_" + System.currentTimeMillis() + ".mp4";
-            return filePath;
-        } else {
-        }
-        return null;
-    }
 
 
 }
