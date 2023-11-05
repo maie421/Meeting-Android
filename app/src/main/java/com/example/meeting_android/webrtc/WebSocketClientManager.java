@@ -1,18 +1,23 @@
 package com.example.meeting_android.webrtc;
+import com.example.meeting_android.R;
 import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
 import static com.example.meeting_android.activity.chatting.Message.GUIDE;
 import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
+import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.example.meeting_android.R;
 import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
 
@@ -69,6 +74,7 @@ public class WebSocketClientManager {
             mSocket.on("answer", onAnswer);
             mSocket.on("ice", onIce);
             mSocket.on("leave_room", onLeaveRoom);
+            mSocket.on("recorder_room", onRecorderRoom);
             mSocket.connect();
 
             mSocket.emit("join_room", roomName, name);
@@ -249,12 +255,33 @@ public class WebSocketClientManager {
         });
     };
 
+    private Emitter.Listener onRecorderRoom = args -> {
+        Log.d("녹화", "onRecorderRoom");
+        mActivity.runOnUiThread(new Runnable() {
+            TextView recorderView = mActivity.findViewById(R.id.recorderView);
+            @Override
+            public void run() {
+                if (isRecording){
+                    Log.d("녹화", "isRecording 비 활성화");
+                    recorderView.setVisibility(View.GONE);
+                    isRecording = false;
+                }else{
+                    Log.d("녹화", "isRecording 활성화");
+                    recorderView.setVisibility(View.VISIBLE);
+                    isRecording = true;
+                }
+            }
+        });
+    };
     public static void sendIce(IceCandidate iceCandidate) {
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
     public static void sendLeave() {
         Log.d(TAG, "sendLeave :" + name);
         mSocket.emit("leave_room", roomName, name);
+    }
+    public static void sendRecorderRoom() {
+        mSocket.emit("recorder_room", roomName);
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {
         JSONObject json = new JSONObject();

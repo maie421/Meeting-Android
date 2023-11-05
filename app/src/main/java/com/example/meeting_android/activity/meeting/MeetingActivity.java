@@ -1,8 +1,10 @@
 package com.example.meeting_android.activity.meeting;
 
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
+import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendRecorderRoom;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -119,12 +121,17 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_recorder) {
-                if (recorder.recording){
-                    item.setIcon(R.drawable.recorder);
-                    recorder.stopRecording();
+                if (hostName == null || hostName.equals(name)){
+                    if (isRecording){
+                        item.setIcon(R.drawable.recorder);
+                        recorder.stopRecording();
+                    }else{
+                        item.setIcon(R.drawable.stop_circled);
+                        recorder.startScreenCapture();
+                    }
+                    sendRecorderRoom();
                 }else{
-                    item.setIcon(R.drawable.stop_circled);
-                    recorder.startScreenCapture();
+                    Toast.makeText(this, "호스트만 기록할 수 있습니다.", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }

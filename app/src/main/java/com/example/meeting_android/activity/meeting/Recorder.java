@@ -29,7 +29,7 @@ import java.io.IOException;
 public class Recorder {
     public Activity mActivity;
     public Context mContext;
-    public boolean recording;
+    public static boolean isRecording;
     public MediaRecorder mediaRecorder;
     public MediaProjectionManager projectionManager;
     public MediaProjection mediaProjection;
@@ -41,14 +41,14 @@ public class Recorder {
     public Recorder(Activity activity, Context context){
         this.mActivity = activity;
         this.mContext = context;
-        this.recording = false;
+        this.isRecording = false;
     }
 
     private void initRecorder() {
         String mFileName =  Environment.getExternalStorageDirectory().getAbsolutePath();
         mFileName += "/Movies/"+System.currentTimeMillis()+"test.mp4";
         try {
-            recording = true;
+            isRecording = true;
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
@@ -89,7 +89,7 @@ public class Recorder {
     }
 
     public void stopRecording() {
-        recording = false;
+        isRecording = false;
         TextView recorderView = mActivity.findViewById(R.id.recorderView);
         recorderView.setVisibility(View.GONE);
 
