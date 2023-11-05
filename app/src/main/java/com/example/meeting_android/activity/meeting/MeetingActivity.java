@@ -61,6 +61,7 @@ public class MeetingActivity extends AppCompatActivity {
     public RoomController roomController;
     public Recorder recorder;
     private boolean isButtonClicked = false;
+    private boolean isButtonRecorderClicked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,14 +123,22 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_recorder) {
+                isButtonRecorderClicked = true;
                 if (hostName == null || hostName.equals(name)){
                     if (isRecording){
                         recorder.stopRecording();
+                        sendRecorderRoom();
                         item.setIcon(R.drawable.recorder);
                     }else{
                         recorder.startScreenCapture();
                         item.setIcon(R.drawable.stop_circled);
                     }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            isButtonRecorderClicked = false;
+                        }
+                    }, 3000);  // 예: 1초 동안 클릭 무시
                 }else{
                     Toast.makeText(this, "호스트만 기록할 수 있습니다.", Toast.LENGTH_SHORT).show();
                 }

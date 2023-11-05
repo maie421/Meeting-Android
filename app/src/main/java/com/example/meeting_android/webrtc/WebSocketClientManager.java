@@ -338,7 +338,8 @@ public class WebSocketClientManager {
                         recorderView.setVisibility(View.VISIBLE);
                         isRecording = true;
                     }
-                });
+                })
+                .setCancelable(false);
         AlertDialog msgDlg = msgBuilder.create();
         msgDlg.show();
     }
