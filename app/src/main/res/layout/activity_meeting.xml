@@ -18,6 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
@@ -33,16 +34,16 @@
             android:id="@+id/messageCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10"
             android:layout_marginLeft="290dp"
             android:background="@color/main"
-            android:textSize="25dp"
-            android:textColor="@color/white"
-            android:visibility="gone"
             android:paddingLeft="5dp"
             android:paddingTop="5dp"
             android:paddingRight="5dp"
-            android:paddingBottom="5dp" />
+            android:paddingBottom="5dp"
+            android:text="10"
+            android:textColor="@color/white"
+            android:textSize="25dp"
+            android:visibility="gone" />
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     <Button
@@ -57,6 +58,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/recorderView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:visibility="gone"
+        android:text="기록중..."
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/buttonDialog"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

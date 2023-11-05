@@ -13,9 +13,14 @@ import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Surface;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.example.meeting_android.R;
+
+import org.w3c.dom.Text;
 import org.webrtc.MediaStream;
 
 import java.io.File;
@@ -85,6 +90,9 @@ public class Recorder {
 
     public void stopRecording() {
         recording = false;
+        TextView recorderView = mActivity.findViewById(R.id.recorderView);
+        recorderView.setVisibility(View.GONE);
+
         if (mediaRecorder != null) {
             mediaRecorder.stop();
             mediaRecorder.reset();

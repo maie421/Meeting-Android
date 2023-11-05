@@ -46,6 +46,7 @@ public class MeetingActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST = 2;
     public static int messageCount = 0;
     public BottomNavigationView bottomNavigationView;
+    public TextView recorderView;
     public WebSocketClientManager webSocketClientManager;
     public Button buttonDialog;
     private CustomDialog customDialog;
@@ -64,6 +65,7 @@ public class MeetingActivity extends AppCompatActivity {
 
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        recorderView = findViewById(R.id.recorderView);
         roomController = new RoomController(this, this);
         roomService = new RoomService(this, this);
         userService = new UserService(this, this);
@@ -118,8 +120,10 @@ public class MeetingActivity extends AppCompatActivity {
             }
             if (itemId == R.id.tab_recorder) {
                 if (recorder.recording){
+                    item.setIcon(R.drawable.recorder);
                     recorder.stopRecording();
                 }else{
+                    item.setIcon(R.drawable.stop_circled);
                     recorder.startScreenCapture();
                 }
                 return true;
@@ -253,9 +257,9 @@ public class MeetingActivity extends AppCompatActivity {
         if (requestCode == 1000) {
             if (resultCode == RESULT_OK && data != null) {
                 recorder.mediaProjection = recorder.projectionManager.getMediaProjection(resultCode, data);
-//                Log.d("녹화", recorder.projectionManager.getMediaProjection(resultCode, data).toString());
                 recorder.initVirtualDisplay();
                 recorder.mediaRecorder.start();
+                recorderView.setVisibility(View.VISIBLE);
             }
         }
     }
