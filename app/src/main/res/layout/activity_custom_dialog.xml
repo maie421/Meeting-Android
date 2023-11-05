@@ -18,10 +18,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginBottom="44dp"
+            android:layout_marginBottom="16dp"
             android:text="방코드"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/roomTextView"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
@@ -32,21 +34,41 @@
             android:backgroundTint="@color/gray"
             android:text="X"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toTopOf="@+id/textView7"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/roomTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="140dp"
-            android:layout_marginBottom="44dp"
+            android:layout_marginBottom="16dp"
             android:text="ABC"
-            android:textSize="20sp"
+            android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="2dp"
+            android:text="호스트"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="@+id/closeButton"
+            app:layout_constraintTop_toBottomOf="@+id/closeButton" />
+
+        <TextView
+            android:id="@+id/hostView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="윤영미"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/roomTextView"
+            app:layout_constraintStart_toStartOf="@+id/roomTextView" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

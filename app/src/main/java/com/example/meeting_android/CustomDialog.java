@@ -19,9 +19,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CustomDialog extends Dialog {
-    public Button copyButton;
     public Button closeButton;
     public TextView roomTextView;
+    public TextView hostView;
 
     public CustomDialog(@NonNull Context context, Activity activity, String roomId, String name) {
         super(context);
@@ -30,7 +30,9 @@ public class CustomDialog extends Dialog {
         closeButton = findViewById(R.id.closeButton);
         closeButton.setOnClickListener(v -> dismiss());
         roomTextView = findViewById(R.id.roomTextView);
+        hostView = findViewById(R.id.hostView);
 
         roomTextView.setText(roomId);
+        hostView.setText(name);
     }
 }
