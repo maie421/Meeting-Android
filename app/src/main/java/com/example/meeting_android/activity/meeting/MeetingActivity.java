@@ -248,8 +248,16 @@ public class MeetingActivity extends AppCompatActivity {
         peerDataChannelnMap.clear();
         webSocketClientManager.offerList.clear();
         messages.clear();
-        isRecording = false;
         sendLeave();
+
+        if (isRecording){
+            //host 만
+            if (hostName == null || hostName.equals(name)) {
+                recorder.stopRecording();
+                sendRecorderRoom();
+            }
+            isRecording = false;
+        }
     }
 
     @Override
