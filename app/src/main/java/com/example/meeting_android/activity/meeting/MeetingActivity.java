@@ -248,6 +248,7 @@ public class MeetingActivity extends AppCompatActivity {
         peerDataChannelnMap.clear();
         webSocketClientManager.offerList.clear();
         messages.clear();
+        isRecording = false;
         sendLeave();
     }
 
