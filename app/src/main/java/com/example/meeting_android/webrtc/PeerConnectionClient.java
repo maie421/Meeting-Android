@@ -1,23 +1,17 @@
 package com.example.meeting_android.webrtc;
 
 import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
-import static com.example.meeting_android.activity.chatting.ChattingMainActivity.stringToByteBuffer;
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
-import static com.example.meeting_android.activity.chatting.Message.GUIDE;
 import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.messageCount;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
-import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
-import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -28,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.meeting_android.R;
 import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
+import com.example.meeting_android.activity.meeting.CustomVideoSink;
 import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
 import org.webrtc.DataChannel;
@@ -41,11 +36,8 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
 import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.SurfaceViewRenderer;
-import org.webrtc.VideoCapturer;
 import org.webrtc.VideoDecoderFactory;
 import org.webrtc.VideoEncoderFactory;
-import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
 import java.nio.ByteBuffer;
@@ -302,6 +294,10 @@ public class PeerConnectionClient {
     }
     public void onAudioTrackSwitch(){
         localAudioTrack.setEnabled(isAudio = !isAudio);
+    }
+
+    public void onCameraFilterSwitch(){
+
     }
 }
 

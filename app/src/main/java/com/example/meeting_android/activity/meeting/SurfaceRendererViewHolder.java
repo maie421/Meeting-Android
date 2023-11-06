@@ -46,6 +46,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public static AudioTrack localAudioTrack;
     public PeerConnectionFactory peerConnectionFactory;
     public SurfaceTextureHelper surfaceTextureHelper;
+    public static CustomVideoSink customVideoSink;
     private boolean isRendererInitialized = false;
     public EglBase.Context eglBaseContext;
     private Map<String, PeerConnection> peerConnectionMap;
@@ -70,8 +71,10 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public void localBind(){
         mActivity.runOnUiThread(() -> {
             localVideoTrack = getLocalVideo(true);
-            localVideoTrack.addSink(surfaceViewRenderer);
             initSurfaceViewRenderer(surfaceViewRenderer);
+
+            customVideoSink = new CustomVideoSink(surfaceViewRenderer, name, peerConnectionMap.get(name));
+            localVideoTrack.addSink(customVideoSink);
         });
         peerConnectionMap.get(name).addTrack(localVideoTrack);
         peerConnectionMap.get(name).addTrack(getAudioTrack());
@@ -200,4 +203,4 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         }
         return null;
     }
-    }
+}

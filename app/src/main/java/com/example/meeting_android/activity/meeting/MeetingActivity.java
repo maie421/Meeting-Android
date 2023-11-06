@@ -2,6 +2,8 @@ package com.example.meeting_android.activity.meeting;
 
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
+import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.customVideoSink;
+import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendRecorderRoom;
@@ -35,6 +37,9 @@ import com.example.meeting_android.api.user.UserService;
 import com.example.meeting_android.common.TokenManager;
 import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.webrtc.VideoFrame;
+import org.webrtc.VideoSink;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -121,6 +126,17 @@ public class MeetingActivity extends AppCompatActivity {
                 }
                 webSocketClientManager.peerConnectionClient.onCameraSwitch();
                 return true;
+            }
+            if (itemId == R.id.tab_background) {
+                if (customVideoSink.filterEnabled){
+                    customVideoSink.filterEnabled = false;
+                }else{
+                    customVideoSink.filterEnabled = true;
+                    localVideoTrack.addSink(customVideoSink);
+//                    webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
+                }
+                return true;
+
             }
             if (itemId == R.id.tab_recorder) {
                 isButtonRecorderClicked = true;
