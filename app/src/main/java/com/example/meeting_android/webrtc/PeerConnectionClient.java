@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.meeting_android.R;
 import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
-import com.example.meeting_android.activity.meeting.CustomVideoSink;
 import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
 import org.webrtc.DataChannel;
@@ -146,6 +145,7 @@ public class PeerConnectionClient {
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
+
             peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
 
         }
@@ -230,6 +230,7 @@ public class PeerConnectionClient {
             // 트랙이 추가될 때 호출되는 콜백
             @Override
             public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
+                Log.d(TAG, "onAddTrack : " + mediaStreams);
             }
         };
     }
@@ -294,10 +295,6 @@ public class PeerConnectionClient {
     }
     public void onAudioTrackSwitch(){
         localAudioTrack.setEnabled(isAudio = !isAudio);
-    }
-
-    public void onCameraFilterSwitch(){
-
     }
 }
 

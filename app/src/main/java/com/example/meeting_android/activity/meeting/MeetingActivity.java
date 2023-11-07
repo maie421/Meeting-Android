@@ -128,15 +128,12 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_background) {
-                if (customVideoSink.filterEnabled){
-                    customVideoSink.filterEnabled = false;
+                if (customVideoSink.isFilterEnabled){
+                    customVideoSink.isFilterEnabled = false;
                 }else{
-                    customVideoSink.filterEnabled = true;
-                    localVideoTrack.addSink(customVideoSink);
-//                    webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).addTrack(localVideoTrack);
+                    customVideoSink.isFilterEnabled = true;
                 }
                 return true;
-
             }
             if (itemId == R.id.tab_recorder) {
                 isButtonRecorderClicked = true;

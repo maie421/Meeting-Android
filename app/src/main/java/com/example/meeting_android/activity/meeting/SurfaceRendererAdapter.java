@@ -21,7 +21,6 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
-import org.webrtc.VideoTrack;
 
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +54,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     @Override
     public SurfaceRendererViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_surface_renderer, parent, false);
-        return new SurfaceRendererViewHolder(view,mActivity, mContext, eglBaseContext,peerConnectionFactory ,peerConnectionMap, sdpMediaConstraints, surfaceTextureHelper, name);
+        return new SurfaceRendererViewHolder(view,mActivity, mContext, eglBaseContext, peerConnectionFactory ,peerConnectionMap, sdpMediaConstraints, surfaceTextureHelper, name);
     }
 
     @Override
@@ -76,10 +75,9 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
 
     public void addMeetingVideoName(String userName){
         MeetingVideo meetingVideo = new MeetingVideo(userName);
-        mActivity.runOnUiThread(() -> {
-            this.meetings.add(meetingVideo);
-            notifyItemInserted(meetings.size() - 1);
-        });
+
+        this.meetings.add(meetingVideo);
+        notifyItemInserted(meetings.size() - 1);
     }
 
     public void addMeetingVideo(String userName, MediaStream mediaStream){

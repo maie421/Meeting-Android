@@ -1,7 +1,6 @@
 package com.example.meeting_android.activity.meeting;
 
 import org.webrtc.MediaStream;
-import org.webrtc.VideoTrack;
 
 public class MeetingVideo {
     public String name;

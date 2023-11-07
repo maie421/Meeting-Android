@@ -69,30 +69,27 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void localBind(){
-        mActivity.runOnUiThread(() -> {
-            localVideoTrack = getLocalVideo(true);
-            initSurfaceViewRenderer(surfaceViewRenderer);
+        initSurfaceViewRenderer(surfaceViewRenderer);
 
-            customVideoSink = new CustomVideoSink(surfaceViewRenderer, name, peerConnectionMap.get(name));
-            localVideoTrack.addSink(customVideoSink);
-        });
+        localVideoTrack = getLocalVideo(true);
+        customVideoSink = new CustomVideoSink(surfaceViewRenderer);
+        localVideoTrack.addSink(customVideoSink);
+
         peerConnectionMap.get(name).addTrack(localVideoTrack);
         peerConnectionMap.get(name).addTrack(getAudioTrack());
     }
 
     public void remoteBind(MeetingVideo meetingVideo){
         Log.d("디버그","remoteBind");
+        initSurfaceViewRenderer(surfaceViewRenderer);
         VideoTrack remoteVideoTrack = meetingVideo.mediaStream.videoTracks.get(0);
         if (meetingVideo.mediaStream.videoTracks.size() > 0) {
-            mActivity.runOnUiThread(() -> {
-                try {
-                    remoteVideoTrack.addSink(surfaceViewRenderer);
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to add video sink", e);
-                }
-            });
+            try {
+                remoteVideoTrack.addSink(surfaceViewRenderer);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to add video sink", e);
+            }
         }
-        initSurfaceViewRenderer(surfaceViewRenderer);
     }
 
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
@@ -146,7 +143,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
         videoCapturer.initialize(surfaceTextureHelper, mActivity, videoSource.getCapturerObserver());
-        videoCapturer.startCapture(10, 10, 25);
+        videoCapturer.startCapture(200, 200, 30);
 
         return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
     }
