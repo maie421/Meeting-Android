@@ -1,23 +1,26 @@
 package com.example.meeting_android.activity.meeting;
-import android.util.Log;
-import org.webrtc.PeerConnection;
 import org.webrtc.VideoFrame;
 import org.webrtc.VideoSink;
+import org.webrtc.VideoSource;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class CustomVideoSink implements VideoSink {
     private VideoSink target;
+    public VideoSource videoSource;
     public boolean isFilterEnabled = false; // 필터 상태 플래그
-    public CustomVideoSink(VideoSink target) {
+    public CustomVideoSink(VideoSink target, VideoSource videoSource) {
         this.target = target;
+        this.videoSource = videoSource;
 
     }
     @Override
     public void onFrame(VideoFrame videoFrame) {
         if (isFilterEnabled) {
-            target.onFrame(applyGreenFilter(videoFrame));
+            VideoFrame filteredFrame = applyGreenFilter(videoFrame);
+            videoSource.getCapturerObserver().onFrameCaptured(filteredFrame);
+            target.onFrame(filteredFrame);
         } else {
             target.onFrame(videoFrame);
         }
@@ -46,7 +49,7 @@ public class CustomVideoSink implements VideoSink {
         vPlane.clear();
         vPlane.put(vArray);
 
-        VideoFrame filteredFrame = new VideoFrame(i420,frame.getRotation(), frame.getTimestampNs());
+        VideoFrame filteredFrame = new VideoFrame(i420, frame.getRotation(), frame.getTimestampNs());
         return filteredFrame;
     }
 
@@ -72,4 +75,5 @@ public class CustomVideoSink implements VideoSink {
         VideoFrame filteredFrame = new VideoFrame(i420, frame.getRotation(), frame.getTimestampNs());
         return filteredFrame;
     }
+
 }

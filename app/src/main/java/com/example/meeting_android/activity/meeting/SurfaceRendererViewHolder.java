@@ -1,8 +1,5 @@
 package com.example.meeting_android.activity.meeting;
 
-import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
-import static org.webrtc.ContextUtils.getApplicationContext;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -50,6 +47,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     private boolean isRendererInitialized = false;
     public EglBase.Context eglBaseContext;
     private Map<String, PeerConnection> peerConnectionMap;
+    public VideoSource videoSource;
     public MediaConstraints sdpMediaConstraints;
     public Activity mActivity;
     public Context mContext;
@@ -72,7 +70,8 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         initSurfaceViewRenderer(surfaceViewRenderer);
 
         localVideoTrack = getLocalVideo(true);
-        customVideoSink = new CustomVideoSink(surfaceViewRenderer);
+
+        customVideoSink = new CustomVideoSink(surfaceViewRenderer, videoSource);
         localVideoTrack.addSink(customVideoSink);
 
         peerConnectionMap.get(name).addTrack(localVideoTrack);
@@ -140,10 +139,10 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
 
     public VideoTrack getLocalVideo(boolean status){
         VideoCapturer videoCapturer = createCameraCapturer(status);
-        VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
+        videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
         videoCapturer.initialize(surfaceTextureHelper, mActivity, videoSource.getCapturerObserver());
-        videoCapturer.startCapture(200, 200, 30);
+        videoCapturer.startCapture(200, 200, 100);
 
         return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
     }
