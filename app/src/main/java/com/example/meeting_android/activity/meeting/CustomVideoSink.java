@@ -10,6 +10,7 @@ public class CustomVideoSink implements VideoSink {
     private VideoSink target;
     public VideoSource videoSource;
     public int selectFilter = 0; // 필터 상태 플래그
+    public boolean isFirst = false;
     public CustomVideoSink(VideoSink target, VideoSource videoSource) {
         this.target = target;
         this.videoSource = videoSource;
@@ -23,16 +24,23 @@ public class CustomVideoSink implements VideoSink {
                 break;
             case 1:
                 VideoFrame filteredFrame = applyGreenFilter(videoFrame);
-                videoSource.getCapturerObserver().onFrameCaptured(filteredFrame);
-                target.onFrame(filteredFrame);
+                sendFilterFrame(filteredFrame);
                 break;
             case 2:
                 VideoFrame filteredGrayFrame = applyGrayFilter(videoFrame);
-                videoSource.getCapturerObserver().onFrameCaptured(filteredGrayFrame);
-                target.onFrame(filteredGrayFrame);
+                sendFilterFrame(filteredGrayFrame);
                 break;
         }
     }
+
+    private void sendFilterFrame(VideoFrame filteredFrame) {
+        if (isFirst) {
+            videoSource.getCapturerObserver().onFrameCaptured(filteredFrame);
+        }
+        target.onFrame(filteredFrame);
+
+    }
+
     public VideoFrame applyGreenFilter(VideoFrame frame){
         VideoFrame.I420Buffer i420 = frame.getBuffer().toI420();
 

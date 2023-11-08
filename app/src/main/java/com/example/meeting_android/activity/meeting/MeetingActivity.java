@@ -82,6 +82,7 @@ public class MeetingActivity extends AppCompatActivity {
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         recorderView = findViewById(R.id.recorderView);
+
         roomController = new RoomController(this, this);
         roomService = new RoomService(this, this);
         userService = new UserService(this, this);
