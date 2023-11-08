@@ -268,6 +268,7 @@ public class MeetingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        customVideoSink.selectFilter = 0;
         Iterator<String> keys = webSocketClientManager.peerConnectionClient.peerConnectionMap.keySet().iterator();
 
         while( keys.hasNext() ){
