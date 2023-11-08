@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.meeting_android.CustomDialog;
 import com.example.meeting_android.R;
+import com.example.meeting_android.activity.MainActivity;
 import com.example.meeting_android.activity.MeetingMainActivity;
 import com.example.meeting_android.activity.chatting.ChattingMainActivity;
 import com.example.meeting_android.api.room.Room;
@@ -67,6 +70,8 @@ public class MeetingActivity extends AppCompatActivity {
     public Recorder recorder;
     private boolean isButtonClicked = false;
     private boolean isButtonRecorderClicked = false;
+    private String[] filterColor = {"필터 제거","초록","회색"};
+    private AlertDialog selectFilterDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +94,15 @@ public class MeetingActivity extends AppCompatActivity {
         buttonDialog.setOnClickListener(v->{
             customDialog.show();
         });
+        selectFilterDialog = new AlertDialog.Builder(this )
+                .setItems(filterColor, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        customVideoSink.selectFilter = i;
+                    }
+                })
+                .setTitle("필터 선택")
+                .create();
     }
 
     private void initDialog() {
@@ -128,11 +142,7 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_background) {
-                if (customVideoSink.isFilterEnabled){
-                    customVideoSink.isFilterEnabled = false;
-                }else{
-                    customVideoSink.isFilterEnabled = true;
-                }
+                selectFilterDialog.show();
                 return true;
             }
             if (itemId == R.id.tab_recorder) {

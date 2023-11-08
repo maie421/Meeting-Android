@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class CustomVideoSink implements VideoSink {
     private VideoSink target;
     public VideoSource videoSource;
-    public boolean isFilterEnabled = false; // 필터 상태 플래그
+    public int selectFilter = 0; // 필터 상태 플래그
     public CustomVideoSink(VideoSink target, VideoSource videoSource) {
         this.target = target;
         this.videoSource = videoSource;
@@ -17,12 +17,20 @@ public class CustomVideoSink implements VideoSink {
     }
     @Override
     public void onFrame(VideoFrame videoFrame) {
-        if (isFilterEnabled) {
-            VideoFrame filteredFrame = applyGreenFilter(videoFrame);
-            videoSource.getCapturerObserver().onFrameCaptured(filteredFrame);
-            target.onFrame(filteredFrame);
-        } else {
-            target.onFrame(videoFrame);
+        switch (selectFilter){
+            case 0:
+                target.onFrame(videoFrame);
+                break;
+            case 1:
+                VideoFrame filteredFrame = applyGreenFilter(videoFrame);
+                videoSource.getCapturerObserver().onFrameCaptured(filteredFrame);
+                target.onFrame(filteredFrame);
+                break;
+            case 2:
+                VideoFrame filteredGrayFrame = applyGrayFilter(videoFrame);
+                videoSource.getCapturerObserver().onFrameCaptured(filteredGrayFrame);
+                target.onFrame(filteredGrayFrame);
+                break;
         }
     }
     public VideoFrame applyGreenFilter(VideoFrame frame){
@@ -57,7 +65,6 @@ public class CustomVideoSink implements VideoSink {
         VideoFrame.I420Buffer i420 = frame.getBuffer().toI420();
 
         // Y 플레인은 밝기 정보를 담고 있으므로, 이를 조절하여 초록색의 밝기를 조절할 수 있습니다.
-        ByteBuffer yPlane = i420.getDataY();
         ByteBuffer uPlane = i420.getDataU();
         ByteBuffer vPlane = i420.getDataV();
 
