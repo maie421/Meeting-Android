@@ -82,6 +82,7 @@ public class WebSocketClientManager {
             mSocket.on("leave_room", onLeaveRoom);
             mSocket.on("recorder_room", onRecorder);
             mSocket.on("recorder_name", onRecorder);
+            mSocket.on("change_host", onChangeHost);
             mSocket.connect();
 
             mSocket.emit("join_room", roomName, name);
@@ -289,6 +290,14 @@ public class WebSocketClientManager {
                     showDialog();
                     Log.d("녹화", "isRecording 활성화");
                 }
+            }
+        });
+    };
+    private Emitter.Listener onChangeHost = args -> {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mActivity, "이제 귀하는 호스트입니다.", Toast.LENGTH_SHORT).show();
             }
         });
     };
