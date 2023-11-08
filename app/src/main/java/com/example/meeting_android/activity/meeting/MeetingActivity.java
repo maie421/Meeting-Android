@@ -70,7 +70,7 @@ public class MeetingActivity extends AppCompatActivity {
     public Recorder recorder;
     private boolean isButtonClicked = false;
     private boolean isButtonRecorderClicked = false;
-    private String[] filterColor = {"필터 제거","초록","회색"};
+    private String[] filterColor = {"없음","초록","회색"};
     private AlertDialog selectFilterDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +101,7 @@ public class MeetingActivity extends AppCompatActivity {
                         customVideoSink.selectFilter = i;
                     }
                 })
-                .setTitle("필터 선택")
+                .setTitle("비디오 필터")
                 .create();
     }
 
