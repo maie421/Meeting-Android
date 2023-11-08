@@ -60,10 +60,10 @@ public class MeetingActivity extends AppCompatActivity {
     public TextView recorderView;
     public WebSocketClientManager webSocketClientManager;
     public Button buttonDialog;
-    private CustomDialog customDialog;
+    public static CustomDialog customDialog;
     private String randomNumberAsString;
-    public String name;
-    public String hostName;
+    public static String name;
+    public static String hostRecordName;
     public UserService userService;
     public RoomService roomService;
     public RoomController roomController;
@@ -114,7 +114,7 @@ public class MeetingActivity extends AppCompatActivity {
         //비회원
         if (intent.hasExtra("name") && intent.hasExtra("joinRoom") && intent.hasExtra("hostName")) {
             name = intent.getStringExtra("name");
-            hostName = intent.getStringExtra("hostName");
+            hostRecordName = intent.getStringExtra("hostName");
             randomNumberAsString = intent.getStringExtra("joinRoom");
         }else{
             //방생성
@@ -153,7 +153,7 @@ public class MeetingActivity extends AppCompatActivity {
             }
             if (itemId == R.id.tab_recorder) {
                 isButtonRecorderClicked = true;
-                if (hostName == null || hostName.equals(name)){
+                if (hostRecordName.equals(name)){
                     if (isRecording){
                         recorder.stopRecording();
                         sendRecorderRoom();
@@ -253,6 +253,9 @@ public class MeetingActivity extends AppCompatActivity {
                 public void onResponse(Call<User> call, Response<User> response) {
                     if (response.isSuccessful()) {
                         User user = response.body();
+                        hostRecordName = user.name;
+                        name = user.name;
+
                         customDialog = new CustomDialog(userService.mContext, userService.mActivity, randomNumberAsString, user.name);
                         webSocketClientManager = new WebSocketClientManager(userService.mContext, userService.mActivity, randomNumberAsString, user.name);
 
@@ -266,7 +269,7 @@ public class MeetingActivity extends AppCompatActivity {
                 }
             });
         }else {
-            customDialog = new CustomDialog(this, this, randomNumberAsString, hostName);
+            customDialog = new CustomDialog(this, this, randomNumberAsString, hostRecordName);
             webSocketClientManager = new WebSocketClientManager(this, this, randomNumberAsString, name);
         }
     }
@@ -291,7 +294,7 @@ public class MeetingActivity extends AppCompatActivity {
 
         if (isRecording){
             //host 만
-            if (hostName == null || hostName.equals(name)) {
+            if (hostRecordName.equals(name)) {
                 recorder.stopRecording();
                 sendRecorderRoom();
             }

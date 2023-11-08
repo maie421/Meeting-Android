@@ -5,6 +5,8 @@ import static com.example.meeting_android.activity.chatting.MemberData.getRandom
 import static com.example.meeting_android.activity.chatting.Message.GUIDE;
 import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
+import static com.example.meeting_android.activity.meeting.MeetingActivity.customDialog;
+import static com.example.meeting_android.activity.meeting.MeetingActivity.hostRecordName;
 import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
@@ -56,11 +58,11 @@ public class WebSocketClientManager {
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
     public List<String> offerList;
-    public WebSocketClientManager(Context Context, Activity activity, String roomName, String name) {
-        peerConnectionClient = new PeerConnectionClient(Context, activity, name);
+    public WebSocketClientManager(Context context, Activity activity, String roomName, String name) {
+        peerConnectionClient = new PeerConnectionClient(context, activity, name);
         this.offerList = new ArrayList<>();
         this.mActivity = activity;
-        this.mContext = Context;
+        this.mContext = context;
         this.roomName = roomName;
         this.name = name;
         this.fromName = name;
@@ -141,7 +143,12 @@ public class WebSocketClientManager {
         String _sdp;
         String name;
         String socketId;
+        String hostName = (String) args[4];
 
+        mActivity.runOnUiThread(() -> {
+            hostRecordName = hostName;
+            customDialog.hostView.setText(hostName);
+        });
         try {
             JSONObject offerData = (JSONObject) args[0];
             _sdp = offerData.getString("sdp");
@@ -224,7 +231,13 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onLeaveRoom = args -> {
         String msg = (String) args[0];
+        String hostName = (String) args[1];
         Log.d("미디어","나간 회원 name :"+ msg);
+
+        mActivity.runOnUiThread(() -> {
+            hostRecordName = hostName;
+            customDialog.hostView.setText(hostName);
+        });
 
         MemberData memberData = new MemberData(msg, getRandomColor());
         Message message = new Message(" 님이 방에서 나갔습니다.", memberData, true, GUIDE, getNowTime());
