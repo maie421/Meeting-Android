@@ -72,6 +72,8 @@ public class MeetingActivity extends AppCompatActivity {
     private boolean isButtonRecorderClicked = false;
     private String[] filterColor = {"없음","초록","회색"};
     private AlertDialog selectFilterDialog;
+
+    private int selectBlockFilter = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +101,7 @@ public class MeetingActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         customVideoSink.selectFilter = i;
+                        selectBlockFilter = i;
                     }
                 })
                 .setTitle("비디오 필터")
@@ -135,8 +138,10 @@ public class MeetingActivity extends AppCompatActivity {
             if (itemId == R.id.tab_video) {
                 if (webSocketClientManager.peerConnectionClient.isCamera == true) {
                     item.setIcon(R.drawable.video_icon_close);
+                    customVideoSink.selectFilter = 0;
                 }else{
                     item.setIcon(R.drawable.video_icon_128703);
+                    customVideoSink.selectFilter = selectBlockFilter;
                 }
                 webSocketClientManager.peerConnectionClient.onCameraSwitch();
                 return true;
