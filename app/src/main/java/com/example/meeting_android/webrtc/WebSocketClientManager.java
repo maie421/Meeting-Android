@@ -345,7 +345,7 @@ public class WebSocketClientManager {
     void showDialog() {
         AlertDialog.Builder msgBuilder = new AlertDialog.Builder(mContext)
                 .setTitle("이 방은 기록되고 있습니다.")
-                .setMessage("회의 대화 내용을 저장하고 공유할 수도 있습니다.\n " +
+                .setMessage("회의 대화 내용을 저장하고 공유할 수도 있습니다.\n" +
                         "이 회의에 머무르면 귀하는 기록되는 것에 동의하는 것입니다.")
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
@@ -355,7 +355,7 @@ public class WebSocketClientManager {
                         isRecording = true;
                     }
                 })
-                .setNegativeButton("화의 나가기", new DialogInterface.OnClickListener() {
+                .setNegativeButton("회의 나가기", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         mActivity.finish();
