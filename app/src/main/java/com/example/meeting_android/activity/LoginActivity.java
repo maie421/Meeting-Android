@@ -1,7 +1,5 @@
 package com.example.meeting_android.activity;
 
-import static com.example.meeting_android.common.Common.isValidEmail;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 

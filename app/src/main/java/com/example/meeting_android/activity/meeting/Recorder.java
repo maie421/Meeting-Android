@@ -25,17 +25,21 @@ import com.example.meeting_android.R;
 
 import org.w3c.dom.Text;
 import org.webrtc.MediaStream;
+import org.webrtc.PeerConnection;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class Recorder {
     public Activity mActivity;
     public Context mContext;
     public static boolean isRecording;
+    public static Map<String, Boolean> isPermissionMap = new HashMap<>();
     public MediaRecorder mediaRecorder;
     public MediaProjectionManager projectionManager;
     public MediaProjection mediaProjection;

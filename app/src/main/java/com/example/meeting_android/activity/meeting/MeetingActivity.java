@@ -7,6 +7,7 @@ import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHo
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendRecorderRoom;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendStopRecorderRoom;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -156,7 +157,7 @@ public class MeetingActivity extends AppCompatActivity {
                 if (hostRecordName.equals(name)){
                     if (isRecording){
                         recorder.stopRecording();
-                        sendRecorderRoom();
+                        sendStopRecorderRoom();
                         item.setIcon(R.drawable.recorder);
                     }else{
                         recorder.startScreenCapture();
@@ -296,7 +297,7 @@ public class MeetingActivity extends AppCompatActivity {
             //host 만
             if (hostRecordName.equals(name)) {
                 recorder.stopRecording();
-                sendRecorderRoom();
+                sendStopRecorderRoom();
             }
             isRecording = false;
         }

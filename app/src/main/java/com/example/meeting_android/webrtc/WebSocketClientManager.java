@@ -7,6 +7,7 @@ import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.customDialog;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.hostRecordName;
+import static com.example.meeting_android.activity.meeting.Recorder.isPermissionMap;
 import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
@@ -57,6 +58,7 @@ public class WebSocketClientManager {
     public static String fromName;
     private static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
+    public Boolean isDuplicateRecording = false;
     public List<String> offerList;
     public WebSocketClientManager(Context context, Activity activity, String roomName, String name) {
         peerConnectionClient = new PeerConnectionClient(context, activity, name);
@@ -82,6 +84,7 @@ public class WebSocketClientManager {
             mSocket.on("leave_room", onLeaveRoom);
             mSocket.on("recorder_room", onRecorder);
             mSocket.on("recorder_name", onRecorder);
+            mSocket.on("stop_recorder_room", onStopRecorder);
             mSocket.on("change_host", onChangeHost);
             mSocket.connect();
 
@@ -278,21 +281,47 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onRecorder = args -> {
         Log.d("녹화", "onRecorder");
+        String roomName = (String) args[0];
         mActivity.runOnUiThread(new Runnable() {
-            TextView recorderView = mActivity.findViewById(R.id.recorderView);
             @Override
             public void run() {
-                if (isRecording){
-                    Log.d("녹화", "isRecording 비 활성화");
-                    recorderView.setVisibility(View.GONE);
-                    isRecording = false;
-                }else{
-                    showDialog();
-                    Log.d("녹화", "isRecording 활성화");
+                if(!isDuplicateRecording) {
+                    if (isPermissionMap.containsKey(roomName)) {
+                        startRecorder(roomName);
+                    } else {
+                        showDialog(roomName);
+                        Log.d("녹화", "isRecording 활성화");
+                    }
+                    isDuplicateRecording = true;
                 }
             }
         });
     };
+
+    private Emitter.Listener onStopRecorder = args -> {
+        Log.d("녹화", "onStopRecorder");
+        String roomName = (String) args[0];
+        mActivity.runOnUiThread(new Runnable() {
+            TextView recorderView = mActivity.findViewById(R.id.recorderView);
+            @Override
+            public void run() {
+                if (isRecording) {
+                    Log.d("녹화", "isRecording 비 활성화");
+                    recorderView.setVisibility(View.GONE);
+                    isRecording = false;
+                    isDuplicateRecording = false;
+                }
+            }
+        });
+    };
+    private void startRecorder(String roomName) {
+        TextView recorderView = mActivity.findViewById(R.id.recorderView);
+        recorderView.setVisibility(View.VISIBLE);
+        Toast.makeText(mActivity, "기록을 시작합니다.", Toast.LENGTH_SHORT).show();
+        isRecording = true;
+        isPermissionMap.put(roomName, true);
+    }
+
     private Emitter.Listener onChangeHost = args -> {
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -310,6 +339,9 @@ public class WebSocketClientManager {
     }
     public static void sendRecorderRoom() {
         mSocket.emit("recorder_room", roomName);
+    }
+    public static void sendStopRecorderRoom() {
+        mSocket.emit("stop_recorder_room", roomName);
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {
         JSONObject json = new JSONObject();
@@ -342,7 +374,7 @@ public class WebSocketClientManager {
         }
 
     }
-    void showDialog() {
+    void showDialog(String roomName) {
         AlertDialog.Builder msgBuilder = new AlertDialog.Builder(mContext)
                 .setTitle("이 방은 기록되고 있습니다.")
                 .setMessage("회의 대화 내용을 저장하고 공유할 수도 있습니다.\n" +
@@ -350,9 +382,7 @@ public class WebSocketClientManager {
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        TextView recorderView = mActivity.findViewById(R.id.recorderView);
-                        recorderView.setVisibility(View.VISIBLE);
-                        isRecording = true;
+                        startRecorder(roomName);
                     }
                 })
                 .setNegativeButton("회의 나가기", new DialogInterface.OnClickListener() {
