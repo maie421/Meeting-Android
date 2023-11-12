@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class Recorder {
     public Activity mActivity;
@@ -39,12 +40,17 @@ public class Recorder {
     private VirtualDisplay virtualDisplay;
     private static final int DISPLAY_WIDTH = 720;
     private static final int DISPLAY_HEIGHT = 1280;
-    private static final int REQUEST_CODE = 1000;
+    public static final int REQUEST_RECORDER_CODE = 1000;
+    public static final int REQUEST_SCREEN_CODE = 2000;
+    public static final String SCREEN = "screen";
+    public static final String RECORDER = "recorder";
     private String mFileName;
+    private String type;
 
-    public Recorder(Activity activity, Context context){
+    public Recorder(Activity activity, Context context, String type){
         this.mActivity = activity;
         this.mContext = context;
+        this.type = type;
         this.isRecording = false;
     }
 
@@ -83,12 +89,18 @@ public class Recorder {
     }
 
     public void startScreenCapture() {
+        int code =  REQUEST_RECORDER_CODE;
+
+        if (Objects.equals(type, SCREEN)){
+            code = REQUEST_SCREEN_CODE;
+        }
+
         initRecorder();
         Intent serviceIntent = new Intent(mContext, YourForegroundService.class);
         ContextCompat.startForegroundService(mContext, serviceIntent);
 
         projectionManager = (MediaProjectionManager) mContext.getSystemService(mContext.MEDIA_PROJECTION_SERVICE);
-        mActivity.startActivityForResult(projectionManager.createScreenCaptureIntent(), REQUEST_CODE);
+        mActivity.startActivityForResult(projectionManager.createScreenCaptureIntent(), code);
     }
 
     public void stopRecording() {

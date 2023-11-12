@@ -1,6 +1,10 @@
 package com.example.meeting_android.activity.meeting;
 
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
+import static com.example.meeting_android.activity.meeting.Recorder.RECORDER;
+import static com.example.meeting_android.activity.meeting.Recorder.REQUEST_RECORDER_CODE;
+import static com.example.meeting_android.activity.meeting.Recorder.REQUEST_SCREEN_CODE;
+import static com.example.meeting_android.activity.meeting.Recorder.SCREEN;
 import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.customVideoSink;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
@@ -69,6 +73,7 @@ public class MeetingActivity extends AppCompatActivity {
     public RoomService roomService;
     public RoomController roomController;
     public Recorder recorder;
+    public Recorder screen;
     private boolean isButtonClicked = false;
     private boolean isButtonRecorderClicked = false;
     private String[] filterColor = {"없음","초록","회색"};
@@ -87,7 +92,8 @@ public class MeetingActivity extends AppCompatActivity {
         roomController = new RoomController(this, this);
         roomService = new RoomService(this, this);
         userService = new UserService(this, this);
-        recorder = new Recorder(this, this);
+        recorder = new Recorder(this, this, RECORDER);
+        screen = new Recorder(this, this, SCREEN);
 
         initDialog();
 
@@ -98,6 +104,7 @@ public class MeetingActivity extends AppCompatActivity {
         buttonDialog.setOnClickListener(v->{
             customDialog.show();
         });
+
         selectFilterDialog = new AlertDialog.Builder(this )
                 .setItems(filterColor, new DialogInterface.OnClickListener() {
                     @Override
@@ -128,15 +135,15 @@ public class MeetingActivity extends AppCompatActivity {
     private void onClickButtonNavigation() {
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.tab_mic) {
-                if (webSocketClientManager.peerConnectionClient.isAudio == true) {
-                    item.setIcon(R.drawable.mic_close);
-                }else{
-                    item.setIcon(R.drawable.mic);
-                }
-                webSocketClientManager.peerConnectionClient.onAudioTrackSwitch();
-                return true;
-            }
+//            if (itemId == R.id.tab_mic) {
+//                if (webSocketClientManager.peerConnectionClient.isAudio == true) {
+//                    item.setIcon(R.drawable.mic_close);
+//                }else{
+//                    item.setIcon(R.drawable.mic);
+//                }
+//                webSocketClientManager.peerConnectionClient.onAudioTrackSwitch();
+//                return true;
+//            }
             if (itemId == R.id.tab_video) {
                 if (webSocketClientManager.peerConnectionClient.isCamera == true) {
                     item.setIcon(R.drawable.video_icon_close);
@@ -150,6 +157,10 @@ public class MeetingActivity extends AppCompatActivity {
             }
             if (itemId == R.id.tab_background) {
                 selectFilterDialog.show();
+                return true;
+            }
+            if (itemId == R.id.tab_screen) {
+                screen.startScreenCapture();
                 return true;
             }
             if (itemId == R.id.tab_recorder) {
@@ -313,7 +324,7 @@ public class MeetingActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1000) {
+        if (requestCode == REQUEST_RECORDER_CODE) {
             if (resultCode == RESULT_OK && data != null) {
                 recorder.mediaProjection = recorder.projectionManager.getMediaProjection(resultCode, data);
                 recorder.initVirtualDisplay();
@@ -321,6 +332,14 @@ public class MeetingActivity extends AppCompatActivity {
                 recorderView.setVisibility(View.VISIBLE);
                 isRecording = true;
                 sendRecorderRoom();
+            }
+        }
+
+        if (requestCode == REQUEST_SCREEN_CODE) {
+            if (resultCode == RESULT_OK && data != null) {
+                screen.mediaProjection = screen.projectionManager.getMediaProjection(resultCode, data);
+                screen.initVirtualDisplay();
+                screen.mediaRecorder.start();
             }
         }
     }
