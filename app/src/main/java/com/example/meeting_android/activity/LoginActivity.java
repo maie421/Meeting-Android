@@ -11,7 +11,6 @@ import com.example.meeting_android.R;
 import com.example.meeting_android.api.user.UserController;
 import com.example.meeting_android.common.Common;
 import com.example.meeting_android.databinding.ActivityLoginBinding;
-import com.example.meeting_android.databinding.ActivityMainBinding;
 
 public class LoginActivity extends AppCompatActivity {
     private UserController userController;

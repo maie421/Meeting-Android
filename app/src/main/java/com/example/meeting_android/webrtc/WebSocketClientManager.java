@@ -3,14 +3,12 @@ import com.example.meeting_android.R;
 import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
 import static com.example.meeting_android.activity.chatting.Message.GUIDE;
-import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.customDialog;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.hostRecordName;
 import static com.example.meeting_android.activity.meeting.Recorder.isPermissionMap;
 import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.common.Common.getNowTime;
-import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,27 +21,17 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.example.meeting_android.R;
-import com.example.meeting_android.activity.MainActivity;
 import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
-import org.webrtc.PeerConnection;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;

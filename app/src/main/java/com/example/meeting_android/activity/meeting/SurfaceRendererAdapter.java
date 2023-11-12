@@ -1,5 +1,4 @@
 package com.example.meeting_android.activity.meeting;
-import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,12 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meeting_android.R;
 
-import org.webrtc.AudioTrack;
 import org.webrtc.EglBase;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
@@ -22,7 +19,6 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

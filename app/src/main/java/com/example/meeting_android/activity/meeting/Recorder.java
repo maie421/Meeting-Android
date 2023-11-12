@@ -3,7 +3,6 @@ package com.example.meeting_android.activity.meeting;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.MediaRecorder;
@@ -22,12 +21,6 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.example.meeting_android.R;
-
-import org.w3c.dom.Text;
-import org.webrtc.MediaStream;
-import org.webrtc.PeerConnection;
-
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

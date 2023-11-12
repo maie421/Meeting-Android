@@ -13,10 +13,8 @@ import com.example.meeting_android.R;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
-import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraVideoCapturer;
-import org.webrtc.DataChannel;
 import org.webrtc.EglBase;
 import org.webrtc.EglRenderer;
 import org.webrtc.MediaConstraints;
@@ -30,10 +28,6 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
 import java.util.Map;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     public SurfaceViewRenderer surfaceViewRenderer;
     public String VIDEO_TRACK_ID = "ARDAMSv0";
