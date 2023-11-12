@@ -10,8 +10,11 @@ import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHo
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendOffer;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendRecorderRoom;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendStopRecorderRoom;
+
+import static org.webrtc.VideoFrameDrawer.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -47,6 +50,8 @@ import com.example.meeting_android.common.TokenManager;
 import com.example.meeting_android.webrtc.WebSocketClientManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.EglBase;
@@ -56,6 +61,7 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
 import org.webrtc.ScreenCapturerAndroid;
+import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoCapturer;
@@ -88,7 +94,7 @@ public class MeetingActivity extends AppCompatActivity {
     public RoomService roomService;
     public RoomController roomController;
     public Recorder recorder;
-    public VideoTrack videoTrack;
+    public static VideoTrack screenVideoTrack;
     public Recorder screen;
     private boolean isButtonClicked = false;
     private boolean isButtonRecorderClicked = false;
@@ -105,7 +111,6 @@ public class MeetingActivity extends AppCompatActivity {
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         recorderView = findViewById(R.id.recorderView);
-//        surfaceScreenRenderer = findViewById(R.id.surfaceScreenRenderer);
 
         roomController = new RoomController(this, this);
         roomService = new RoomService(this, this);
@@ -366,22 +371,8 @@ public class MeetingActivity extends AppCompatActivity {
     private void initWebRTC(Intent data){
         VideoCapturer videoCapturer = createVideoCapturer(data);
         MediaStream mediaStream = createMediaStream(videoCapturer);
-        webSocketClientManager.peerConnectionClient.getScreenStream(mediaStream, "화면공유", eglBaseContext, videoTrack);
-
-//
-//        surfaceScreenRenderer.setVisibility(View.VISIBLE);
-//
-//        surfaceScreenRenderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-//            //            첫 번째 프레임이 렌더링되면 콜백이 실행됩니다.
-//            @Override
-//            public void onFirstFrameRendered() {
-//                Log.i("RendererEvents","onFirstFrameRendered");
-//            }
-//            @Override
-//            public void onFrameResolutionChanged(int i, int i1, int i2) {
-//                Log.i("RendererEvents","onFrameResolutionChanged");
-//            }
-//        });
+        webSocketClientManager.peerConnectionClient.getScreenStream(mediaStream, "화면공유", eglBaseContext, screenVideoTrack);
+        webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).addTrack(screenVideoTrack);
     }
     public MediaStream createMediaStream(VideoCapturer videoCapturer){
         EglBase rootEglBase = EglBase.create();
@@ -394,19 +385,18 @@ public class MeetingActivity extends AppCompatActivity {
 
         // 비디오 소스와 트랙 생성
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
-        videoTrack = peerConnectionFactory.createVideoTrack("ARDAMSv0", videoSource);
+        screenVideoTrack = peerConnectionFactory.createVideoTrack("ARDAMSv1", videoSource);
 
         videoCapturer.initialize(surfaceTextureHelper, this, videoSource.getCapturerObserver());
         videoCapturer.startCapture(200, 200, 100);
 
         // 오디오 소스와 트랙 생성
         AudioSource audioSource = peerConnectionFactory.createAudioSource(new MediaConstraints());
-        AudioTrack audioTrack = peerConnectionFactory.createAudioTrack("ARDAMSa0", audioSource);
+        AudioTrack audioTrack = peerConnectionFactory.createAudioTrack("ARDAMSv1", audioSource);
 
         // 미디어 스트림에 비디오 및 오디오 트랙 추가
-        mediaStream.addTrack(videoTrack);
+        mediaStream.addTrack(screenVideoTrack);
         mediaStream.addTrack(audioTrack);
-
 
         return mediaStream;
     }

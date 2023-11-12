@@ -5,10 +5,13 @@ import static com.example.meeting_android.activity.chatting.MemberData.getRandom
 import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.messageCount;
+import static com.example.meeting_android.activity.meeting.MeetingActivity.screenVideoTrack;
+import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localAudioTrack;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.fromName;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendIce;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendOffer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,8 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.meeting_android.R;
 import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
+import com.example.meeting_android.activity.meeting.MeetingActivity;
 import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.DataChannel;
@@ -34,6 +40,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RtpReceiver;
+import org.webrtc.SessionDescription;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
 import org.webrtc.SurfaceTextureHelper;
@@ -47,6 +54,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -147,6 +155,11 @@ public class PeerConnectionClient {
             String  n = String.valueOf(rand.nextInt(1000));
             Log.i("디버그2", "welcome participants " + name);
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
+
+            if (screenVideoTrack != null) {
+                Log.i("화면공유디버그", "화면공유 addTrack :  " + name);
+                peerConnectionMap.get(name).addTrack(screenVideoTrack);
+            }
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
             peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));

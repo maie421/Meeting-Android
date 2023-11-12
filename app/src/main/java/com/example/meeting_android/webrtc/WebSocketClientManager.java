@@ -62,7 +62,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://c1ac-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://82eb-27-35-20-189.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -141,6 +141,7 @@ public class WebSocketClientManager {
             hostRecordName = hostName;
             customDialog.hostView.setText(hostName);
         });
+
         try {
             JSONObject offerData = (JSONObject) args[0];
             _sdp = offerData.getString("sdp");
@@ -325,6 +326,10 @@ public class WebSocketClientManager {
         Log.d(TAG, "sendLeave :" + name);
         mSocket.emit("leave_room", roomName, name);
     }
+
+    public static void sendOffer(JSONObject message, String _name){
+        mSocket.emit("offer", message, roomName, _name, name);
+    }
     public static void sendRecorderRoom() {
         mSocket.emit("recorder_room", roomName);
     }
@@ -343,22 +348,26 @@ public class WebSocketClientManager {
 
         return json;
     }
-    class SimpleSdpObserver implements SdpObserver {
+    public static class SimpleSdpObserver implements SdpObserver {
 
         @Override
         public void onCreateSuccess(SessionDescription sessionDescription) {
+            Log.e("재협상", "setLocalDescription 성공");
         }
 
         @Override
         public void onSetSuccess() {
+            Log.e("재협상", "onSetSuccess");
         }
 
         @Override
         public void onCreateFailure(String s) {
+            Log.e("재협상", "onCreateFailure : "+ s);
         }
 
         @Override
         public void onSetFailure(String s) {
+            Log.e("재협상", "onSetFailure");
         }
 
     }

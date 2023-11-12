@@ -77,6 +77,9 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         customVideoSink.isFirst = true;
         Log.d("디버그","remoteBind");
         initSurfaceViewRenderer(surfaceViewRenderer);
+
+        Log.d("화면공유디버그", String.valueOf(meetingVideo.mediaStream.videoTracks.size()));
+
         VideoTrack remoteVideoTrack = meetingVideo.mediaStream.videoTracks.get(0);
         if (meetingVideo.mediaStream.videoTracks.size() > 0) {
             try {
