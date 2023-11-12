@@ -57,8 +57,7 @@ public class YourForegroundService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // 필요한 경우 여기에서 미디어 프로젝션을 시작하는 로직을 처리합니다.
-        Notification notification = createNotification(); // 적절한 알림을 생성하는 메소드를 구현하십시오.
+        Notification notification = createNotification();
         startForeground(NOTIFICATION_ID, notification);
 
         return START_STICKY;
