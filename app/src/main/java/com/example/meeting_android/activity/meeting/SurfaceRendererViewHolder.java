@@ -87,9 +87,9 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    public void remoteScreen(MeetingVideo meetingVideo){
-//        initSurfaceViewRenderer(surfaceViewRenderer);
-
+    public void localScreen(MeetingVideo meetingVideo){
+        meetingVideo.videoTrack.addSink(surfaceViewRenderer);
+        initScreenSurfaceViewRenderer(surfaceViewRenderer, meetingVideo.eglBaseContext);
     }
 
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
@@ -138,6 +138,18 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    void initScreenSurfaceViewRenderer(SurfaceViewRenderer surfaceViewRenderer, EglBase.Context eglBaseContext){
+        surfaceViewRenderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
+            @Override
+            public void onFirstFrameRendered() {
+                Log.i("RendererEvents","onFirstFrameRendered");
+            }
+            @Override
+            public void onFrameResolutionChanged(int i, int i1, int i2) {
+                Log.i("RendererEvents","onFrameResolutionChanged");
+            }
+        });
+    }
     public VideoTrack getLocalVideo(boolean status){
         VideoCapturer videoCapturer = createCameraCapture(status);
         videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());

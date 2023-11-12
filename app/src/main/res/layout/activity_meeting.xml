@@ -9,31 +9,26 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="652dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
         android:nestedScrollingEnabled="false"
-        app:layout_constraintBottom_toTopOf="@+id/surfaceScreenRenderer"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <org.webrtc.SurfaceViewRenderer
-        android:id="@+id/surfaceScreenRenderer"
-        android:layout_width="wrap_content"
-        android:layout_height="248dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
-        android:layout_width="411dp"
+        app:labelVisibilityMode="labeled"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:itemBackground="@android:color/white"
-        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView"
         app:menu="@menu/btm_navi_menu">
 
         <TextView
@@ -56,11 +51,11 @@
         android:id="@+id/buttonDialog"
         android:layout_width="54dp"
         android:layout_height="54dp"
+        android:layout_marginBottom="607dp"
         android:backgroundTint="@color/gray"
         android:text="V"
         android:textColor="@color/black"
-        app:layout_constraintEnd_toStartOf="@+id/recorderView"
-        app:layout_constraintHorizontal_bias="0.044"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -68,13 +63,13 @@
         android:id="@+id/recorderView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="256dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
         android:visibility="gone"
         android:text="기록중..."
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonDialog"
         app:layout_constraintTop_toTopOf="parent" />
 
 

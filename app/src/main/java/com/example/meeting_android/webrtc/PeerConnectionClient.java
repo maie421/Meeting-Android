@@ -150,7 +150,6 @@ public class PeerConnectionClient {
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
             peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
-
         }
     }
     public void createFirstPeerConnection(String name) {
@@ -285,16 +284,15 @@ public class PeerConnectionClient {
                     addMediaStreamLayout(mediaStream, fromName, "video");
                 }
             });
-
         }
     }
 
-    public void getScreenStream(MediaStream mediaStream, String name) {
+    public void getScreenStream(MediaStream mediaStream, String name, EglBase.Context eglBaseContext, VideoTrack videoTrack) {
         if (mediaStream.videoTracks.size() > 0) {
             gridCount++;
             userRecyclerView.post(new Runnable() {
                 public void run() {
-                    addMediaStreamLayout(mediaStream, name, "screen");
+                    addMediaStreamScreenLayout(mediaStream, name, "screen", eglBaseContext, videoTrack);
                 }
             });
 
@@ -303,6 +301,15 @@ public class PeerConnectionClient {
 
     private void addMediaStreamLayout(MediaStream mediaStream, String name, String type) {
         surfaceRendererAdapter.addMeetingVideo(name, mediaStream, type);
+        addSurfaceRendererAdapter();
+    }
+
+    private void addMediaStreamScreenLayout(MediaStream mediaStream, String name, String type, EglBase.Context eglBaseContext, VideoTrack videoTrack) {
+        surfaceRendererAdapter.addScreenVideo(name, mediaStream, type, eglBaseContext, videoTrack);
+        addSurfaceRendererAdapter();
+    }
+
+    private void addSurfaceRendererAdapter() {
         GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
         layoutManager.setSpanCount(gridCount);
         surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);

@@ -88,12 +88,12 @@ public class MeetingActivity extends AppCompatActivity {
     public RoomService roomService;
     public RoomController roomController;
     public Recorder recorder;
+    public VideoTrack videoTrack;
     public Recorder screen;
     private boolean isButtonClicked = false;
     private boolean isButtonRecorderClicked = false;
     private String[] filterColor = {"없음","초록","회색"};
     private AlertDialog selectFilterDialog;
-    private SurfaceViewRenderer surfaceScreenRenderer;
     private EglBase.Context eglBaseContext;
 
     private int selectBlockFilter = 0;
@@ -105,7 +105,7 @@ public class MeetingActivity extends AppCompatActivity {
         buttonDialog = findViewById(R.id.buttonDialog);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         recorderView = findViewById(R.id.recorderView);
-        surfaceScreenRenderer = findViewById(R.id.surfaceScreenRenderer);
+//        surfaceScreenRenderer = findViewById(R.id.surfaceScreenRenderer);
 
         roomController = new RoomController(this, this);
         roomService = new RoomService(this, this);
@@ -366,27 +366,27 @@ public class MeetingActivity extends AppCompatActivity {
     private void initWebRTC(Intent data){
         VideoCapturer videoCapturer = createVideoCapturer(data);
         MediaStream mediaStream = createMediaStream(videoCapturer);
+        webSocketClientManager.peerConnectionClient.getScreenStream(mediaStream, "화면공유", eglBaseContext, videoTrack);
 
-        surfaceScreenRenderer.setVisibility(View.VISIBLE);
-
-        surfaceScreenRenderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-            //            첫 번째 프레임이 렌더링되면 콜백이 실행됩니다.
-            @Override
-            public void onFirstFrameRendered() {
-                Log.i("RendererEvents","onFirstFrameRendered");
-            }
-            //            렌더링된 프레임 해상도 또는 회전이 변경되면 콜백이 실행됩니다.
-            @Override
-            public void onFrameResolutionChanged(int i, int i1, int i2) {
-                Log.i("RendererEvents","onFrameResolutionChanged");
-            }
-        });
+//
+//        surfaceScreenRenderer.setVisibility(View.VISIBLE);
+//
+//        surfaceScreenRenderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
+//            //            첫 번째 프레임이 렌더링되면 콜백이 실행됩니다.
+//            @Override
+//            public void onFirstFrameRendered() {
+//                Log.i("RendererEvents","onFirstFrameRendered");
+//            }
+//            @Override
+//            public void onFrameResolutionChanged(int i, int i1, int i2) {
+//                Log.i("RendererEvents","onFrameResolutionChanged");
+//            }
+//        });
     }
     public MediaStream createMediaStream(VideoCapturer videoCapturer){
         EglBase rootEglBase = EglBase.create();
         eglBaseContext = rootEglBase.getEglBaseContext();
         SurfaceTextureHelper surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
-
 
         // MediaStream 생성
         PeerConnectionFactory peerConnectionFactory = webSocketClientManager.peerConnectionClient.peerConnectionFactory;
@@ -394,7 +394,7 @@ public class MeetingActivity extends AppCompatActivity {
 
         // 비디오 소스와 트랙 생성
         VideoSource videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
-        VideoTrack videoTrack = peerConnectionFactory.createVideoTrack("ARDAMSv0", videoSource);
+        videoTrack = peerConnectionFactory.createVideoTrack("ARDAMSv0", videoSource);
 
         videoCapturer.initialize(surfaceTextureHelper, this, videoSource.getCapturerObserver());
         videoCapturer.startCapture(200, 200, 100);
@@ -407,8 +407,6 @@ public class MeetingActivity extends AppCompatActivity {
         mediaStream.addTrack(videoTrack);
         mediaStream.addTrack(audioTrack);
 
-        VideoTrack stream = peerConnectionFactory.createVideoTrack("ARDAMSv0", videoSource);
-        stream.addSink(surfaceScreenRenderer);
 
         return mediaStream;
     }

@@ -18,6 +18,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoTrack;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
         }
 
         if (Objects.equals(meetingVideo.type, "screen")){
-            holder.remoteScreen(meetingVideo);
+            holder.localScreen(meetingVideo);
         }
     }
 
@@ -84,6 +85,10 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
 
     public void addMeetingVideo(String userName, MediaStream mediaStream, String type){
         MeetingVideo meetingVideo = new MeetingVideo(userName, mediaStream, type);
+        this.meetings.add(meetingVideo);
+    }
+    public void addScreenVideo(String userName, MediaStream mediaStream, String type, EglBase.Context eglBase, VideoTrack videoTrack){
+        MeetingVideo meetingVideo = new MeetingVideo(userName, mediaStream, type, eglBase, videoTrack);
         this.meetings.add(meetingVideo);
     }
 
