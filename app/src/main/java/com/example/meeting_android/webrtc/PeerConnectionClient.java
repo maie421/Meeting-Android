@@ -24,6 +24,8 @@ import com.example.meeting_android.activity.chatting.MemberData;
 import com.example.meeting_android.activity.chatting.Message;
 import com.example.meeting_android.activity.meeting.SurfaceRendererAdapter;
 
+import org.webrtc.AudioSource;
+import org.webrtc.AudioTrack;
 import org.webrtc.DataChannel;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
@@ -35,8 +37,10 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.SoftwareVideoDecoderFactory;
 import org.webrtc.SoftwareVideoEncoderFactory;
 import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoCapturer;
 import org.webrtc.VideoDecoderFactory;
 import org.webrtc.VideoEncoderFactory;
+import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
 import java.nio.ByteBuffer;
@@ -145,7 +149,6 @@ public class PeerConnectionClient {
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
             peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
-
             peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
 
         }
@@ -274,27 +277,45 @@ public class PeerConnectionClient {
         });
     }
 
-    private void getRemoteStream(MediaStream mediaStream) {
+    public void getRemoteStream(MediaStream mediaStream) {
         if (mediaStream.videoTracks.size() > 0) {
             gridCount++;
             userRecyclerView.post(new Runnable() {
                 public void run() {
-                    Log.d("미디어","미디어 추가: "+ fromName);
-                    surfaceRendererAdapter.addMeetingVideo(fromName, mediaStream);
-                    GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
-                    layoutManager.setSpanCount(gridCount);
-                    surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
+                    addMediaStreamLayout(mediaStream, fromName, "video");
                 }
             });
 
         }
     }
-//
+
+    public void getScreenStream(MediaStream mediaStream, String name) {
+        if (mediaStream.videoTracks.size() > 0) {
+            gridCount++;
+            userRecyclerView.post(new Runnable() {
+                public void run() {
+                    addMediaStreamLayout(mediaStream, name, "screen");
+                }
+            });
+
+        }
+    }
+
+    private void addMediaStreamLayout(MediaStream mediaStream, String name, String type) {
+        surfaceRendererAdapter.addMeetingVideo(name, mediaStream, type);
+        GridLayoutManager layoutManager = (GridLayoutManager) userRecyclerView.getLayoutManager();
+        layoutManager.setSpanCount(gridCount);
+        surfaceRendererAdapter.notifyItemInserted(surfaceRendererAdapter.getItemCount() - 1);
+    }
+
+    //
     public void onCameraSwitch(){
         localVideoTrack.setEnabled(isCamera = !isCamera);
     }
     public void onAudioTrackSwitch(){
         localAudioTrack.setEnabled(isAudio = !isAudio);
     }
+
+
 }
 

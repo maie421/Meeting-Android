@@ -57,10 +57,16 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public void onBindViewHolder(@NonNull SurfaceRendererViewHolder holder, int position) {
         MeetingVideo meetingVideo = meetings.get(position);
 
-        if (meetings.size() <= 1) {
-            holder.localBind();
-        }else {
-            holder.remoteBind(meetingVideo);
+        if (Objects.equals(meetingVideo.type, "video")) {
+            if (meetings.size() <= 1) {
+                holder.localBind();
+            } else {
+                holder.remoteBind(meetingVideo);
+            }
+        }
+
+        if (Objects.equals(meetingVideo.type, "screen")){
+            holder.remoteScreen(meetingVideo);
         }
     }
 
@@ -76,8 +82,8 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
         notifyItemInserted(meetings.size() - 1);
     }
 
-    public void addMeetingVideo(String userName, MediaStream mediaStream){
-        MeetingVideo meetingVideo = new MeetingVideo(userName, mediaStream);
+    public void addMeetingVideo(String userName, MediaStream mediaStream, String type){
+        MeetingVideo meetingVideo = new MeetingVideo(userName, mediaStream, type);
         this.meetings.add(meetingVideo);
     }
 

@@ -18,6 +18,7 @@ import org.webrtc.CameraVideoCapturer;
 import org.webrtc.EglBase;
 import org.webrtc.EglRenderer;
 import org.webrtc.MediaConstraints;
+import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
@@ -86,6 +87,11 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    public void remoteScreen(MeetingVideo meetingVideo){
+//        initSurfaceViewRenderer(surfaceViewRenderer);
+
+    }
+
     void initSurfaceViewRenderer(SurfaceViewRenderer view){
         Log.d("디버그","initSurfaceViewRenderer");
         view.setMirror(false);
@@ -133,7 +139,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     }
 
     public VideoTrack getLocalVideo(boolean status){
-        VideoCapturer videoCapturer = createCameraCapturer(status);
+        VideoCapturer videoCapturer = createCameraCapture(status);
         videoSource = peerConnectionFactory.createVideoSource(videoCapturer.isScreencast());
 
         videoCapturer.initialize(surfaceTextureHelper, mActivity, videoSource.getCapturerObserver());
@@ -149,7 +155,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         return localAudioTrack;
     }
 
-    private VideoCapturer createCameraCapturer(boolean isFront) {
+    private VideoCapturer createCameraCapture(boolean isFront) {
         Camera2Enumerator enumerator = new Camera2Enumerator(mContext);
 
         final String[] deviceNames = enumerator.getDeviceNames();
