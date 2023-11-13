@@ -325,7 +325,7 @@ public class PeerConnectionClient {
                 surfaceTextureHelperList.add(mediaStreamId);
                 userRecyclerView.post(new Runnable() {
                     public void run() {
-                        addMediaStreamScreenLayout(mediaStream, name, "screen", eglBaseContext, videoTrack);
+                        addMediaStreamScreenLayout(mediaStream, name, "localScreen", eglBaseContext, videoTrack);
                     }
                 });
 
@@ -336,7 +336,7 @@ public class PeerConnectionClient {
     private void addMediaStreamLayout(MediaStream mediaStream, String name) {
         gridCount++;
         if (Objects.equals(mediaStream.videoTracks.get(0).id(), "ARDAMSv1")) {
-            surfaceRendererAdapter.addMeetingVideo(name, mediaStream, "video");
+            surfaceRendererAdapter.addMeetingVideo(name, mediaStream, "remoteScreen");
         } else {
             surfaceRendererAdapter.addMeetingVideo(name, mediaStream, "video");
         }

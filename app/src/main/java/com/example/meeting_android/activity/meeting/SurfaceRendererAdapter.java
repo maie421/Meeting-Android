@@ -21,6 +21,7 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,16 +61,14 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public void onBindViewHolder(@NonNull SurfaceRendererViewHolder holder, int position) {
         MeetingVideo meetingVideo = meetings.get(position);
 
-        if (Objects.equals(meetingVideo.type, "video")) {
+        if (Objects.equals(meetingVideo.type, "localScreen")){
+            holder.localScreen(meetingVideo);
+        }else{
             if (meetings.size() <= 1) {
                 holder.localBind();
             } else {
                 holder.remoteBind(meetingVideo);
             }
-        }
-
-        if (Objects.equals(meetingVideo.type, "screen")){
-            holder.localScreen(meetingVideo);
         }
     }
 

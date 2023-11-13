@@ -328,6 +328,7 @@ public class MeetingActivity extends AppCompatActivity {
         webSocketClientManager.peerConnectionClient.peerConnectionMap.clear();
         peerDataChannelnMap.clear();
         webSocketClientManager.offerList.clear();
+        webSocketClientManager.peerConnectionClient.surfaceTextureHelperList.clear();
         messages.clear();
         sendLeave();
 
@@ -378,37 +379,7 @@ public class MeetingActivity extends AppCompatActivity {
         webSocketClientManager.peerConnectionClient.getScreenStream(mediaStream, "화면공유", eglBaseContext, screenVideoTrack);
         webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).addTrack(screenVideoTrack);
 
-//        webSocketClientManager.peerConnectionClient.createPeerConnection("11");
         mSocket.emit("join_room", roomName, name);
-//        Iterator<String> keys = webSocketClientManager.peerConnectionClient.peerConnectionMap.keySet().iterator();
-
-//        while( keys.hasNext() ) {
-//            String strKey = keys.next();
-//            if (!Objects.equals(strKey, name)) {
-//                Log.e(TAG, "재협상 - " + "name : " + name + "strKey :" + strKey);
-//                webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).createOffer(new WebSocketClientManager.SimpleSdpObserver() {
-//                    @Override
-//                    public void onCreateSuccess(SessionDescription sessionDescription) {
-//                        JSONObject message = new JSONObject();
-//                        try {
-//                            message.put("type", "offer");
-//                            message.put("sdp", sessionDescription.description);
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//
-//                        sendOffer(message, strKey);
-//                        webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new WebSocketClientManager.SimpleSdpObserver() {
-//                            @Override
-//                            public void onSetFailure(String error) {
-//                                Log.e(TAG, "setLocalDescription failed: " + error + "( " + name + " )");
-//                            }
-//                        }, sessionDescription);
-//                    }
-//                }, webSocketClientManager.peerConnectionClient.sdpMediaConstraints);
-//            }
-//        }
-
     }
     public MediaStream createMediaStream(VideoCapturer videoCapturer){
         EglBase rootEglBase = EglBase.create();
