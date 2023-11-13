@@ -156,11 +156,11 @@ public class PeerConnectionClient {
             Log.i("디버그2", "welcome participants " + name);
             peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
 
+            peerConnectionMap.get(name).addTrack(localVideoTrack);
             if (screenVideoTrack != null) {
                 Log.i("화면공유디버그", "화면공유 addTrack :  " + name);
                 peerConnectionMap.get(name).addTrack(screenVideoTrack);
             }
-            peerConnectionMap.get(name).addTrack(localVideoTrack);
             peerConnectionMap.get(name).addTrack(localAudioTrack);
             peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
         }
