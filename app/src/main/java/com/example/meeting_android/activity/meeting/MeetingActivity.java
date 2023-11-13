@@ -9,6 +9,8 @@ import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.customVideoSink;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.mSocket;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.roomName;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendOffer;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendRecorderRoom;
@@ -61,6 +63,7 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
 import org.webrtc.ScreenCapturerAndroid;
+import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.SurfaceViewRenderer;
@@ -73,6 +76,7 @@ import org.webrtc.VideoTrack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import retrofit2.Call;
@@ -373,6 +377,38 @@ public class MeetingActivity extends AppCompatActivity {
         MediaStream mediaStream = createMediaStream(videoCapturer);
         webSocketClientManager.peerConnectionClient.getScreenStream(mediaStream, "화면공유", eglBaseContext, screenVideoTrack);
         webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).addTrack(screenVideoTrack);
+
+//        webSocketClientManager.peerConnectionClient.createPeerConnection("11");
+        mSocket.emit("join_room", roomName, name);
+//        Iterator<String> keys = webSocketClientManager.peerConnectionClient.peerConnectionMap.keySet().iterator();
+
+//        while( keys.hasNext() ) {
+//            String strKey = keys.next();
+//            if (!Objects.equals(strKey, name)) {
+//                Log.e(TAG, "재협상 - " + "name : " + name + "strKey :" + strKey);
+//                webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).createOffer(new WebSocketClientManager.SimpleSdpObserver() {
+//                    @Override
+//                    public void onCreateSuccess(SessionDescription sessionDescription) {
+//                        JSONObject message = new JSONObject();
+//                        try {
+//                            message.put("type", "offer");
+//                            message.put("sdp", sessionDescription.description);
+//                        } catch (JSONException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//
+//                        sendOffer(message, strKey);
+//                        webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).setLocalDescription(new WebSocketClientManager.SimpleSdpObserver() {
+//                            @Override
+//                            public void onSetFailure(String error) {
+//                                Log.e(TAG, "setLocalDescription failed: " + error + "( " + name + " )");
+//                            }
+//                        }, sessionDescription);
+//                    }
+//                }, webSocketClientManager.peerConnectionClient.sdpMediaConstraints);
+//            }
+//        }
+
     }
     public MediaStream createMediaStream(VideoCapturer videoCapturer){
         EglBase rootEglBase = EglBase.create();

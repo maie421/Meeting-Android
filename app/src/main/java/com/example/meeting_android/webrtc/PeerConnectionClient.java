@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class PeerConnectionClient {
@@ -78,7 +79,9 @@ public class PeerConnectionClient {
     public SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
     public int gridCount = 1;
-    public PeerConnectionClient(Context context, Activity activity, String name){
+    public List<String> surfaceTextureHelperList = new ArrayList<String>();
+
+    public PeerConnectionClient(Context context, Activity activity, String name) {
         this.mContext = context;
         this.mActivity = activity;
 
@@ -86,7 +89,7 @@ public class PeerConnectionClient {
 
         initPeer(name);
 
-        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity, mContext, new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnectionMap ,sdpMediaConstraints, surfaceTextureHelper, name);
+        surfaceRendererAdapter = new SurfaceRendererAdapter(mActivity, mContext, new ArrayList<>(), eglBaseContext, peerConnectionFactory, peerConnectionMap, sdpMediaConstraints, surfaceTextureHelper, name);
         userRecyclerView.setAdapter(surfaceRendererAdapter);
         userRecyclerView.setItemAnimator(null);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 1, GridLayoutManager.HORIZONTAL, false);
@@ -95,6 +98,7 @@ public class PeerConnectionClient {
 
         surfaceRendererAdapter.addMeetingVideoName(name);
     }
+
     private void initPeer(String name) {
         PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions
                 .builder(mContext)
@@ -118,7 +122,7 @@ public class PeerConnectionClient {
         List<PeerConnection.IceServer> iceServers = new ArrayList<>();
         PeerConnection.IceServer stunServer = PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer();
         PeerConnection.IceServer stunServer1 = PeerConnection.IceServer.builder("stun:stun1.l.google.com:19302").createIceServer();
-        PeerConnection.IceServer stunServer2= PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer();
+        PeerConnection.IceServer stunServer2 = PeerConnection.IceServer.builder("stun:stun2.l.google.com:19302").createIceServer();
         PeerConnection.IceServer stunServer3 = PeerConnection.IceServer.builder("stun:stun3.l.google.com:19302").createIceServer();
         PeerConnection.IceServer stunServer4 = PeerConnection.IceServer.builder("stun:stun4.l.google.com:19302").createIceServer();
         PeerConnection.IceServer turnServer = PeerConnection.IceServer.builder("turn:15.165.75.15:3478")
@@ -139,32 +143,33 @@ public class PeerConnectionClient {
         surfaceTextureHelper = SurfaceTextureHelper.create(Thread.currentThread().getName(), eglBaseContext);
 
         sdpMediaConstraints = new MediaConstraints();
-        sdpMediaConstraints.mandatory.add(
-                new MediaConstraints.KeyValuePair("OfferToReceiveAudioChannel", "true"));
         sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
                 "OfferToReceiveVideoChannel", "true"));
+        sdpMediaConstraints.mandatory.add(
+                new MediaConstraints.KeyValuePair("OfferToReceiveAudioChannel", "true"));
 
         pcObserver();
         createFirstPeerConnection(name);
     }
 
     public void createPeerConnection(String name) {
-        if (peerConnectionMap.get(name) == null) {
-            Random rand = new Random();
+//        if (peerConnectionMap.get(name) == null) {
+        Random rand = new Random();
 
-            String  n = String.valueOf(rand.nextInt(1000));
-            Log.i("디버그2", "welcome participants " + name);
-            peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
+        String n = String.valueOf(rand.nextInt(1000));
+        Log.i("디버그2", "welcome participants " + name);
+        peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
 
-            peerConnectionMap.get(name).addTrack(localVideoTrack);
-            if (screenVideoTrack != null) {
-                Log.i("화면공유디버그", "화면공유 addTrack :  " + name);
-                peerConnectionMap.get(name).addTrack(screenVideoTrack);
-            }
-            peerConnectionMap.get(name).addTrack(localAudioTrack);
-            peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
+        peerConnectionMap.get(name).addTrack(localVideoTrack);
+        peerConnectionMap.get(name).addTrack(localAudioTrack);
+        if (screenVideoTrack != null) {
+            Log.i("화면공유디버그", "화면공유 addTrack :  " + name);
+            peerConnectionMap.get(name).addTrack(screenVideoTrack);
         }
+        peerDataChannelnMap.put(n, peerConnectionMap.get(name).createDataChannel(name, new DataChannel.Init()));
+//        }
     }
+
     public void createFirstPeerConnection(String name) {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
     }
@@ -173,53 +178,58 @@ public class PeerConnectionClient {
         pcObserver = new PeerConnection.Observer() {
             @Override
             public void onSignalingChange(PeerConnection.SignalingState signalingState) {
-                Log.d(TAG, "onSignalingChange : "+String.valueOf(signalingState));
+                Log.d(TAG, "onSignalingChange : " + String.valueOf(signalingState));
             }
 
             // ICE (Interactive Connectivity Establishment) 연결 상태 변경에 대한 콜백
             @Override
             public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
-                Log.d(TAG, "onIceConnectionChange : "+ iceConnectionState);
+                Log.d(TAG, "onIceConnectionChange : " + iceConnectionState);
 
             }
+
             // ICE 연결 수신 상태가 변경될 때 호출되는 콜백
             @Override
             public void onIceConnectionReceivingChange(boolean b) {
-                Log.d(TAG, "onIceConnectionReceivingChange : "+ b);
+                Log.d(TAG, "onIceConnectionReceivingChange : " + b);
             }
+
             // ICE 후보 수집 상태 변경에 대한 콜백
             @Override
             public void onIceGatheringChange(PeerConnection.IceGatheringState iceGatheringState) {
-                Log.d(TAG, "onIceGatheringChange : "+ iceGatheringState);
+                Log.d(TAG, "onIceGatheringChange : " + iceGatheringState);
             }
+
             // 새 ICE 후보가 생성될 때 호출되는 콜백
             @Override
             public void onIceCandidate(IceCandidate iceCandidate) {
-                Log.d(TAG, "onIceCandidate : "+ iceCandidate);
-
                 sendIce(iceCandidate);
             }
+
             // 제거된 ICE 후보에 대한 콜백
             @Override
             public void onIceCandidatesRemoved(IceCandidate[] iceCandidates) {
-                Log.d(TAG, "onIceCandidatesRemoved : "+ iceCandidates);
+                Log.d(TAG, "onIceCandidatesRemoved : " + iceCandidates);
             }
+
             // 새로운 미디어 스트림이 추가될 때 호출되는 콜백
             @Override
             public void onAddStream(MediaStream mediaStream) {
                 Log.d(TAG, "onAddStream : " + mediaStream);
                 getRemoteStream(mediaStream);
             }
+
             // 제거된 미디어 스트림에 대한 콜백
             @Override
             public void onRemoveStream(MediaStream mediaStream) {
 
             }
+
             // 데이터 채널이 생성될 때 호출되는 콜백
             @Override
             public void onDataChannel(DataChannel dataChannel) {
-                Log.d(CHATTING_TAG, "onDataChannel : "+ dataChannel.label());
-                Log.d(CHATTING_TAG, "onDataChannel : "+ dataChannel);
+                Log.d(CHATTING_TAG, "onDataChannel : " + dataChannel.label());
+                Log.d(CHATTING_TAG, "onDataChannel : " + dataChannel);
                 dataChannel.registerObserver(new DataChannel.Observer() {
                     @Override
                     public void onBufferedAmountChange(long l) {
@@ -237,11 +247,13 @@ public class PeerConnectionClient {
                     }
                 });
             }
+
             // 재협상이 필요한 경우 호출되는 콜백
             @Override
             public void onRenegotiationNeeded() {
                 Log.d(TAG, "onRenegotiationNeeded");
             }
+
             // 트랙이 추가될 때 호출되는 콜백
             @Override
             public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
@@ -262,9 +274,9 @@ public class PeerConnectionClient {
         String firstMessage = new String(bytes, Charset.defaultCharset());
         String type = firstMessage.substring(0, 2);
 
-         if (type.equals("-s")) {
-             addMessage(firstMessage, MESSAGE);
-         }
+        if (type.equals("-s")) {
+            addMessage(firstMessage, MESSAGE);
+        }
     }
 
     private void addMessage(String firstMessage, String type) {
@@ -277,9 +289,9 @@ public class PeerConnectionClient {
         Log.d(CHATTING_TAG, "텍스트: " + _text);
         MemberData memberData = new MemberData(_name, getRandomColor());
         Message message = new Message(_text, memberData, false, type, _time);
-        if (messageAdapter == null){
+        if (messageAdapter == null) {
             messages.add(message);
-        }else {
+        } else {
             messageAdapter.add(message);
         }
         mActivity.runOnUiThread(() -> {
@@ -291,33 +303,48 @@ public class PeerConnectionClient {
 
     public void getRemoteStream(MediaStream mediaStream) {
         if (mediaStream.videoTracks.size() > 0) {
-            gridCount++;
-            userRecyclerView.post(new Runnable() {
-                public void run() {
-                    addMediaStreamLayout(mediaStream, fromName, "video");
-                }
-            });
+            String mediaStreamId = mediaStream.videoTracks.get(0).id();
+
+            if (!surfaceTextureHelperList.contains(mediaStreamId)) {
+
+                surfaceTextureHelperList.add(mediaStreamId);
+                userRecyclerView.post(new Runnable() {
+                    public void run() {
+                        addMediaStreamLayout(mediaStream, fromName);
+                    }
+                });
+            }
         }
     }
 
     public void getScreenStream(MediaStream mediaStream, String name, EglBase.Context eglBaseContext, VideoTrack videoTrack) {
         if (mediaStream.videoTracks.size() > 0) {
-            gridCount++;
-            userRecyclerView.post(new Runnable() {
-                public void run() {
-                    addMediaStreamScreenLayout(mediaStream, name, "screen", eglBaseContext, videoTrack);
-                }
-            });
+            String mediaStreamId = videoTrack.id();
 
+            if (!surfaceTextureHelperList.contains(mediaStreamId)) {
+                surfaceTextureHelperList.add(mediaStreamId);
+                userRecyclerView.post(new Runnable() {
+                    public void run() {
+                        addMediaStreamScreenLayout(mediaStream, name, "screen", eglBaseContext, videoTrack);
+                    }
+                });
+
+            }
         }
     }
 
-    private void addMediaStreamLayout(MediaStream mediaStream, String name, String type) {
-        surfaceRendererAdapter.addMeetingVideo(name, mediaStream, type);
+    private void addMediaStreamLayout(MediaStream mediaStream, String name) {
+        gridCount++;
+        if (Objects.equals(mediaStream.videoTracks.get(0).id(), "ARDAMSv1")) {
+            surfaceRendererAdapter.addMeetingVideo(name, mediaStream, "video");
+        } else {
+            surfaceRendererAdapter.addMeetingVideo(name, mediaStream, "video");
+        }
         addSurfaceRendererAdapter();
     }
 
     private void addMediaStreamScreenLayout(MediaStream mediaStream, String name, String type, EglBase.Context eglBaseContext, VideoTrack videoTrack) {
+        gridCount++;
         surfaceRendererAdapter.addScreenVideo(name, mediaStream, type, eglBaseContext, videoTrack);
         addSurfaceRendererAdapter();
     }
@@ -329,10 +356,11 @@ public class PeerConnectionClient {
     }
 
     //
-    public void onCameraSwitch(){
+    public void onCameraSwitch() {
         localVideoTrack.setEnabled(isCamera = !isCamera);
     }
-    public void onAudioTrackSwitch(){
+
+    public void onAudioTrackSwitch() {
         localAudioTrack.setEnabled(isAudio = !isAudio);
     }
 

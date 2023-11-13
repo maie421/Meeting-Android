@@ -44,7 +44,7 @@ public class WebSocketClientManager {
     public static String roomName;
     public static String name;
     public static String fromName;
-    private static Socket mSocket;
+    public static Socket mSocket;
     public PeerConnectionClient peerConnectionClient;
     public Boolean isDuplicateRecording = false;
     public List<String> offerList;
@@ -149,7 +149,6 @@ public class WebSocketClientManager {
             name = (String) args[1];
             socketId = (String) args[2];
             fromName = (String) args[3];
-            Log.d(TAG2, "onOffer "+ name);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -162,13 +161,15 @@ public class WebSocketClientManager {
             offerList.add(socketId);
             peerConnectionClient.createPeerConnection(socketId);
             Log.i(TAG2, "createPeerConnection " + socketId);
+        }else {
+            peerConnectionClient.createPeerConnection(socketId);
         }
 
         // 로컬 PeerConnection에 Offer를 설정
         peerConnectionClient.peerConnectionMap.get(socketId).setRemoteDescription(new SimpleSdpObserver() {
             @Override
             public void onSetFailure(String error) {
-                Log.e(TAG, "setRemoteDescription failed: " + error + "( "+ socketId +" )");
+                Log.e(TAG2, "setRemoteDescription failed: " + error + "( "+ socketId +" )");
             }
         }, sdp);
         Log.i(TAG2, "setRemoteDescription " + socketId);
@@ -180,7 +181,7 @@ public class WebSocketClientManager {
                 peerConnectionClient.peerConnectionMap.get(socketId).setLocalDescription(new SimpleSdpObserver() {
                     @Override
                     public void onSetFailure(String error) {
-                        Log.e(TAG, "setRemoteDescription1 failed: " + error + "( "+ socketId +" )");
+                        Log.e(TAG2, "setLocalDescription failed: " + error + "( "+ socketId +" )");
                     }
                 }, sessionDescription);
 
@@ -328,6 +329,7 @@ public class WebSocketClientManager {
     }
 
     public static void sendOffer(JSONObject message, String _name){
+        Log.d(TAG, "sendOffer 재협상:" + name);
         mSocket.emit("offer", message, roomName, _name, name);
     }
     public static void sendRecorderRoom() {

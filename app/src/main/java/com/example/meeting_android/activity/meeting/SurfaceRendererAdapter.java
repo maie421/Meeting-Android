@@ -20,6 +20,7 @@ import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoTrack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +36,7 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
     public Activity mActivity;
     public Context mContext;
     public String name;
+
     public SurfaceRendererAdapter(Activity activity, Context context, List<MeetingVideo> meetings, EglBase.Context eglBaseContext, PeerConnectionFactory peerConnectionFactory, Map<String, PeerConnection> peerConnectionMap, MediaConstraints sdpMediaConstraints, SurfaceTextureHelper surfaceTextureHelper, String name) {
         this.meetings = meetings;
         this.eglBaseContext = eglBaseContext;

@@ -78,9 +78,6 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         Log.d("디버그","remoteBind");
         initSurfaceViewRenderer(surfaceViewRenderer);
 
-//        Log.d("화면공유디버그", String.valueOf(meetingVideo.mediaStream.videoTracks.size()));
-        Log.d("화면공유디버그", meetingVideo.mediaStream.videoTracks.get(0).id());
-
         VideoTrack remoteVideoTrack = meetingVideo.mediaStream.videoTracks.get(0);
         if (meetingVideo.mediaStream.videoTracks.size() > 0) {
             try {
@@ -161,7 +158,7 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
         videoCapturer.initialize(surfaceTextureHelper, mActivity, videoSource.getCapturerObserver());
         videoCapturer.startCapture(200, 200, 100);
 
-        return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
+        return peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID+name, videoSource);
     }
 
     private AudioTrack getAudioTrack() {
