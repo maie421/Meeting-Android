@@ -161,7 +161,7 @@ public class PeerConnectionClient {
         peerConnectionMap.put(name, peerConnectionFactory.createPeerConnection(configuration, pcObserver));
 
         peerConnectionMap.get(name).addTrack(localVideoTrack);
-        peerConnectionMap.get(name).addTrack(localAudioTrack);
+//        peerConnectionMap.get(name).addTrack(localAudioTrack);
         if (screenVideoTrack != null) {
             Log.i("화면공유디버그", "화면공유 addTrack :  " + name);
             peerConnectionMap.get(name).addTrack(screenVideoTrack);
