@@ -242,6 +242,10 @@ public class WebSocketClientManager {
             messageAdapter.add(message);
         }
 
+        if (peerConnectionClient.surfaceTextureHelperList.contains("ARDAMSv0"+msg)) {
+            peerConnectionClient.surfaceTextureHelperList.remove("ARDAMSv0"+msg);
+        }
+
         if (peerConnectionClient.gridCount >= 2) {
             int i = peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
             peerConnectionClient.peerConnectionMap.get(name).close();
@@ -316,7 +320,9 @@ public class WebSocketClientManager {
     };
 
     public void deleteScreenLayoutManager() {
-        peerConnectionClient.surfaceTextureHelperList.clear();
+        if (peerConnectionClient.surfaceTextureHelperList.contains("ARDAMSv1")) {
+            peerConnectionClient.surfaceTextureHelperList.remove("ARDAMSv1");
+        }
         if (peerConnectionClient.gridCount >= 2) {
             int i = peerConnectionClient.surfaceRendererAdapter.deleteScreenVideo();
             peerConnectionClient.surfaceTextureHelperList.clear();

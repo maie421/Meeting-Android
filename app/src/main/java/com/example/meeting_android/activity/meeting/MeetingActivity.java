@@ -190,9 +190,7 @@ public class MeetingActivity extends AppCompatActivity {
                     screen.stopScreen();
                     screen.isScreen = false;
                     webSocketClientManager.deleteScreenLayoutManager();
-
                     deleteVideoTrack();
-
                     screenVideoTrack = null;
                 }else {
                     screen.startScreenCapture();
@@ -363,11 +361,11 @@ public class MeetingActivity extends AppCompatActivity {
 
         if (screen.isScreen){
             screen.stopScreen();
-            isRecording = false;
+            screen.isScreen = false;
+            screenVideoTrack = null;
+            deleteVideoTrack();
         }
 
-        deleteVideoTrack();
-        screenVideoTrack = null;
     }
 
     @Override
