@@ -242,9 +242,7 @@ public class WebSocketClientManager {
             messageAdapter.add(message);
         }
 
-        if (peerConnectionClient.surfaceTextureHelperList.contains("ARDAMSv0"+msg)) {
-            peerConnectionClient.surfaceTextureHelperList.remove("ARDAMSv0"+msg);
-        }
+        peerConnectionClient.surfaceTextureHelperList.clear();
 
         if (peerConnectionClient.gridCount >= 2) {
             int i = peerConnectionClient.surfaceRendererAdapter.deleteMeetingVideo(msg);
