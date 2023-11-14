@@ -1,5 +1,8 @@
 package com.example.meeting_android.activity.meeting;
 
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendStopRecorderRoom;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendStopScreenRoom;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +36,7 @@ public class Recorder {
     public Activity mActivity;
     public Context mContext;
     public static boolean isRecording;
+    public boolean isScreen;
     public static Map<String, Boolean> isPermissionMap = new HashMap<>();
     public MediaRecorder mediaRecorder;
     public MediaProjectionManager projectionManager;
@@ -108,6 +112,24 @@ public class Recorder {
         TextView recorderView = mActivity.findViewById(R.id.recorderView);
         recorderView.setVisibility(View.GONE);
 
+        stopMediaRecorder();
+
+        String baseDirectory = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String audioFileName = "AUDIO_" + timeStamp + ".mp3"; // Use ".mp3" or ".aac" if required
+        String fullAudioFilePath = baseDirectory + "/Music/" + audioFileName;
+        extractAudioFromVideo(mFileName, fullAudioFilePath);
+
+        sendStopRecorderRoom();
+    }
+
+    public void stopScreen(){
+        isScreen = false;
+        stopMediaRecorder();
+        sendStopScreenRoom();
+    }
+
+    private void stopMediaRecorder() {
         if (mediaRecorder != null) {
             mediaRecorder.stop();
             mediaRecorder.reset();
@@ -121,12 +143,6 @@ public class Recorder {
         if (mediaProjection != null) {
             mediaProjection.stop();
         }
-
-        String baseDirectory = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String audioFileName = "AUDIO_" + timeStamp + ".mp3"; // Use ".mp3" or ".aac" if required
-        String fullAudioFilePath = baseDirectory + "/Music/" + audioFileName;
-        extractAudioFromVideo(mFileName, fullAudioFilePath);
     }
 
     private void extractAudioFromVideo(String videoFilePath, String outputAudioFilePath) {

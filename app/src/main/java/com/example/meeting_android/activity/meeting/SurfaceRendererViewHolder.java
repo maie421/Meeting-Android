@@ -140,16 +140,19 @@ public class SurfaceRendererViewHolder extends RecyclerView.ViewHolder {
     }
 
     void initScreenSurfaceViewRenderer(SurfaceViewRenderer surfaceViewRenderer, EglBase.Context eglBaseContext){
-        surfaceViewRenderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
-            @Override
-            public void onFirstFrameRendered() {
-                Log.i("RendererEvents","onFirstFrameRendered");
-            }
-            @Override
-            public void onFrameResolutionChanged(int i, int i1, int i2) {
-                Log.i("RendererEvents","onFrameResolutionChanged");
-            }
-        });
+        if (!isRendererInitialized) {
+            surfaceViewRenderer.init(eglBaseContext,  new RendererCommon.RendererEvents() {
+                @Override
+                public void onFirstFrameRendered() {
+                    Log.i("RendererEvents","onFirstFrameRendered");
+                }
+                @Override
+                public void onFrameResolutionChanged(int i, int i1, int i2) {
+                    Log.i("RendererEvents","onFrameResolutionChanged");
+                }
+            });
+            isRendererInitialized = true;
+        }
     }
     public VideoTrack getLocalVideo(boolean status){
         VideoCapturer videoCapturer = createCameraCapture(status);

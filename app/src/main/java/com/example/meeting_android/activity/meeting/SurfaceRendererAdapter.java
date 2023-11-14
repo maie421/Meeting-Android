@@ -101,7 +101,18 @@ public class SurfaceRendererAdapter extends RecyclerView.Adapter<SurfaceRenderer
                 return i;
             }
         }
-        return 404;
+        return -1;
+    }
+
+    public int deleteScreenVideo(){
+        for(int i = 0 ; i< meetings.size() ; i++){
+            if (Objects.equals(meetings.get(i).type, "localScreen") || Objects.equals(meetings.get(i).type, "remoteScreen")){
+                Log.d("meetings","미디어 삭제 : " + meetings.get(i).name);
+                meetings.remove(i);
+                return i;
+            }
+        }
+        return -1;
     }
     public void clearMeetingVideo(){
         this.meetings.clear();

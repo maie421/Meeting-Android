@@ -73,6 +73,7 @@ public class WebSocketClientManager {
             mSocket.on("recorder_room", onRecorder);
             mSocket.on("recorder_name", onRecorder);
             mSocket.on("stop_recorder_room", onStopRecorder);
+            mSocket.on("stop_screen_room", onStopScreen);
             mSocket.on("change_host", onChangeHost);
             mSocket.connect();
 
@@ -247,7 +248,7 @@ public class WebSocketClientManager {
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (i != 404) {
+                    if (i != -1) {
                         Log.d("미디어","나간 회원 if 문 들어옴:" + i);
                         peerConnectionClient.surfaceRendererAdapter.notifyItemRemoved(i);
                         GridLayoutManager layoutManager = (GridLayoutManager) peerConnectionClient.userRecyclerView.getLayoutManager();
@@ -290,7 +291,6 @@ public class WebSocketClientManager {
 
     private Emitter.Listener onStopRecorder = args -> {
         Log.d("녹화", "onStopRecorder");
-        String roomName = (String) args[0];
         mActivity.runOnUiThread(new Runnable() {
             TextView recorderView = mActivity.findViewById(R.id.recorderView);
             @Override
@@ -304,6 +304,35 @@ public class WebSocketClientManager {
             }
         });
     };
+    private Emitter.Listener onStopScreen = args -> {
+        Log.d("화면공유", "onStopScreen");
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("화면 공유", "isRecording 비 활성화");
+                deleteScreenLayoutManager();
+            }
+        });
+    };
+
+    public void deleteScreenLayoutManager() {
+        peerConnectionClient.surfaceTextureHelperList.clear();
+        if (peerConnectionClient.gridCount >= 2) {
+            int i = peerConnectionClient.surfaceRendererAdapter.deleteScreenVideo();
+            peerConnectionClient.surfaceTextureHelperList.clear();
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (i != -1) {
+                        peerConnectionClient.surfaceRendererAdapter.notifyItemRemoved(i);
+                        GridLayoutManager layoutManager = (GridLayoutManager) peerConnectionClient.userRecyclerView.getLayoutManager();
+                        layoutManager.setSpanCount(--peerConnectionClient.gridCount);
+                    }
+                }
+            });
+        }
+    }
+
     private void startRecorder(String roomName) {
         TextView recorderView = mActivity.findViewById(R.id.recorderView);
         recorderView.setVisibility(View.VISIBLE);
@@ -337,6 +366,10 @@ public class WebSocketClientManager {
     }
     public static void sendStopRecorderRoom() {
         mSocket.emit("stop_recorder_room", roomName);
+    }
+
+    public static void sendStopScreenRoom() {
+        mSocket.emit("stop_screen_room", roomName);
     }
     private static JSONObject toJsonCandidate(final IceCandidate candidate) {
         JSONObject json = new JSONObject();

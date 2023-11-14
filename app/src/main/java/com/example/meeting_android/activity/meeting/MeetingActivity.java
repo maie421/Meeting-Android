@@ -7,12 +7,10 @@ import static com.example.meeting_android.activity.meeting.Recorder.REQUEST_SCRE
 import static com.example.meeting_android.activity.meeting.Recorder.SCREEN;
 import static com.example.meeting_android.activity.meeting.Recorder.isRecording;
 import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.customVideoSink;
-import static com.example.meeting_android.activity.meeting.SurfaceRendererViewHolder.localVideoTrack;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.mSocket;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.roomName;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendLeave;
-import static com.example.meeting_android.webrtc.WebSocketClientManager.sendOffer;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendRecorderRoom;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.sendStopRecorderRoom;
 
@@ -62,6 +60,7 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
+import org.webrtc.RtpSender;
 import org.webrtc.ScreenCapturerAndroid;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
@@ -187,7 +186,17 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_screen) {
-                screen.startScreenCapture();
+                if (screen.isScreen){
+                    screen.stopScreen();
+                    screen.isScreen = false;
+                    webSocketClientManager.deleteScreenLayoutManager();
+
+                    deleteVideoTrack();
+
+                    screenVideoTrack = null;
+                }else {
+                    screen.startScreenCapture();
+                }
                 return true;
             }
             if (itemId == R.id.tab_recorder) {
@@ -230,6 +239,18 @@ public class MeetingActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    private void deleteVideoTrack() {
+        RtpSender sender = webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).getSenders()
+                .stream()
+                .filter(rtpSender -> rtpSender.track() == screenVideoTrack)
+                .findFirst()
+                .orElse(null);
+
+        if (sender != null) {
+            webSocketClientManager.peerConnectionClient.peerConnectionMap.get(name).removeTrack(sender);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -336,10 +357,17 @@ public class MeetingActivity extends AppCompatActivity {
             //host 만
             if (hostRecordName.equals(name)) {
                 recorder.stopRecording();
-                sendStopRecorderRoom();
             }
             isRecording = false;
         }
+
+        if (screen.isScreen){
+            screen.stopScreen();
+            isRecording = false;
+        }
+
+        deleteVideoTrack();
+        screenVideoTrack = null;
     }
 
     @Override
@@ -369,6 +397,7 @@ public class MeetingActivity extends AppCompatActivity {
                 screen.initVirtualDisplay();
                 screen.mediaRecorder.start();
                 initWebRTC(data);
+                screen.isScreen = true;
             }
         }
     }
