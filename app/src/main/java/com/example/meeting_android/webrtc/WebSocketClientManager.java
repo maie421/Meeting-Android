@@ -325,7 +325,6 @@ public class WebSocketClientManager {
         }
         if (peerConnectionClient.gridCount >= 2) {
             int i = peerConnectionClient.surfaceRendererAdapter.deleteScreenVideo();
-            peerConnectionClient.surfaceTextureHelperList.clear();
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

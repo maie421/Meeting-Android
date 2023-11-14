@@ -186,14 +186,26 @@ public class MeetingActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.tab_screen) {
-                if (screen.isScreen){
-                    screen.stopScreen();
-                    screen.isScreen = false;
-                    webSocketClientManager.deleteScreenLayoutManager();
-                    deleteVideoTrack();
-                    screenVideoTrack = null;
-                }else {
-                    screen.startScreenCapture();
+                isButtonRecorderClicked = true;
+                if (hostRecordName.equals(name)) {
+                    if (screen.isScreen) {
+                        screen.stopScreen();
+                        screen.isScreen = false;
+                        webSocketClientManager.deleteScreenLayoutManager();
+                        deleteVideoTrack();
+                        screenVideoTrack = null;
+                    } else {
+                        screen.startScreenCapture();
+                    }
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            isButtonRecorderClicked = false;
+                        }
+                    }, 3000);  // 예: 1초 동안 클릭 무시
+                }else{
+                    Toast.makeText(this, "호스트만 기록할 수 있습니다.", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -360,10 +372,12 @@ public class MeetingActivity extends AppCompatActivity {
         }
 
         if (screen.isScreen){
-            screen.stopScreen();
-            screen.isScreen = false;
-            screenVideoTrack = null;
-            deleteVideoTrack();
+            if (hostRecordName.equals(name)) {
+                screen.stopScreen();
+                screen.isScreen = false;
+                screenVideoTrack = null;
+                deleteVideoTrack();
+            }
         }
 
     }
