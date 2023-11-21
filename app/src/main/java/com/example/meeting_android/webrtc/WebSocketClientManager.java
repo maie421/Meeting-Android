@@ -160,11 +160,9 @@ public class WebSocketClientManager {
 
         if (!offerList.contains(socketId)) {
             offerList.add(socketId);
-            peerConnectionClient.createPeerConnection(socketId);
             Log.i(TAG2, "createPeerConnection " + socketId);
-        }else {
-            peerConnectionClient.createPeerConnection(socketId);
         }
+        peerConnectionClient.createPeerConnection(socketId);
 
         // 로컬 PeerConnection에 Offer를 설정
         peerConnectionClient.peerConnectionMap.get(socketId).setRemoteDescription(new SimpleSdpObserver() {
