@@ -5,8 +5,8 @@ import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.common.Common.getNowTime;
 import static com.example.meeting_android.webrtc.PeerConnectionClient.peerDataChannelnMap;
 import static com.example.meeting_android.webrtc.WebSocketClientManager.name;
+import static com.example.meeting_android.webrtc.WebSocketClientManager.sendWebMessage;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -63,7 +63,8 @@ public class ChattingMainActivity extends AppCompatActivity {
             Message message = new Message(messageString, memberData, true, MESSAGE, time);
             messageAdapter.add(message);
 
-            peerDataChannelnMap.forEach((key, value)->{
+            sendWebMessage("-s" +name+"::"+messageString+"::"+ time);
+            peerDataChannelnMap.forEach((key, dvalue)->{
                 ByteBuffer data = stringToByteBuffer("-s" +name+"::"+messageString+"::"+ time, Charset.defaultCharset());
                 Log.d(CHATTING_TAG, "send data : "+ data + " key : " + key);
                 peerDataChannelnMap.get(key).send(new DataChannel.Buffer(data, false));

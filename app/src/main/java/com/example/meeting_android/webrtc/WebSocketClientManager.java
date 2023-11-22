@@ -3,6 +3,7 @@ import com.example.meeting_android.R;
 import static com.example.meeting_android.activity.chatting.ChattingMainActivity.messageAdapter;
 import static com.example.meeting_android.activity.chatting.MemberData.getRandomColor;
 import static com.example.meeting_android.activity.chatting.Message.GUIDE;
+import static com.example.meeting_android.activity.chatting.Message.MESSAGE;
 import static com.example.meeting_android.activity.chatting.MessageAdapter.messages;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.customDialog;
 import static com.example.meeting_android.activity.meeting.MeetingActivity.hostRecordName;
@@ -32,6 +33,8 @@ import org.webrtc.SessionDescription;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -62,7 +65,7 @@ public class WebSocketClientManager {
     private void connect(){
         Log.d(TAG,"소켓 연결");
         try {
-            mSocket = IO.socket("https://9f0c-221-148-25-236.ngrok-free.app");
+            mSocket = IO.socket("https://12ff-221-148-25-236.ngrok-free.app");
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
             mSocket.on("welcome", onWelcome);
@@ -75,6 +78,7 @@ public class WebSocketClientManager {
             mSocket.on("stop_recorder_room", onStopRecorder);
             mSocket.on("stop_screen_room", onStopScreen);
             mSocket.on("change_host", onChangeHost);
+            mSocket.on("send_android_message", onSendAndroidMessage);//web 으로 부터 메세지 받아오기
             mSocket.connect();
 
             mSocket.emit("join_room", roomName, name);
@@ -350,12 +354,23 @@ public class WebSocketClientManager {
             }
         });
     };
+
+    private Emitter.Listener onSendAndroidMessage = args -> {
+        String msg = (String) args[0];
+        if (!Objects.equals(peerConnectionClient.doubleMessage, msg)) {
+            peerConnectionClient.addMessage(msg, MESSAGE);
+        }
+    };
+
     public static void sendIce(IceCandidate iceCandidate) {
         mSocket.emit("ice", toJsonCandidate(iceCandidate), roomName);
     }
     public static void sendLeave() {
         Log.d(TAG, "sendLeave :" + name);
         mSocket.emit("leave_room", roomName, name);
+    }
+    public static void sendWebMessage(String msg) {
+        mSocket.emit("send_web_message", roomName, msg);
     }
 
     public static void sendOffer(JSONObject message, String _name){

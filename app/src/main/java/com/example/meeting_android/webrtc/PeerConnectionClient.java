@@ -79,6 +79,7 @@ public class PeerConnectionClient {
     public SurfaceRendererAdapter surfaceRendererAdapter;
     public RecyclerView userRecyclerView;
     public int gridCount = 1;
+    public String doubleMessage;
     public List<String> surfaceTextureHelperList = new ArrayList<String>();
 
     public PeerConnectionClient(Context context, Activity activity, String name) {
@@ -275,11 +276,12 @@ public class PeerConnectionClient {
         String type = firstMessage.substring(0, 2);
 
         if (type.equals("-s")) {
+            doubleMessage = firstMessage;
             addMessage(firstMessage, MESSAGE);
         }
     }
 
-    private void addMessage(String firstMessage, String type) {
+    public void addMessage(String firstMessage, String type) {
         String _message = firstMessage.substring(2, firstMessage.length());
         String[] parts = _message.split("::");
         String _name = parts[0];
@@ -306,7 +308,6 @@ public class PeerConnectionClient {
             String mediaStreamId = mediaStream.videoTracks.get(0).id();
 
             if (!surfaceTextureHelperList.contains(mediaStreamId)) {
-
                 surfaceTextureHelperList.add(mediaStreamId);
                 userRecyclerView.post(new Runnable() {
                     public void run() {
