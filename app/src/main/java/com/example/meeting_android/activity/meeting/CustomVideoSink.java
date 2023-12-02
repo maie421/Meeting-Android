@@ -5,7 +5,9 @@ import org.webrtc.VideoSource;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
+/**
+ * 비디오 프레임
+ */
 public class CustomVideoSink implements VideoSink {
     private VideoSink target;
     public VideoSource videoSource;
@@ -40,7 +42,6 @@ public class CustomVideoSink implements VideoSink {
         target.onFrame(filteredFrame);
 
     }
-
     public VideoFrame applyGreenFilter(VideoFrame frame){
         VideoFrame.I420Buffer i420 = frame.getBuffer().toI420();
 
