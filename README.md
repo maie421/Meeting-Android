@@ -6,10 +6,6 @@
 ### api server 
 https://github.com/maie421/Meeting-API
 
-## skill
-- Node.js 20
-- pug
-
 ## 기능
 - 마이크
 - 카메라
