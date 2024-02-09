@@ -24,4 +24,4 @@ https://github.com/maie421/Meeting-API
 ![287443339-649ad248-f504-41aa-ba0f-36aecc2312d0-ezgif com-video-to-gif-converter](https://github.com/maie421/Meeting-Android/assets/35258834/17cac569-2b50-4ec6-8ac3-507d3afd0db3)
 
 
-https://github.com/maie421/Meeting-Signaling-Server/assets/35258834/55623d53-515c-4367-a572-8457b6eb0a8a
+![287441451-55623d53-515c-4367-a572-8457b6eb0a8a-ezgif com-video-to-gif-converter](https://github.com/maie421/Meeting-Android/assets/35258834/9fa86e56-4b66-466d-bda0-7f0db22c39e4)
